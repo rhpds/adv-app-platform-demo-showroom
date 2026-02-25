@@ -1,0 +1,274 @@
+= Module 4: Developer Hub and catalog
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+*Presenter note*: This is the first module of Section 2 (Advanced Developer Services). Fast forward from Section 1: the Parasol application and its components are now registered in the Red Hat Developer Hub catalog. This module introduces Developer Lightspeed for MTA (tell not show), then demonstrates the RHDH catalog, Lightspeed Q&A, and self-service capabilities including environment provisioning and component scaffolding. Target duration: 15 minutes across 3 parts.
+
+[NOTE]
+====
+**Presenter note:** Section 2 picks up where Section 1 left off. The foundational platform is in place. Now the organization is ready to adopt advanced developer services that improve discoverability, self-service, and software supply chain security.
+====
+
+[#part-1]
+== Part 1 — Developer Lightspeed for MTA (tell not show)
+
+=== Know
+
+_In Section 1, we discussed how Parasol used MTA to migrate their legacy application. Now, Red Hat Developer Lightspeed takes that modernization story further by bringing AI-assisted migration analysis directly into the developer's IDE. This section is a talk track only — we discuss the capability but do not demonstrate it live._
+
+**Business challenge:**
+
+* Application modernization analysis requires specialized expertise that is scarce
+* Developers unfamiliar with migration patterns waste time on manual code refactoring
+* Migration recommendations from tools like MTA still require interpretation and manual implementation
+* Organizations have hundreds of applications waiting to be modernized with limited migration capacity
+
+**Current state at Parasol:**
+
+* Parasol has successfully migrated their flagship application using MTA (as shown in Section 1)
+* Dozens of additional applications in the portfolio still need modernization
+* Developers lack migration expertise and need guided assistance for refactoring tasks
+* The migration backlog grows faster than the team can address manually
+
+**Value proposition:**
+
+Developer Lightspeed integrates AI-powered assistance directly into the developer's IDE within DevSpaces. For migration scenarios, it can interpret MTA analysis results and suggest specific code changes, helping developers implement migration recommendations without deep expertise in legacy frameworks. This accelerates the modernization backlog by making every developer capable of contributing to migration work.
+
+=== Show
+
+[NOTE]
+====
+**Presenter note:** This section is a talk track only. Developer Lightspeed for MTA is discussed but not shown live. Use the talking points below to set context for the audience.
+====
+
+**What I say:**
+
+"In Section 1, we showed how MTA analyzed Parasol's legacy application and guided the migration to Quarkus. But what about the next 50 applications in the portfolio? That is where Developer Lightspeed comes in.
+
+Developer Lightspeed is an AI-powered assistant that integrates directly into the developer's IDE within DevSpaces. For migration scenarios, it reads the MTA analysis report and helps developers implement the recommended changes. Instead of needing a migration expert for every application, any developer can use Lightspeed to understand what needs to change and get AI-generated code suggestions for the refactoring.
+
+This turns migration from a bottleneck into a scalable activity. Every developer becomes capable of contributing to the modernization backlog, which dramatically accelerates the organization's transformation timeline."
+
+**If asked:**
+
+Q: "Is Developer Lightspeed available today?"::
+A: "Developer Lightspeed is part of Red Hat Developer Hub. It integrates with large language models to provide code assistance, including migration-specific guidance when combined with MTA analysis results."
+
+Q: "Which LLM does it use?"::
+A: "Developer Lightspeed supports multiple model backends. Organizations can use Red Hat-hosted models or bring their own, depending on their security and data residency requirements."
+
+'''
+
+[#part-2]
+== Part 2 — Exploring the RHDH catalog
+
+=== Know
+
+_Red Hat Developer Hub (RHDH) provides a centralized catalog where developers can discover applications, components, APIs, and documentation. The Parasol application and all its components — frontend, backend, Kafka, database — are registered as a system in the catalog, making it easy for any developer to understand the architecture and find what they need._
+
+**Business challenge:**
+
+* Developers spend excessive time discovering services, APIs, and documentation across fragmented tools
+* No single source of truth for what components exist, who owns them, and how they relate
+* Tribal knowledge about application architecture is lost when team members leave
+* New developers have no structured way to learn the system landscape
+
+**Current state at Parasol:**
+
+* Application documentation is scattered across wikis, READMEs, and tribal knowledge
+* Developers regularly ask teammates for API endpoints, service locations, and dependency information
+* No centralized view of which components provide or consume which APIs
+* Onboarding a new developer to the application landscape takes weeks of knowledge transfer
+
+**Value proposition:**
+
+RHDH provides a centralized, searchable catalog of all applications, components, APIs, and documentation. The Parasol application is registered as a "system" with its frontend, backend, database, and Kafka components linked together. Developers can browse the catalog to understand relationships, find API documentation, and discover available services without asking anyone. Documentation lives alongside code as docs-as-code, ensuring it stays current.
+
+=== Show
+
+**What I say:**
+
+"Now let me show you what Developer Hub looks like in practice. The Parasol application and all its components have been registered in the catalog. A developer joining the team can discover everything they need without asking a single question."
+
+**What I do:**
+
+. Open **Red Hat Developer Hub** at {rhdh_url}
+
+. Navigate to the **Catalog** in the left sidebar:
+* Show the list of registered entities (applications, components, APIs)
+* Point out that the Parasol application appears as a **System** with multiple components underneath it
+* "Everything related to the Parasol application is organized here: the frontend, the backend, the database, Kafka. A new developer can see the entire landscape in seconds."
+
+. Click on the **Parasol Insurance** system to show the system view:
+* Show all components registered under the system: frontend, backend, database, Kafka
+* Point out the **"depends-on"** and **"provides"** associations between components
+* Show the **provided APIs** and **consumed APIs** for each component
+* "The catalog captures how components relate to each other. The backend depends on the database and Kafka. The frontend consumes the backend API. A developer can trace these relationships without reading architecture documents or asking teammates."
+
+. Click on a component (e.g., the backend service) to show the component detail view:
+* Show the **Overview** tab with ownership, lifecycle, and system information
+* Show the **Docs** tab with rendered documentation (docs-as-code from the repository)
+* Show the **API** tab with provided and consumed API definitions
+* "Notice the documentation. It is rendered directly from the repository, written as code alongside the application. When the code changes, the docs stay current. No more stale wikis."
+
+. Demonstrate **Developer Lightspeed** by asking a question about the application:
+* Open the Lightspeed chat panel (AI assistant) in Developer Hub
+* Type a question about the Parasol application, for example: "What APIs does the Parasol backend provide?" or "How does the claims service connect to Kafka?"
+* Show the AI response with relevant information pulled from the catalog and documentation
+* "Developers can ask natural language questions about the application. Lightspeed uses the catalog data and documentation to provide answers. Instead of searching through wikis or interrupting teammates, the developer asks the AI."
+
+// TODO: Add screenshot of RHDH catalog showing the Parasol system with components
+image::rhdh-catalog-parasol-system.png[Red Hat Developer Hub catalog showing the Parasol Insurance system with frontend and backend and Kafka and database components,link=self,window=blank,align="center",width=700,title="Parasol system in the Developer Hub catalog"]
+
+// TODO: Add screenshot of component detail view with docs-as-code
+image::rhdh-component-docs.png[Developer Hub component detail view showing rendered documentation from the repository,link=self,window=blank,align="center",width=700,title="Docs-as-code rendered directly from the repository"]
+
+// TODO: Add screenshot of Developer Lightspeed answering a question about the app
+image::rhdh-lightspeed-question.png[Developer Lightspeed AI assistant answering a question about the Parasol application using catalog and documentation data,link=self,window=blank,align="center",width=700,title="Developer Lightspeed answers questions about the application"]
+
+**What they should notice:**
+
+* The catalog provides a complete, structured view of the application landscape
+* Components are linked together with explicit relationships (depends-on, provides, consumes)
+* Documentation is rendered from the repository, not a separate wiki. It stays current automatically.
+* Developer Lightspeed provides AI-powered Q&A about the application, reducing onboarding friction
+* No tickets, no asking teammates, no searching through scattered tools
+
+**Business value callout:**
+
+"At Parasol, onboarding a new developer to the application landscape takes weeks of knowledge transfer. With Developer Hub, a developer can explore the entire system in minutes: see all the components, understand how they relate, read current documentation, and even ask the AI questions. That weeks-long knowledge transfer just became self-service."
+
+**If asked:**
+
+Q: "Who maintains the catalog data?"::
+A: "The catalog is populated from `catalog-info.yaml` files in each repository. When a team registers their component, the catalog data stays in sync with the code. The platform team manages the overall catalog configuration, but individual teams own their component registrations."
+
+Q: "Can we integrate internal APIs from other teams?"::
+A: "Yes. Any team can register their APIs in the catalog. This creates a self-service API marketplace where developers can discover and consume APIs across the organization without knowing which team owns them."
+
+Q: "How does Lightspeed know about our application?"::
+A: "Lightspeed uses the catalog data, registered APIs, and docs-as-code content to answer questions. It has context about the relationships between components, the API contracts, and the documentation. As the catalog grows, Lightspeed becomes more useful."
+
+'''
+
+[#part-3]
+== Part 3 — Self-service and component templating
+
+=== Know
+
+_Beyond discovery, RHDH provides self-service capabilities that allow developers to provision development environments and create new components from templates. Instead of filing tickets and waiting for operations teams, developers use golden path templates that the platform team has pre-approved._
+
+**Business challenge:**
+
+* Provisioning development infrastructure (namespaces, databases, message queues) requires tickets and wait times
+* No standardized way to create new components that follow organizational patterns
+* Each team reinvents project structure, CI/CD configuration, and deployment manifests
+* Shadow IT emerges when developers bypass slow provisioning processes
+
+**Current state at Parasol:**
+
+* Creating a new development environment takes 3-5 days of ticket processing
+* New components are created ad hoc with inconsistent project structures
+* Teams copy-paste configurations from existing projects, propagating technical debt
+* Platform team is a bottleneck for all infrastructure provisioning requests
+
+**Value proposition:**
+
+RHDH templates provide golden path self-service for developers. The platform team creates templates that include everything needed to bootstrap a new component: project structure, CI/CD pipeline configuration, deployment manifests, and catalog registration. Developers select a template, fill in a few parameters, and the platform provisions everything automatically, including Kafka topics, database schemas, namespaces, and Git repositories. The new component is automatically registered in the catalog and linked to the parent system.
+
+=== Show
+
+**What I say:**
+
+"The catalog solves discovery. Now let me show you self-service. Our developer needs a new development environment and a new component for the Parasol application. Traditionally, this means filing a ticket, waiting days for a namespace, another ticket for a Kafka topic, another for a database. Let me show you how that changes."
+
+**What I do:**
+
+. In **Developer Hub**, navigate to the **Create** section in the left sidebar
+
+. First, show the **development environment** template:
+* Select a template for provisioning a new development environment
+* Walk through the template form:
+** **Environment name**: `parasol-dev-claims-ai`
+** **Namespace**: Automatically provisioned on OpenShift
+** **Kafka topics**: Select the topics needed for development
+** **Database**: Provision a development database instance
+* Click **Create** and show the provisioning progress
+* "In one step, the developer has a fully provisioned development environment: namespace, Kafka topics, database. No tickets, no waiting. The platform team defined this template, and the developer consumes it."
+
++
+[NOTE]
+====
+**Presenter tip:** Emphasize that the developer did not need to contact anyone. The platform team pre-approved these templates with the right resource limits and security policies. The developer gets what they need instantly, within guardrails.
+====
+
+. Next, show the **component scaffolding** template:
+* Navigate back to **Create** and select a template for a new Parasol component
+* Walk through the template form:
+** **Component name**: `claims-ai-router`
+** **Description**: `AI-powered claims email routing service`
+** **System**: Select "Parasol Insurance" from the system entitypicker (automatically links the new component to the existing Parasol system via catalog.yaml)
+** **Repository**: Git repository automatically created in GitLab
+* Click **Create** and show the provisioning progress:
+** Git repository created in GitLab with project scaffolding
+** CI/CD pipeline configured
+** Component registered in the RHDH catalog and linked to the Parasol system
+** "The developer now has a fully scaffolded component with a Git repository, a pipeline, and catalog registration. All from a single template."
+
+. Click the link to **open the new component in DevSpaces**:
+* Show the workspace starting up with the correct tooling
+* Show the project structure: source code scaffolding, `pom.xml` with dependencies, `devfile.yaml`, pipeline configuration
+* "The developer is ready to start coding. The template handled all the boilerplate: project structure, build configuration, pipeline definition, and catalog registration."
+
+// TODO: Add screenshot of the development environment template form
+image::rhdh-env-template.png[Developer Hub software template form for provisioning a new development environment with namespace and Kafka and database options,link=self,window=blank,align="center",width=700,title="Self-service development environment provisioning"]
+
+// TODO: Add screenshot of the component template form with system entitypicker
+image::rhdh-component-template.png[Developer Hub software template form for scaffolding a new component with system entitypicker linking to Parasol,link=self,window=blank,align="center",width=700,title="Scaffolding a new component with golden path template"]
+
+// TODO: Add screenshot of the scaffolded component open in DevSpaces
+image::devspaces-scaffolded-component.png[DevSpaces IDE showing the scaffolded component project structure with source code and pipeline configuration,link=self,window=blank,align="center",width=700,title="Scaffolded component ready for development in DevSpaces"]
+
+**What they should notice:**
+
+* Two self-service actions replaced days of ticket processing: environment provisioning and component scaffolding
+* The developer did not contact anyone, file a ticket, or wait for infrastructure
+* The system entitypicker automatically linked the new component to the Parasol system in the catalog
+* The scaffolded project includes everything: source code structure, dependencies, pipeline, catalog registration
+* The developer landed in DevSpaces ready to code, setting up Module 5
+
+**Business value callout:**
+
+"What you just saw would normally take Parasol a week: file a ticket for a namespace, wait for IT to provision it, file another ticket for Kafka topics, wait again, file another for a database, wait again. Then manually create a project, copy-paste pipeline configurations from another project, and register it somewhere. The developer just did all of that in under a minute with two templates. No tickets, no waiting, no IT bottleneck."
+
+**If asked:**
+
+Q: "Who creates and maintains the templates?"::
+A: "The platform team creates and maintains the templates. They define what infrastructure is provisioned, what project structure is scaffolded, and what pipeline is configured. Templates are version-controlled and reviewed like any other code."
+
+Q: "Can templates enforce organizational standards?"::
+A: "Yes. Templates are the golden path. They include the organization's approved project structure, dependency versions, pipeline configuration, and security policies. Every component created from a template follows the same standards."
+
+Q: "What if a developer needs something not covered by a template?"::
+A: "Developers can request new templates from the platform team, or the platform team can create a more flexible template with optional parameters. The goal is to cover the most common patterns as golden paths while allowing flexibility for edge cases."
+
+== Module 4 summary
+
+=== What we demonstrated
+
+In this module, you saw how Red Hat Developer Hub transforms the developer experience at scale:
+
+. **AI-assisted modernization** — Developer Lightspeed extends the MTA story by helping developers implement migration recommendations with AI guidance
+. **Centralized catalog** — RHDH provides a single source of truth for all applications, components, APIs, and documentation, with AI-powered Q&A through Lightspeed
+. **Self-service provisioning** — Golden path templates allow developers to provision environments and create new components with all infrastructure provisioned automatically
+
+=== Setting up Module 5
+
+Our developer has a fully provisioned development environment and a scaffolded component open in DevSpaces. In Module 5, we will see how they develop within this component using the Dependency Analytics plugin to catch vulnerabilities, then create a merge request that triggers the secure build pipeline.
+
+=== Presenter transition
+
+[NOTE]
+====
+**Presenter tip:** The transition to Module 5 should emphasize the shift from setup to development: "Our developer now has a fully provisioned component with everything they need. Let's see what happens when they start working on the code and discover a dependency vulnerability."
+====

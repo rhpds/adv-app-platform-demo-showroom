@@ -1,0 +1,363 @@
+= Module 1: Developer experience (dev inner loop)
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+*Presenter note*: This module sets the scene with application modernization context, then follows a new developer joining Parasol who opens the app in DevSpaces and adds a feature using Quarkus dev mode. The developer intentionally does not add a unit test, which sets up the pipeline failure in Module 2. The module closes with a platform engineer perspective on managing DevSpaces environments. Target duration: 15 minutes across 4 parts.
+
+[#part-1]
+== Part 1 — Setting the scene: Application modernization
+
+=== Know
+
+_Before Parasol Insurance could modernize their development practices, they first had to modernize their application. Their core insurance platform was a monolithic Java EE application running on a traditional application server. The Migration Toolkit for Applications (MTA) helped them analyze, plan, and execute the migration to Quarkus on OpenShift._
+
+**Business challenge:**
+
+* Legacy Java EE monolith is expensive to maintain and difficult to extend with new features
+* Traditional application server licensing costs are increasing year over year
+* The monolith cannot take advantage of cloud native capabilities like auto-scaling and containerization
+* New developers need deep knowledge of legacy APIs and patterns before they can contribute
+
+**Current state at Parasol:**
+
+* The core insurance platform has been running on a traditional Java EE application server for over a decade
+* Feature releases take months due to the complexity of the monolithic codebase
+* Only a handful of senior developers understand the full application architecture
+* The application cannot run in containers without significant rework
+
+**Value proposition:**
+
+The Migration Toolkit for Applications (MTA) provides automated analysis of existing applications, identifying migration issues, estimating effort, and providing guided remediation steps. For Parasol, MTA analyzed their Java EE application and provided a clear path to modernize to Quarkus, a cloud native Java framework optimized for OpenShift. This migration is the foundation for everything we demonstrate in this demo: without a modernized, cloud native application, the developer experience improvements, automated pipelines, and platform operations capabilities would not be possible.
+
+=== Show
+
+[NOTE]
+====
+**Presenter note:** This section is a talk track only. There is no live demo for the MTA migration. The application has already been migrated. Use the talking points below to set the context for the audience.
+====
+
+**What I say:**
+
+"Before we dive into the developer experience, let me set the stage. Parasol Insurance had a challenge that many of you probably recognize: a core business application built on legacy Java EE, running on a traditional application server. It worked, but it was expensive to maintain, slow to update, and could not take advantage of modern cloud native capabilities.
+
+Parasol used the Migration Toolkit for Applications, or MTA, which is included with their OpenShift subscription, to analyze their application. MTA scanned the codebase and identified every Java EE API, every proprietary dependency, and every pattern that needed to change. It generated a detailed migration report with specific remediation steps, categorized by effort level.
+
+The key insight from MTA's analysis was that Parasol's application was a strong candidate for migration to Quarkus, Red Hat's cloud native Java framework. Quarkus is designed from the ground up for OpenShift and Kubernetes: fast startup times, low memory footprint, and a developer experience built around live reload and continuous testing.
+
+Parasol completed this migration, and the application you are about to see running in this demo is the result. It is a modern Quarkus application, containerized, running on OpenShift, and ready to take advantage of every platform capability we are going to show you.
+
+The important thing to understand is that this modernization step is the foundation. Without it, none of the developer experience improvements, automated pipelines, or platform operations capabilities we are about to demonstrate would be possible. MTA made that transition practical and de-risked."
+
+**Business value callout:**
+
+"Application modernization is often the first and most critical step in an enterprise platform transformation. MTA reduces the risk and effort of migration by providing automated analysis and guided remediation. For Parasol, this unlocked the ability to adopt cloud native development practices, automated CI/CD, and platform-managed operations, all of which we will see in this demo."
+
+**If asked:**
+
+Q: "How long did the migration take?"::
+A: "Migration timelines vary based on application complexity. MTA categorizes issues by effort level, so teams can plan iteratively. Many organizations start with the highest-value, lowest-effort migrations and build momentum. MTA also supports analyzing Spring Boot applications for migration to Quarkus, as well as migrations between OpenShift versions."
+
+Q: "Can you show us MTA?"::
+A: "MTA is available as part of the OpenShift platform. In this demo we focus on the results of the migration, the modernized Quarkus application, and what it enables. For a detailed MTA walkthrough, there are dedicated MTA demos and workshops available."
+
+Q: "Does MTA handle all types of migrations?"::
+A: "MTA supports a wide range of migration paths: Java EE to Quarkus, Spring Boot to Quarkus, WebLogic to JBoss EAP, and migrations between OpenShift versions. It also supports cloud-to-cloud migrations. The analysis rules are extensible, so teams can add custom rules for proprietary frameworks."
+
+Q: "What about the database and other dependencies?"::
+A: "MTA focuses on the application code and configuration. Database migrations, schema changes, and infrastructure dependencies are handled separately, though MTA's analysis identifies those dependencies so teams can plan accordingly."
+
+'''
+
+[#part-2]
+== Part 2 — Standardized development with DevSpaces
+
+=== Know
+
+_With the Parasol application modernized to Quarkus, new developers still face a common challenge: setting up their development environment. Dependencies conflict, IDE configurations differ across teams, and "works on my machine" remains a constant source of friction. Red Hat OpenShift Dev Spaces eliminates this entirely._
+
+**Business challenge:**
+
+* New developer onboarding takes 1-2 weeks before the first line of code is written
+* Local environment inconsistencies cause integration failures and rework
+* Developers maintain their own tooling, creating security blind spots and configuration drift
+* Teams waste hours each sprint troubleshooting environment-specific issues
+
+**Current state at Parasol:**
+
+* 200+ developers each maintaining unique local configurations
+* 15-20 hours per developer per quarter lost to environment troubleshooting
+* No standardization across teams for IDE versions, SDK versions, or code formatting rules
+* Security team has no visibility into developer workstations
+
+**Value proposition:**
+
+Cloud-based development environments eliminate local setup entirely. Every developer gets an identical, pre-configured workspace in seconds, complete with the correct SDK versions, extensions, and security policies. The devfile in the application repository defines the workspace configuration, so the platform engineer defines it once and every developer consumes it automatically. This is the "golden path" for development environments.
+
+=== Show
+
+**What I say:**
+
+"Now let me introduce you to our new developer. They have just joined the Parasol team and need to start working on the insurance application. Traditionally, their first 1-2 weeks would be spent setting up a local development environment: installing the right Java version, configuring the IDE, connecting to databases, getting the build to work. Let me show you how we eliminate that entirely."
+
+**What I do:**
+
+. Open the **OpenShift web console** at {console_url} and navigate to the **Developer** perspective
+
+. Show the **Topology** view for the Parasol application namespace:
+* Point out the "blue donut" icons representing the running application components
+* "This is the Parasol application running on OpenShift. The developer can see all the components and their status at a glance."
+
+. Click the **DevSpaces icon** on the Parasol application's blue donut:
+* "Notice this icon on the application. One click, and it opens the application's source code directly in a cloud development environment. The developer does not need to clone a repository, install tools, or configure anything."
+
+. Show the DevSpaces workspace starting up automatically, pointing out:
+* The devfile in the repository defines the entire workspace configuration
+* The correct Java SDK, Quarkus CLI, and extensions are installed automatically
+* Database connections and service endpoints are pre-configured
+* "The workspace is created from the devfile in the repository. The developer did not choose a configuration, install plugins, or set up anything. The platform handled it."
+
+. Once the workspace loads, show the fully configured browser-based IDE:
+* File explorer with the complete project structure
+* Terminal with all CLI tools available (`oc`, `mvn`, `quarkus`)
+* Extensions pre-installed (Java, Quarkus, YAML, OpenShift toolkit)
+* Git integration connected to the repository
+
+. Open the `devfile.yaml` in the repository root and briefly show its contents:
+* Point out the container image definition with pre-installed tools
+* Show the endpoint definitions for the application
+* Highlight that this file lives in the repository, so it is versioned and reviewed like any other code
+
+// TODO: Add screenshot of OpenShift Topology view with DevSpaces icon on the blue donut
+image::ocp-topology-devspaces-icon.png[OpenShift Topology view showing the Parasol application with the DevSpaces icon on the blue donut,link=self,window=blank,align="center",width=700,title="One-click access to DevSpaces from the OpenShift Topology view"]
+
+// TODO: Add screenshot of Dev Spaces workspace loaded with Parasol project
+image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded and configured,link=self,window=blank,align="center",width=700,title="Fully configured cloud development workspace"]
+
+**What they should notice:**
+
+* The developer clicked a single icon on the running application and landed in a fully configured IDE
+* No installation wizards, no dependency downloads, no manual configuration
+* The workspace is identical for every developer on the team
+* The platform engineer defined this workspace configuration once in a devfile
+* Everything runs in the cloud, nothing on the developer's local machine
+* The devfile is part of the application repository, versioned alongside the code
+
+**Business value callout:**
+
+"What used to take Parasol developers 1-2 weeks just happened in under 2 minutes. The developer clicked one button on the running application and got a fully configured workspace. Every single developer gets the exact same environment, eliminating 'works on my machine' issues entirely. Platform engineers define the workspace once in the devfile, and it becomes the golden path for the entire team."
+
+**If asked:**
+
+Q: "Can developers customize their workspace?"::
+A: "Yes. The devfile provides the baseline, but developers can add personal preferences like themes and keybindings. The important thing is the toolchain, SDKs, and security policies are standardized by the platform team."
+
+Q: "What happens if a developer loses their internet connection?"::
+A: "The workspace state is preserved in the cluster. When they reconnect, they pick up exactly where they left off. No work is lost."
+
+Q: "How does this handle different projects with different requirements?"::
+A: "Each project repository contains its own devfile. A Python project gets Python tooling, a Java project gets Java tooling. Developers just open the repository, and the right environment appears."
+
+Q: "What about VS Code desktop? Do developers have to use the browser?"::
+A: "Dev Spaces supports connecting from VS Code desktop as well. Developers can use the browser-based IDE or their local VS Code installation connecting to the remote workspace. The workspace still runs in the cluster either way."
+
+'''
+
+[#part-3]
+== Part 3 — Adding a feature with Quarkus dev mode
+
+=== Know
+
+_Our new developer is now in their cloud workspace and ready to contribute. They have been assigned their first task: add a new feature to the Parasol claims service. Using Quarkus dev mode, they can write code and see changes reflected immediately without manual builds or restarts. However, in their eagerness to ship, the developer does not write a unit test for the new feature, which will have consequences in Module 2._
+
+**Business challenge:**
+
+* Inner loop (code-build-test) averages 20-30 minutes per iteration
+* Developers lose flow state waiting for builds to complete
+* Slow feedback loops discourage experimentation and innovation
+* Lack of testing discipline means defects are caught late in the cycle
+
+**Current state at Parasol:**
+
+* Average developer makes 8-12 code changes per day, each requiring a full rebuild
+* 3-5 hours per developer per day spent waiting for build and test cycles
+* No continuous testing, developers run tests manually (if at all) before committing
+* Defects frequently discovered in integration, requiring expensive context switching to fix
+
+**Value proposition:**
+
+Quarkus dev mode provides live reload and continuous testing capabilities that reduce the inner loop from minutes to seconds. Developers see their changes reflected immediately, and the framework supports instant feedback on code changes. This keeps developers in flow state and dramatically accelerates feature delivery.
+
+=== Show
+
+**What I say:**
+
+"Our new developer has their workspace ready and has been assigned their first task: add a discount field to the claims service. Let me show you how fast this inner loop is with Quarkus dev mode. The developer writes code, saves, and the application updates immediately, no manual builds, no restarts, no waiting."
+
+**What I do:**
+
+. In the Dev Spaces workspace, open the Parasol claims service source file:
+* Navigate to `src/main/java/com/parasol/claims/ClaimsResource.java`
+
+. Start the application in development mode using the terminal:
++
+[source,bash,role=execute]
+----
+./mvnw quarkus:dev
+----
+
+. Show the application starting and the development mode output:
+* Live coding is active
+* The application is running and accessible
+
+. Open the running application in a browser preview to show the current claims API response
+
+. Make a code change to add the new feature:
++
+[source,java,role=copy]
+----
+// Add a discount field to the claims response
+claim.setDiscount(0.15);
+----
+
+. Save the file and immediately show:
+* The application reloads automatically (no restart required)
+* The browser preview reflects the change in seconds
+* No manual build step, no repackaging, no redeployment
+
+. Point out that the developer has added a feature but has NOT written a unit test:
+* "Notice that our developer has added the discount feature and verified it works in dev mode. But they have not written a unit test for this new functionality. That is going to matter when we get to the CI/CD pipeline in Module 2."
+
+// TODO: Add screenshot of Quarkus dev mode showing live reload
+image::quarkus-dev-mode-live-reload.png[Development mode terminal showing live reload with instant feedback on code changes,link=self,window=blank,align="center",width=700,title="Quarkus dev mode with live reload"]
+
+**What they should notice:**
+
+* Code changes are reflected in seconds, not minutes
+* No manual build, package, or deploy steps in the inner loop
+* The developer stays in flow state, never leaving the IDE
+* The developer did NOT write a unit test for the new feature (this is intentional and sets up Module 2)
+
+**Business value callout:**
+
+"That code change was reflected in under 3 seconds. At Parasol's current pace, developers wait 20-30 minutes per iteration. Multiply that across 200 developers making 10 changes a day, and you are talking about thousands of hours recovered every month. Quarkus dev mode keeps developers in flow state and dramatically accelerates feature delivery."
+
+**If asked:**
+
+Q: "Does this work with other languages besides Java?"::
+A: "Red Hat supports multiple runtimes including Node.js, Python, .NET, and Go through OpenShift application runtimes. The live reload experience varies by framework, but the principle of fast feedback is consistent."
+
+Q: "What about continuous testing?"::
+A: "Quarkus dev mode supports continuous testing where tests run automatically after each code change. In this demo, our developer has not written a test yet, which is a realistic scenario. In Module 2, we will see how the CI/CD pipeline catches this gap."
+
+Q: "What about debugging?"::
+A: "Development mode includes full debugging support. Developers can set breakpoints, inspect variables, and step through code directly in the cloud IDE. The experience is identical to a local IDE."
+
+[#part-4]
+== Part 4 — Managing DevSpaces environments (platform engineer persona)
+
+=== Know
+
+_So far we have seen the developer's perspective: a pre-configured workspace that just works. But someone has to build and maintain that golden path. This section shifts to the platform engineer persona and shows how DevSpaces environments are centrally managed, governed, and scaled across the organization._
+
+**Business challenge:**
+
+* Platform engineers spend excessive time handling individual developer environment requests
+* No centralized governance over IDE configurations, extensions, or security policies
+* Inconsistent environments across teams lead to integration failures and security blind spots
+* Scaling development environments manually does not keep pace with organizational growth
+
+**Current state at Parasol:**
+
+* Platform team fields 20-30 environment-related support tickets per week
+* No standardized approach to managing workspace configurations across 200+ developers
+* Security team has no visibility into what tools and extensions developers install locally
+* Onboarding a new team to the platform requires manual environment setup by a senior engineer
+
+**Value proposition:**
+
+DevSpaces gives platform engineers centralized control over developer environments through devfiles, resource quotas, and organizational policies. The PE defines the golden path once — specifying approved container images, IDE extensions, resource limits, and security policies — and every developer workspace is automatically provisioned to match. This eliminates per-developer support overhead while ensuring consistent security and compliance.
+
+=== Show
+
+**What I say:**
+
+"We have seen the developer's experience: click one button and get a fully configured workspace. But someone has to define and maintain that experience. Let me show you how the platform engineer manages DevSpaces for the organization."
+
+**What I do:**
+
+. Open the **Devfile Registry** at https://registry.devfile.io/viewer in a browser tab:
+* Show the catalog of community and Red Hat-maintained devfile stacks
+* Point out the available stacks: Java/Quarkus, Node.js, Python, .NET, Go, and more
+* "This is the public devfile registry. Platform engineers use it as a starting point when creating devfiles for their teams. They can pick a stack, customize it with their organization's tools and policies, and add it to their application repositories."
+* Browse a Quarkus stack entry to show what it includes: base container image, tools, extensions, endpoints
+* "The platform engineer does not start from scratch. They take a community-maintained stack and customize it for their organization's requirements."
+
+. Switch to the **OpenShift web console** at {console_url} and navigate to the **Administrator** perspective
+
+. Navigate to **Operators** → **Installed Operators** → **Red Hat OpenShift Dev Spaces**
+
+. Click on the **CheCluster** custom resource (CR) to show the DevSpaces configuration:
+* Show the key configuration sections:
+** **devEnvironments** — default IDE, container build configuration, default resources (CPU, memory) for workspaces
+** **maxNumberOfRunningWorkspacesPerUser** — limits how many workspaces a developer can run simultaneously
+** **secondsOfInactivityBeforeIdling** — idle timeout to reclaim resources from unused workspaces
+** **storage** — persistent volume configuration for workspace data
+* "This is where the platform engineer fine-tunes DevSpaces for the organization. Resource limits, idle timeouts, storage policies, default IDE configuration. These settings apply to every workspace across the cluster."
+
++
+[NOTE]
+====
+**Presenter tip:** Do not spend too much time on individual CR fields. The goal is to show that the platform engineer has centralized control, not to walk through every configuration option. Highlight 2-3 settings that resonate with the audience (resource limits, idle timeout, and max workspaces are usually the most interesting).
+====
+
+// TODO: Add screenshot of the devfile registry viewer showing available stacks
+image::devfile-registry-viewer.png[Devfile registry viewer showing available community and Red Hat devfile stacks for various languages and frameworks,link=self,window=blank,align="center",width=700,title="Devfile registry: starting point for platform engineers"]
+
+// TODO: Add screenshot of the CheCluster CR in the OpenShift console
+image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster custom resource with DevSpaces configuration parameters,link=self,window=blank,align="center",width=700,title="DevSpaces operator configuration via custom resource"]
+
+**What they should notice:**
+
+* The devfile registry provides a curated catalog of starting points. Platform engineers do not build devfiles from scratch.
+* The DevSpaces operator gives centralized control over workspace policies through a Kubernetes custom resource
+* Configuration changes apply to all new workspaces automatically. No per-developer configuration required.
+* Resource governance (CPU, memory, storage, idle timeout) prevents workspace sprawl
+
+**Business value callout:**
+
+"The platform engineer defines the golden path once: choose a devfile stack from the registry, customize it for the organization, and configure workspace policies through the operator. Every developer gets the same governed environment automatically. No more 20-30 support tickets per week for environment issues. No more security blind spots from unmanaged developer workstations."
+
+**If asked:**
+
+Q: "Can different teams have different devfile configurations?"::
+A: "Yes. Each application repository contains its own devfile. A Java team gets Java tooling, a Python team gets Python tooling. The platform engineer can provide a base devfile template and let teams customize within guardrails."
+
+Q: "What happens when a devfile is updated?"::
+A: "When the devfile in the repository is updated, all new workspaces created from that repository use the updated configuration. Existing running workspaces are not affected until they are restarted."
+
+Q: "Can the platform engineer restrict which container images are used?"::
+A: "Yes. The DevSpaces operator supports configuring trusted image registries and restricting which images can be used in devfiles. This ensures that only approved, scanned images are used in developer workspaces."
+
+'''
+
+== Module 1 summary
+
+=== What we demonstrated
+
+In this module, you saw how Parasol Insurance modernized their application and transformed both the developer and platform engineer experience:
+
+. **Application modernization** — MTA analyzed and guided the migration from legacy Java EE to Quarkus, unlocking cloud native capabilities and setting the foundation for everything that follows
+. **Cloud development environments** — DevSpaces eliminated 1-2 weeks of setup time, giving every developer an identical, pre-configured workspace defined by a devfile in the repository
+. **Live reload development** — Quarkus dev mode reduced the inner development loop from 20-30 minutes to seconds, keeping developers in flow state
+. **Platform engineer governance** — DevSpaces provides centralized control over developer environments through devfiles, resource quotas, and organizational policies
+
+=== Setting up Module 2
+
+Our new developer has added a feature and verified it works in dev mode. But they have not written a unit test. When they push this code and it triggers the CI/CD pipeline in Module 2, that missing test is going to cause a pipeline failure. This is where the platform's guardrails come in: the pipeline enforces quality standards that the developer's inner loop does not.
+
+=== Presenter transition
+
+[NOTE]
+====
+**Presenter tip:** The transition to Module 2 should feel natural: "Our developer is happy with their change and is going to push it. Let's see what happens when the platform's CI/CD pipeline picks it up." This creates anticipation and a continuous narrative thread.
+====

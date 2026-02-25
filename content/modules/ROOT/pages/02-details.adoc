@@ -1,0 +1,142 @@
+= Environment details and setup
+include::partial$_attributes.adoc[]
+
+*Presenter note*: Review this section before your demo to familiarize yourself with the environment components and access details. Not all components are used in every section — check which section(s) you are presenting.
+
+== Environment components
+
+=== Section 1: Foundational application platform
+
+* **Red Hat OpenShift Container Platform** {ocp_version} - The foundational platform
+* **Migration Toolkit for Applications** {mta_version} - Application modernization and migration analysis (discussed in Module 1, not shown live)
+* **Red Hat OpenShift Dev Spaces** {devspaces_version} - Cloud development environments with AI code assistance
+* **Red Hat build of Quarkus** {quarkus_version} - Cloud native Java runtime (featured application)
+* **Red Hat OpenShift Pipelines** {pipelines_version} - Tekton-based CI/CD pipelines
+* **Red Hat OpenShift GitOps** {gitops_version} - Argo CD for GitOps delivery
+* **Red Hat OpenShift Service Mesh** {servicemesh_version} - Istio-based traffic management and security
+* **Kiali** - Service mesh observability console
+* **Red Hat OpenShift monitoring stack** {monitoring_version} - Prometheus, Grafana, and AlertManager
+
+=== Section 2: Advanced developer services
+
+* **Red Hat Developer Hub** {rhdh_version} - Developer portal with catalog, templates, and self-service
+* **Developer Lightspeed** - AI-assisted development within Developer Hub (discussed in Module 4, not shown live)
+* **Red Hat Advanced Cluster Security for Kubernetes** {acs_version} - Vulnerability scanning and policy enforcement
+* **Red Hat Trusted Artifact Signer** {tas_version} - Image signing, verification, and admission control
+* **Tekton Chains** {tekton_chains_version} - Automated image signing, SBOM generation, and SLSA attestation
+* **Red Hat Trusted Profile Analyzer** {tpa_version} - SBOM management and vulnerability tracking
+* **HashiCorp Vault** - External secrets management
+* **Dependency Analytics** - IDE plugin for real-time dependency vulnerability scanning
+
+=== Section 3: Intelligent applications
+
+* **Red Hat OpenShift AI** {openshift_ai_version} - Model serving for LLM endpoints
+* **Apache Kafka** - Event streaming for business data (pre-existing in the demo environment)
+
+== Access details
+
+**OpenShift console**
+
+* URL: {console_url}
+* Admin username: {admin_user}
+* Admin password: {admin_password}
+
+**Developer credentials**
+
+* Username: {user}
+* Password: {password}
+
+**Dev Spaces**
+
+* URL: {devspaces_url}
+* Login with developer credentials above
+
+**Gitea (Git server — Section 1)**
+
+* URL: {gitea_url}
+* Username: {gitea_user}
+* Password: {gitea_password}
+
+**GitLab (Git server — Sections 2-3)**
+
+* URL: {gitlab_url}
+* Username: {gitlab_user}
+* Password: {gitlab_password}
+
+**Argo CD**
+
+* URL: {argocd_url}
+* Username: {argocd_user}
+* Password: {argocd_password}
+
+**Kiali**
+
+* URL: {kiali_url}
+* Login with developer credentials above
+
+**Tekton pipelines**
+
+* URL: {pipeline_url}
+* Accessible through the OpenShift console Pipelines section
+
+**Red Hat Developer Hub (Sections 2-3)**
+
+* URL: {rhdh_url}
+* Login with developer credentials above
+
+**Red Hat Advanced Cluster Security (Section 2)**
+
+* URL: {acs_url}
+* Login with admin credentials above
+
+**Trusted Profile Analyzer (Section 2)**
+
+* URL: {tpa_url}
+* Login with admin credentials above
+
+**Vault (Section 2)**
+
+* URL: {vault_url}
+* Login with admin credentials above
+
+== Demo application
+
+The demo application is the **Parasol Insurance** web application, a Quarkus-based microservices application that handles policy management, claims processing, and customer interactions. Parasol migrated this application from a legacy Java EE platform to Quarkus on OpenShift using the Migration Toolkit for Applications (MTA). The application is pre-deployed in the environment and serves as the foundation for all demo sections.
+
+In Section 2, the application and all its components are registered in the Red Hat Developer Hub catalog as a "system" with linked components (frontend, backend, Kafka, database).
+
+In Section 3, the application is extended with an AI-enhanced component that consumes an existing LLM endpoint and processes business data from Kafka.
+
+== Pre-demo checklist
+
+=== Section 1
+
+. Log into the OpenShift console at {console_url} and confirm you can access the Developer perspective
+. Open Dev Spaces at {devspaces_url} and confirm the dashboard loads
+. Verify the Parasol application is running and accessible
+. Open Argo CD at {argocd_url} and confirm the application sync status shows healthy
+. Open a browser tab to Gitea at {gitea_url} and confirm repository access
+. Verify the Tekton pipeline is visible in the OpenShift console under Pipelines
+. Open Kiali at {kiali_url} and confirm the service graph loads
+. Verify DevSpaces AI code assistance is enabled and functional
+
+=== Section 2 (in addition to Section 1)
+
+. Open Red Hat Developer Hub at {rhdh_url} and confirm the catalog loads
+. Verify the Parasol system and its components are registered in the catalog
+. Confirm software templates are available in the "Create" section
+. Open ACS at {acs_url} and confirm the dashboard loads
+. Open TPA at {tpa_url} and confirm SBOM data is visible
+. Verify Vault is accessible at {vault_url} with Parasol secrets configured
+. Open GitLab at {gitlab_url} and confirm repository access
+
+=== Section 3 (in addition to Sections 1-2)
+
+. Verify the LLM endpoint is serving and accessible
+. Confirm the Kafka topic with business data is available and producing messages
+. Verify the AI component template is available in RHDH
+
+[TIP]
+====
+**Presenter tip:** Open all the URLs in separate browser tabs before starting. This avoids waiting for pages to load during the live demo. For Section 2, consider pre-loading the pipeline view and ACS dashboard. For Section 3, verify the LLM endpoint is responding before starting.
+====

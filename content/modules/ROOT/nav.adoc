@@ -1,18 +1,44 @@
-* xref:index.adoc[What is Showroom?]
+* xref:index.adoc[Home]
 
-.Content Developer Guide
-* xref:quick-start.adoc[Quick Start]
-* xref:content-repo.adoc[Creating a Content Repository]
-* xref:agnosticv-config.adoc[AgnosticV Configuration]
-* xref:ui-config.adoc[UI Configuration]
-* xref:user-data.adoc[User Data and Variables]
-* xref:ocp4-role-reference.adoc[OCP4 Role Reference]
-* xref:vm-role-reference.adoc[VM Role Reference]
+* xref:01-overview.adoc[Overview and presenter preparation]
 
-.Showroom Developer Guide
-* xref:architecture.adoc[Architecture]
-* xref:deployer.adoc[Showroom Deployer]
-* xref:images.adoc[Showroom Images]
-* xref:nookbag.adoc[Nookbag UI]
-* xref:ocp-integration.adoc[OCP Integration]
-* xref:contributing.adoc[Contributing]
+* xref:02-details.adoc[Environment details and setup]
+
+.Section 1: Foundational application platform
+* xref:03-module-01-developer-experience.adoc[Module 1: Developer experience]
+** xref:03-module-01-developer-experience.adoc#part-1[Part 1: Application modernization]
+** xref:03-module-01-developer-experience.adoc#part-2[Part 2: Standardized development with DevSpaces]
+** xref:03-module-01-developer-experience.adoc#part-3[Part 3: Adding a feature with Quarkus dev mode]
+** xref:03-module-01-developer-experience.adoc#part-4[Part 4: Managing DevSpaces environments]
+
+* xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline]
+** xref:04-module-02-cicd-pipeline.adoc#part-1[Part 1: Triggering the pipeline]
+** xref:04-module-02-cicd-pipeline.adoc#part-2[Part 2: Pipeline catches missing tests]
+** xref:04-module-02-cicd-pipeline.adoc#part-3[Part 3: GitOps-driven delivery with Argo CD]
+
+* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations]
+** xref:05-module-03-platform-operations.adoc#part-1[Part 1: Traffic management and security]
+** xref:05-module-03-platform-operations.adoc#part-2[Part 2: Observability with Kiali]
+** xref:05-module-03-platform-operations.adoc#part-3[Part 3: Platform capabilities]
+
+.Section 2: Advanced developer services
+* xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and catalog]
+** xref:06-module-04-developer-hub.adoc#part-1[Part 1: Developer Lightspeed for MTA]
+** xref:06-module-04-developer-hub.adoc#part-2[Part 2: Exploring the RHDH catalog]
+** xref:06-module-04-developer-hub.adoc#part-3[Part 3: Self-service and component templating]
+
+* xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow]
+** xref:07-module-05-secure-development.adoc#part-1[Part 1: DevSpaces and Dependency Analytics]
+** xref:07-module-05-secure-development.adoc#part-2[Part 2: Merge request and secure build pipeline]
+** xref:07-module-05-secure-development.adoc#part-3[Part 3: External secrets with Vault]
+
+* xref:08-module-06-supply-chain.adoc[Module 6: Trusted software supply chain]
+** xref:08-module-06-supply-chain.adoc#part-1[Part 1: Production deployment with admission control]
+** xref:08-module-06-supply-chain.adoc#part-2[Part 2: SBOM management with TPA]
+** xref:08-module-06-supply-chain.adoc#part-3[Part 3: Application topology and wrap-up]
+
+.Section 3: Intelligent applications
+* xref:09-module-07-ai-applications.adoc[Module 7: AI-enhanced applications]
+** xref:09-module-07-ai-applications.adoc#part-1[Part 1: Leveraging AI for business value]
+** xref:09-module-07-ai-applications.adoc#part-2[Part 2: Building the AI component]
+** xref:09-module-07-ai-applications.adoc#part-3[Part 3: Deploying and showcasing the feature]

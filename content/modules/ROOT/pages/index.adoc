@@ -1,94 +1,41 @@
-= What is Showroom?
-:navtitle: What is Showroom?
+= {lab_name}
+include::partial$_attributes.adoc[]
 
-Showroom is a web-based lab instruction platform for the https://demo.redhat.com[Red Hat Demo Platform].
-It combines rendered AsciiDoc content with embedded terminals, consoles, and interactive tools -- giving workshop and demo participants everything they need in a single browser tab.
+**What this demo covers**
 
-== What Users See
+This demonstration shows why Red Hat OpenShift is more than container management. While any Kubernetes distribution can orchestrate containers, OpenShift delivers a complete application platform above the Kubernetes API: integrated development environments, automated CI/CD, a trusted software supply chain, a developer portal with self-service, and AI-ready application delivery. Through the Parasol Insurance scenario, presenters walk customers through the full platform story in three progressive sections, from foundational capabilities to advanced developer services to intelligent applications.
 
-When a participant opens their Showroom URL they get a split-pane interface:
+**Preparation**
 
-* **Left pane** -- step-by-step lab instructions rendered from an https://antora.org[Antora] site you author in AsciiDoc.
-* **Right pane** -- one or more tabs such as:
-** A web terminal (SSH to a bastion, containerised CLI tools, or both).
-** The OpenShift web console embedded in an iframe.
-** A VS Code editor (Code Server).
-** A VNC desktop (noVNC).
-** Any external URL you choose.
+* xref:01-overview.adoc[Overview and presenter preparation]
+* xref:02-details.adoc[Environment details and setup]
 
-The UI layout, tab names, and tab URLs are all controlled by a simple `ui-config.yml` file that lives in your content repository.
+**Section 1: Foundational application platform**
 
-== How It Gets Deployed
+Establish the core value of OpenShift as an application platform. Application modernization, standardized development with DevSpaces, Quarkus dev mode, Tekton pipelines with quality enforcement, Argo CD delivery, and platform operations with Service Mesh and observability.
 
-This Ansible collection -- `agnosticd.showroom` -- is the primary way Showroom instances are deployed on the Red Hat Demo Platform.
-Depending on the environment type, you use one of two roles:
+* xref:03-module-01-developer-experience.adoc[Module 1: Developer experience] — MTA migration context, one-click DevSpaces from the topology view, Quarkus dev mode, and platform engineer governance
+* xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline] — Tekton pipeline triggering, SAST/Sonarqube quality gates, AI-assisted test generation, and GitOps delivery with Argo CD
+* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, and broader platform capabilities
 
-[cols="1,3",options="header"]
-|===
-|Role |Use when...
+**Section 2: Advanced developer services**
 
-|`ocp4_workload_showroom`
-|Your lab runs on an OpenShift 4 cluster.
-The role deploys Showroom as a pod using a Helm chart, complete with content rendering, terminals, and an OpenShift `Route`.
+Move from "good to great." Red Hat Developer Hub as the single pane of glass for catalog, self-service, pipelines, and deployment status. Secure software factory with ACS scanning, Tekton Chains signing, SBOM generation, admission control, and Vault for secrets management.
 
-|`vm_workload_showroom`
-|Your lab runs on a VM (RHEL, Fedora, etc.).
-The role deploys Showroom with rootless Podman, Traefik for TLS, and systemd for lifecycle management.
-|===
+* xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and catalog] — Developer Lightspeed for MTA, RHDH catalog exploration with AI-powered Q&A, and self-service environment and component provisioning
+* xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow] — Dependency Analytics in DevSpaces, secure build pipeline with signing and attestation, and external secrets with Vault
+* xref:08-module-06-supply-chain.adoc[Module 6: Trusted software supply chain] — Production deployment with admission control, SBOM management with TPA, and application topology
 
-Both roles follow the same basic flow:
+**Section 3: Intelligent applications**
 
-. Clone your Antora content repository.
-. Inject runtime variables (credentials, hostnames, GUIDs) as AsciiDoc attributes.
-. Render the content to HTML.
-. Serve the content alongside the terminal and tab services you configured.
-. Publish the final URL back to the user.
+Show that AI-enhanced applications follow the same golden path. Developers consume LLM endpoints served by Red Hat AI, process business data from Kafka (Red Hat AMQ Streams), and deploy through the same trusted pipeline.
 
-== Key Concepts
+* xref:09-module-07-ai-applications.adoc[Module 7: AI-enhanced applications] — Building an AI-powered email routing service with DevHub templates, LLM integration, Kafka data processing, and trusted delivery
 
-Content repository::
-A Git repo containing your AsciiDoc lab instructions, structured as an Antora component.
-You typically fork https://github.com/rhpds/showroom_template_nookbag[showroom_template_nookbag] and add your own pages.
-See xref:content-repo.adoc[].
+**Target audience**
 
-AgnosticV catalog item::
-The YAML configuration in the https://github.com/rhpds/agnosticv[agnosticv] repository that ties your content repo to an environment on the Red Hat Demo Platform.
-See xref:agnosticv-config.adoc[].
+Sales engineers, solution architects, and technical sellers positioning OpenShift as a complete application platform to customers evaluating container management, application modernization, or developer platform strategies.
 
-User data::
-A set of key-value pairs (hostnames, passwords, URLs) written by infrastructure roles during provisioning and automatically injected into your content as Antora attributes.
-See xref:user-data.adoc[].
+**Demo duration**
 
-UI configuration::
-A `ui-config.yml` file in your content repo that defines the tabs, layout width, and dynamic URLs shown alongside your lab instructions.
-See xref:ui-config.adoc[].
-
-== Where to Start
-
-[cols="1,3",options="header"]
-|===
-|Goal |Page
-
-|Get a Showroom lab running quickly
-|xref:quick-start.adoc[]
-
-|Create or structure a content repo
-|xref:content-repo.adoc[]
-
-|Wire up an AgnosticV catalog item
-|xref:agnosticv-config.adoc[]
-
-|Understand the full architecture
-|xref:architecture.adoc[]
-
-|Contribute to Showroom itself
-|xref:contributing.adoc[]
-|===
-
-== Related Projects
-
-* https://github.com/agnosticd/showroom[agnosticd.showroom collection] -- this Ansible collection (you are here).
-* https://github.com/rhpds/showroom_template_nookbag[showroom_template_nookbag] -- the recommended content repo template.
-* https://github.com/rhpds/showroom-deployer[showroom-deployer] -- Helm charts that power OCP deployments.
-* https://github.com/rhpds/showroom-images[showroom-images] -- container images (content server, terminals, Antora, etc.).
-* https://github.com/rhpds/nookbag[nookbag] -- the zero-touch UI bundle.
+Each section is approximately 45 minutes (15 minutes per module). Sections can be presented independently or combined. Section 1 establishes the foundation, Section 2 demonstrates the "good to great" progression, and Section 3 adds the intelligent applications story.

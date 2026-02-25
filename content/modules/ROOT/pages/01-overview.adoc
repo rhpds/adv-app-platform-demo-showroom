@@ -1,0 +1,202 @@
+= Demo overview and presenter preparation
+include::partial$_attributes.adoc[]
+
+*Presenter note*: Read this section before the demo. It provides the full business context and narrative you need to deliver a compelling presentation. This content is not shown to the audience.
+
+== The core message
+
+Every Kubernetes distribution can orchestrate containers. That is table stakes. What differentiates Red Hat OpenShift is everything above the Kubernetes API: integrated development environments, application runtimes, automated CI/CD, a developer portal with self-service, a trusted software supply chain, and AI-ready application delivery. This demo shows that complete application platform story, progressing from foundational capabilities through advanced developer services to intelligent applications.
+
+The goal is to help customers see the difference between container management (what they get with OKE or a competing Kubernetes distribution) and a true application platform (what they get with OpenShift, OpenShift Platform Plus, and Red Hat Advanced Developer Services). Each section of this demo adds a layer of platform value that does not exist in a basic Kubernetes offering.
+
+== Background
+
+Parasol Insurance is a mid-size insurance company with over 200 developers and 30 platform engineers supporting a portfolio of customer-facing and internal applications. Like many enterprises, Parasol adopted Kubernetes several years ago for container management, but they are still manually building, testing, deploying, and operating their applications. Their Kubernetes investment handles orchestration, but everything else, the developer experience, CI/CD, security, compliance, and AI readiness, is a patchwork of manual processes and disconnected tools.
+
+Their leadership team is under pressure from multiple directions: slower time to market for new capabilities, runaway IT costs from technical debt and legacy applications, increasing regulatory compliance demands, and competitive pressure to integrate AI into customer-facing applications. Meanwhile, their competitors are shipping features faster and offering better digital experiences to policyholders.
+
+Parasol's CTO has mandated a transformation initiative: stop treating OpenShift as just a container runtime and start using it as the complete application platform it is. The goal is to empower developers with self-service, enable platform engineers to define golden paths, secure the software supply chain end-to-end, and make AI integration a standard development activity.
+
+== The demo narrative
+
+This demo tells a continuous story across three sections. Each section builds on the previous one, following Parasol's journey from foundational platform capabilities to a fully governed, AI-ready application platform. The progression demonstrates the "good to great" story: Section 1 is what every OpenShift customer should have, Section 2 is what differentiates a mature platform, and Section 3 shows AI readiness.
+
+=== Section 1: Foundational application platform (Modules 1-3)
+
+_Establish the core value of OpenShift as an application platform, not just container management._
+
+A new developer joins Parasol Insurance and experiences the full application lifecycle on the platform:
+
+. **Application modernization (context setting)** — Parasol has already migrated their legacy Java EE application to OpenShift using the Migration Toolkit for Applications (MTA). This migration is discussed but not shown live. It sets the stage for everything that follows.
+
+. **Developer inner loop** — The new developer clicks a single button in the OpenShift topology view to open the Parasol app in DevSpaces. They add a simple feature using Quarkus dev mode. The developer does not write a unit test for the new feature.
+
+. **Platform engineer perspective** — The platform engineer manages DevSpaces environments centrally, using the devfile registry as a starting point and the DevSpaces operator for governance.
+
+. **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the missing unit test. The developer uses AI-assisted code generation in DevSpaces to write the test, pushes again, and the pipeline passes. Argo CD handles the deployment.
+
+. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through Service Mesh, real-time observability through the Service Mesh console (Kiali), and additional platform capabilities.
+
+**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, DevSpaces code assistance, Argo CD, Service Mesh, Kiali
+
+=== Section 2: Advanced developer services (Modules 4-6)
+
+_Move from "good to great." Show the capabilities that differentiate a mature application platform from basic container management._
+
+Fast forward: the Parasol application and its components are now registered in the Red Hat Developer Hub catalog.
+
+. **Developer Hub and catalog** — Developer Lightspeed extends MTA modernization with AI assistance (discussed, not shown). Developers explore the RHDH catalog to discover components, APIs, and documentation. They ask Lightspeed questions about the application. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
+
+. **Secure development workflow** — Developers work in DevSpaces with the Dependency Analytics plugin, catching and fixing a dependency vulnerability in real time. A merge request triggers the secure build pipeline: ACS scanning, image signing, SBOM generation, and SLSA attestation via Tekton Chains. External secrets are managed through Vault.
+
+. **Trusted software supply chain** — The pipeline creates a merge request to the Argo CD production configuration. The platform engineer merges it. The admission controller verifies that the image is signed and has all required attestations before allowing deployment. SBOMs and associated vulnerabilities are managed through the Trusted Profile Analyzer (TPA). The Developer Hub topology provides a complete view of all components.
+
+**Platform capabilities demonstrated:** RHDH catalog, RHDH templating, RHDH self-service, Developer Lightspeed, Dependency Analytics, ACS, TAS (signing and admission control), Tekton Chains, TPA, Vault
+
+=== Section 3: Intelligent applications (Module 7)
+
+_Show that AI-enhanced applications follow the same golden path. No special tools, no ungoverned experimentation._
+
+Fast forward: applications are running smoothly, and the CIO wants to leverage an existing LLM to enhance customer-facing applications.
+
+. **AI-enhanced applications** — A developer uses a DevHub template to scaffold a new Quarkus service that consumes customer emails from a Kafka topic (Red Hat AMQ Streams for Apache Kafka), evaluates them using an LLM endpoint served by Red Hat AI, and routes them to the correct processing queue. The developer integrates the new service with the main Parasol application through the standard merge request workflow. The same trusted pipeline validates and deploys the AI-enhanced feature.
+
+**Platform capabilities demonstrated:** RHDH templates for AI components, Red Hat AI (model serving), Red Hat AMQ Streams for Apache Kafka, trusted pipeline (reusing Section 2 supply chain)
+
+Each section can be presented independently or combined for a comprehensive platform story. The progressive structure supports persona-based solution selling: start with the foundational story for customers evaluating the platform, advance to Section 2 for customers ready to differentiate, and show Section 3 for customers exploring AI.
+
+== Problem breakdown
+
+**Business challenges**
+
+* Kubernetes investment delivers container orchestration but not the full application lifecycle
+* Slower time to market for new capabilities, losing ground to competitors
+* Runaway IT costs from technical debt, legacy applications, and disconnected tooling
+* Software supply chain security gaps creating compliance and risk exposure
+* No strategy for integrating AI capabilities into existing applications within IT guardrails
+
+**Developer pain points**
+
+* Immense cognitive load from fragmented tooling and manual processes above the Kubernetes API
+* Unsecure local development environments with inconsistent configurations
+* New developers wait 1-2 weeks before writing their first line of code
+* Inner development loop (code-build-test) takes 20-30 minutes per iteration
+* No automated testing or security scanning in the development workflow
+* No centralized catalog for discovering services, APIs, and documentation
+* No self-service provisioning, developers file tickets and wait for infrastructure
+
+**Platform engineer pain points**
+
+* Difficulty enforcing security and compliance guardrails without becoming a bottleneck
+* No standardized "golden paths" for common development workflows
+* Low developer satisfaction and platform adoption (developers see Kubernetes, not a platform)
+* No trusted software supply chain with artifact signing, attestation, and SBOM management
+* No strategy for operationalizing AI tools and workloads on the platform
+
+== Solution overview
+
+Red Hat OpenShift as a complete application platform addresses these challenges through integrated capabilities above the Kubernetes API, organized across three progressive layers:
+
+**Foundational platform (Section 1)**
+
+* **Application modernization** accelerates migration from legacy platforms to cloud native architectures using MTA
+* **Cloud development environments** (DevSpaces) eliminate setup friction and standardize the developer workspace
+* **Application runtimes** (Quarkus) accelerate coding with enterprise-grade libraries, live reload, and continuous testing
+* **Automated CI/CD pipelines** (Tekton) catch defects early through automated testing and SAST/Sonarqube quality gates
+* **AI-assisted development** (DevSpaces code assistance) helps developers write tests and fix issues directly in their cloud IDE
+* **GitOps-driven delivery** (Argo CD) ensures consistent, auditable deployments across environments
+* **Traffic management and security** (Service Mesh) provide mTLS encryption and fine-grained traffic control without application code changes
+* **Observability** (Service Mesh console/Kiali) gives real-time visibility into service health and traffic patterns
+
+**Advanced developer services (Section 2)**
+
+* **Developer Hub** (RHDH) provides a single pane of glass: centralized catalog, golden path templates, pipeline status, deployment status, and container images
+* **Developer Lightspeed** brings AI-assisted development and migration guidance into the IDE
+* **Dependency Analytics** scans dependencies for vulnerabilities in real time during development
+* **Secure build pipeline** integrates ACS scanning, image signing, SBOM generation, and SLSA attestation
+* **External secrets management** (Vault) keeps sensitive data out of source control with centralized management and audit trails
+* **Trusted Artifact Signer** (TAS) provides admission control that verifies signatures and attestations at deployment
+* **Trusted Profile Analyzer** (TPA) manages SBOMs and vulnerability tracking across the portfolio
+
+**Intelligent applications (Section 3)**
+
+* **Red Hat AI** provides model serving for LLM endpoints consumed by applications
+* **Red Hat AMQ Streams** (Apache Kafka) enables event-driven data processing for AI-enhanced components
+* **Golden path templates** extend to AI-enhanced components, making AI integration a standard development activity governed by the same trusted supply chain
+
+== Business benefits
+
+**Developer productivity**
+
+* Time from code commit to production deployment: weeks reduced to minutes
+* Time to first pull request for new developers: 1-2 weeks reduced to hours
+* Developer onboarding time: shortened with standardized environments and centralized catalog
+* Self-service provisioning: from 3-5 day ticket queues to minutes with golden path templates
+* Mean time to recovery: reduced through automated rollbacks and observability
+
+**Software supply chain**
+
+* Security and compliance issues found earlier through automated scanning in pipelines and in the IDE
+* Every artifact signed, attested, and tracked with a software bill of materials
+* Admission control ensures only verified artifacts reach production
+* Continuous compliance posture through TPA-managed SBOM data
+
+**AI application development**
+
+* AI integration follows the same golden path as any other component, no special processes
+* Developers consume model endpoints served by Red Hat AI and process data from Kafka
+* AI workloads governed by the same trusted supply chain as all other software
+
+**Platform differentiation**
+
+* OpenShift delivers the complete application lifecycle above the Kubernetes API, not just container orchestration
+* The "good to great" progression (foundational, advanced, intelligent) gives customers a clear platform maturity roadmap
+* Persona-based value: developers get self-service and productivity, platform engineers get governance and golden paths, security teams get supply chain trust, and business leaders get AI readiness
+
+== Audience guidance
+
+**For customers evaluating container management**
+
+Lead with the Section 1 foundational story. Show the difference between just running containers and having a platform that handles the entire developer lifecycle. Emphasize that everything in Section 1 is built into OpenShift, not bolted on. This is the upsell from OKE or competing Kubernetes distributions to the full application platform.
+
+**For customers ready to differentiate their platform**
+
+Focus on Section 2. Show how Developer Hub transforms the developer experience with self-service, how the secure pipeline automates supply chain trust, and how admission control ensures only verified artifacts reach production. This is the "good to great" story: moving from a functional platform to a mature, governed platform.
+
+**For customers exploring AI**
+
+Show all three sections, with Section 3 as the payoff. The message is that a well-architected application platform is prerequisite to AI adoption. The same golden path patterns from Sections 1 and 2 apply to AI workloads. The platform makes AI a standard development activity, not a science project.
+
+**For IT decision makers and budget holders**
+
+Highlight the operational cost reduction and consolidation benefits. OpenShift replaces a patchwork of separate CI, GitOps, service mesh, developer portal, and security scanning tools with an integrated platform. Emphasize the total cost of ownership reduction and the compliance automation story from Section 2.
+
+== Common customer questions
+
+**"How is this different from just running Kubernetes?"**
+
+Kubernetes handles container orchestration: scheduling, scaling, networking. That is the API surface. OpenShift adds everything above that API: cloud IDEs, a developer portal, build automation, CI/CD, security scanning, supply chain trust, traffic management, observability, and AI-ready delivery. These capabilities work together to accelerate the full path from idea to production. That is the difference between container management and an application platform.
+
+**"We already have OpenShift. Why do we need more?"**
+
+Many organizations use OpenShift as a container runtime without adopting the platform capabilities above the API. This demo shows what they are missing: DevSpaces for developer productivity, Tekton for automated CI/CD, Argo CD for GitOps, Service Mesh for security and observability, Developer Hub for self-service, and a trusted software supply chain. Each section adds incremental value that compounds across the organization.
+
+**"What about our existing tools and investments?"**
+
+OpenShift enhances rather than replaces existing investments. Teams using Jenkins can integrate it with OpenShift Pipelines. Existing Git workflows work with OpenShift GitOps. The platform meets teams where they are and provides a path to consolidation over time.
+
+**"What about application modernization? We still have legacy apps."**
+
+The Migration Toolkit for Applications (MTA) is included with the OpenShift subscription. In Section 1, we discuss how Parasol used MTA to migrate their legacy Java EE application to Quarkus. In Section 2, Developer Lightspeed extends this by providing AI-assisted migration guidance directly in the IDE.
+
+**"How do you handle software supply chain security?"**
+
+Section 2 demonstrates a complete trusted software supply chain: Dependency Analytics catches vulnerabilities in the IDE, ACS scans images in the pipeline, Tekton Chains signs images and generates SBOMs with SLSA attestation, the admission controller verifies signatures at deployment, and TPA provides ongoing SBOM management. Every step is automated and policy-driven.
+
+**"How does this set us up for AI?"**
+
+Section 3 demonstrates this directly: a developer uses the same DevHub templates, DevSpaces environments, and CI/CD pipelines to build an AI-enhanced component that consumes an LLM endpoint served by Red Hat AI and processes business data from Kafka. The platform makes AI integration a standard development activity, not a special case. The same trusted supply chain governs AI workloads.
+
+**"What is the ROI?"**
+
+The ROI spans multiple dimensions: developer productivity (onboarding from weeks to hours, inner loop from minutes to seconds), infrastructure consolidation (replacing multiple tools with an integrated platform), compliance automation (SBOM and attestation generated automatically), and AI readiness (same platform patterns for traditional and AI workloads). Organizations typically see measurable improvements within the first sprint.

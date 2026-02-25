@@ -1,0 +1,281 @@
+= Module 6: Trusted software supply chain
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+*Presenter note*: This is the final module of Section 2 (Advanced Developer Services). It covers production deployment with admission control, SBOM management through TPA, and the Developer Hub application topology view. This module closes the trust chain from build to production. The admission controller section may require a more detailed talk track since it is difficult to show visually. Target duration: 15 minutes across 3 parts.
+
+[#part-1]
+== Part 1 — Production deployment with admission control
+
+=== Know
+
+_The secure build pipeline from Module 5 created a merge request to the Argo CD production configuration repository. When the platform engineer merges that MR, Argo CD syncs the production environment with the new image. But before the image can actually run in production, the admission controller verifies that it is properly signed and has all necessary attestations. This is the final gate in the trusted software supply chain._
+
+**Business challenge:**
+
+* No automated verification that deployed images are genuine and untampered
+* Unsigned or unattested images can reach production through manual processes or misconfigurations
+* Compliance frameworks require proof that only verified software is deployed
+* Rollback of compromised images requires manual identification and intervention
+
+**Current state at Parasol:**
+
+* Container images are deployed to production without signature verification
+* No admission policies enforce artifact signing or attestation requirements
+* Manual approval processes are the only gate between build and production deployment
+* Post-deployment audits cannot verify the provenance of running images
+
+**Value proposition:**
+
+The Trusted Artifact Signer (TAS) admission controller acts as the final gate before production deployment. When Argo CD reconciles the production environment, the admission controller intercepts the deployment and verifies that the container image is signed with a valid signature and has all required attestations (SLSA provenance, SBOM). If verification fails, the deployment is rejected. This ensures that only trusted, fully attested artifacts run in production.
+
+=== Show
+
+**What I say:**
+
+"The secure pipeline from Module 5 built our image, scanned it, signed it, generated an SBOM, and created a SLSA attestation. The pipeline also created a merge request to the production configuration repository. Let me show you what happens when we merge that MR and Argo CD tries to deploy the new image."
+
+**What I do:**
+
+. Open **GitLab** at {gitlab_url} and navigate to the **Argo CD production configuration repository**:
+* Show the merge request created automatically by the pipeline
+* Point out that the MR updates the image reference to the new signed image
+* "This MR was created by the pipeline. It updates the production deployment to use the newly built and signed image."
+
+. **Merge the MR** (simulating the platform engineer approving the production deployment):
+* Click **Merge**
+* "The platform engineer reviews and merges the MR. This is the only manual step in the process, an intentional approval gate for production changes."
+
+. Switch to **Developer Hub** at {rhdh_url} and navigate to the component's **Argo CD** tab (or deployment view):
+* Show the production application detecting the change (OutOfSync)
+* Show Argo CD beginning to sync the new image to the production environment
+* "The developer sees the Argo CD sync status right here in Developer Hub. The same single pane of glass that shows the catalog, pipelines, and container images also shows deployment status. No need to switch to the Argo CD console."
+
+. Explain the **admission controller verification** (talk track with visual support):
+* "Here is the critical part. Before the new pod can start, the admission controller intercepts the deployment request and verifies the image."
+* Optionally, show deployment events in the OpenShift console (Events tab) if the audience is technical:
+** Point out any admission webhook events
+** If visible: show the verification passing
+* Walk through what the admission controller checks:
+** **Image signature**: Verifies the cryptographic signature applied by Tekton Chains matches a trusted signing key
+** **SLSA attestation**: Verifies the provenance attestation exists and was created by the trusted build pipeline
+** **Required attestations**: Verifies all required attestation types are present per the organization's policy
+* "If any of these checks fail, the deployment is rejected. The image does not run. This ensures that only artifacts built by the trusted pipeline, with valid signatures and attestations, can reach production."
+
+. Show the **successful deployment** after verification passes:
+* In Developer Hub, show the Argo CD status reaching Synced/Healthy
+* Show the new pod running (visible in the Developer Hub topology or the OpenShift console)
+* "The admission controller verified the image. The signature is valid, the SLSA attestation checks out, and all required attestations are present. The deployment proceeds."
+
++
+[NOTE]
+====
+**Presenter tip:** The admission controller works behind the scenes. The audience may not see a dramatic visual moment. Emphasize the concept: "This is an invisible gate. If someone tried to deploy an unsigned image, or an image that was not built by the trusted pipeline, the deployment would be silently rejected. The platform enforces trust automatically." If you have access to the admission controller logs or events, showing a rejected deployment (from a test scenario) can be a compelling demonstration.
+====
+
+// TODO: Add screenshot of GitLab showing the production MR created by the pipeline
+image::gitlab-prod-mr.png[GitLab merge request for production deployment showing the image reference update created automatically by the secure pipeline,link=self,window=blank,align="center",width=700,title="Production merge request created by the pipeline"]
+
+// TODO: Add screenshot of Developer Hub showing Argo CD sync status after admission control
+image::devhub-argocd-prod-sync.png[Developer Hub showing Argo CD production application synced and healthy after admission controller verification,link=self,window=blank,align="center",width=700,title="Production deployment verified and synced (viewed in Developer Hub)"]
+
+**What they should notice:**
+
+* The pipeline created the production MR automatically. The platform engineer only needed to review and merge.
+* The admission controller verifies signature and attestation before allowing deployment. No bypass possible.
+* The verification is invisible when it passes but blocks deployment when it fails
+* Argo CD sync status is visible in Developer Hub, the same single pane of glass used for catalog, pipelines, and images
+* This closes the trust chain: source code to signed image to verified deployment
+* Only one manual step in the entire flow: the platform engineer merging the production MR
+
+**Business value callout:**
+
+"At Parasol today, there is no verification that deployed images are genuine. Anyone with cluster access could deploy a modified image. With the admission controller, the platform enforces cryptographic verification on every deployment. If an image is not signed by the trusted pipeline, it does not run. Period. This is the kind of supply chain security that compliance frameworks are increasingly requiring."
+
+**If asked:**
+
+Q: "What happens if someone tries to deploy an unsigned image?"::
+A: "The admission controller rejects the deployment request. The pod does not start. The event is logged. The platform team can configure alerting for rejected deployments."
+
+Q: "Can we verify specific attestation types?"::
+A: "Yes. The admission controller policy is configurable. The platform team specifies which attestation types are required: signature, SLSA provenance, SBOM. Different environments can have different policies, for example, production requires all attestations while development may only require a signature."
+
+Q: "How does this relate to Sigstore?"::
+A: "Trusted Artifact Signer (TAS) is Red Hat's distribution of the Sigstore project. It provides the signing infrastructure, the verification policies, and the admission controller integration within OpenShift."
+
+'''
+
+[#part-2]
+== Part 2 — SBOM management with TPA
+
+=== Know
+
+_Every build in the secure pipeline generates a software bill of materials (SBOM). The Trusted Profile Analyzer (TPA) provides a centralized platform for managing SBOMs, tracking associated vulnerabilities, and monitoring license compliance across all applications in the organization._
+
+**Business challenge:**
+
+* No centralized view of what software components are included in deployed applications
+* Vulnerability tracking across the application portfolio requires manual effort
+* License compliance is difficult to verify without comprehensive dependency data
+* When a new CVE is disclosed, identifying which applications are affected takes days or weeks
+
+**Current state at Parasol:**
+
+* No SBOMs exist for any deployed application
+* When a new vulnerability is announced, manual investigation is required for every application
+* License compliance is tracked in spreadsheets with no automation
+* Audit responses require weeks of manual evidence gathering
+
+**Value proposition:**
+
+TPA provides a single pane of glass for all SBOM data across the organization. When a new CVE is disclosed, TPA immediately identifies which applications, components, and versions are affected. License data from SBOMs enables automated compliance checking. The combination of SBOM generation in the pipeline and TPA management creates a continuous compliance posture that scales with the organization.
+
+=== Show
+
+**What I say:**
+
+"Every image that comes out of our pipeline has an SBOM, a complete inventory of every software component inside it. But an SBOM sitting in a registry is not useful unless you can query it. That is what the Trusted Profile Analyzer does."
+
+**What I do:**
+
+. Open **TPA** at {tpa_url}
+
+. Show the **SBOM inventory**:
+* Navigate to the list of SBOMs
+* Point out the SBOM for the Parasol component that was just built
+* "Every image built by the pipeline has an SBOM registered here automatically. No manual step required."
+
+. Click on the Parasol component SBOM to show the contents:
+* Walk through the SBOM data:
+** **Dependencies**: List of all direct and transitive dependencies with versions
+** **Licenses**: License information for each dependency
+** **Vulnerabilities**: Known CVEs associated with the included dependencies
+* "This is a complete inventory of everything inside the container image. Every library, every version, every license. This is what compliance teams need for audit."
+
+. Demonstrate **vulnerability search**:
+* Search for a specific CVE (or show the vulnerability list for the SBOM)
+* Show which components are affected by the CVE, which version introduced it, and whether a fix is available
+* "When a new CVE is announced, the security team does not need to check every application manually. They search TPA and immediately see which images are affected, which versions, and whether a fix exists."
+
+. Show **license compliance** data:
+* Point out the license summary for the SBOM
+* Show any flagged license issues (e.g., copyleft licenses in proprietary code)
+* "License compliance is automated. TPA flags any dependencies with licenses that conflict with the organization's policies."
+
+// TODO: Add screenshot of TPA showing the SBOM inventory
+image::tpa-sbom-inventory.png[Trusted Profile Analyzer showing the SBOM inventory with the Parasol application component and its dependency list,link=self,window=blank,align="center",width=700,title="SBOM inventory in the Trusted Profile Analyzer"]
+
+// TODO: Add screenshot of TPA vulnerability search results
+image::tpa-vulnerability-search.png[Trusted Profile Analyzer showing vulnerability search results identifying affected components and available fixes,link=self,window=blank,align="center",width=700,title="CVE search across all SBOMs"]
+
+**What they should notice:**
+
+* SBOMs are generated automatically by the pipeline and registered in TPA without manual steps
+* TPA provides a searchable inventory of every software component across all applications
+* Vulnerability search identifies affected applications immediately when a new CVE is disclosed
+* License compliance data is available for every component
+* This is continuous compliance, not point-in-time audit evidence
+
+**Business value callout:**
+
+"When the next Log4Shell happens, Parasol's security team will not spend weeks figuring out which applications are affected. They will search TPA and know in seconds. Every application, every version, every dependency. And because SBOMs are generated for every build, this data is always current. That is the difference between reactive incident response and continuous compliance."
+
+**If asked:**
+
+Q: "How often are SBOMs updated?"::
+A: "A new SBOM is generated for every pipeline run. Every time an image is built, the SBOM reflects the current state of dependencies. TPA maintains the history so you can compare SBOMs across versions."
+
+Q: "Can we export SBOM data for auditors?"::
+A: "Yes. TPA supports standard SBOM formats (SPDX, CycloneDX). SBOMs can be exported for external auditors, regulatory submissions, or integration with other compliance tools."
+
+Q: "Does TPA integrate with our existing vulnerability scanning?"::
+A: "TPA complements existing scanning by providing the SBOM context. Your existing tools scan for vulnerabilities. TPA tells you which applications contain the affected components. Together, they provide a complete picture."
+
+'''
+
+[#part-3]
+== Part 3 — Application topology and section wrap-up
+
+=== Know
+
+_With all components deployed and verified, the Developer Hub application topology view provides a visual overview of the entire Parasol system, all components, their relationships, deployment status, and health. This view gives both developers and platform engineers a shared understanding of the application landscape._
+
+**Business challenge:**
+
+* No single view of the complete application architecture and its deployment status
+* Teams lack visibility into cross-component dependencies and health
+* Understanding the full system requires navigating multiple tools and dashboards
+* Architecture diagrams are manually maintained and quickly become outdated
+
+**Value proposition:**
+
+The Developer Hub application topology view automatically generates a visual representation of the Parasol system from the catalog data. It shows all components, their relationships (depends-on, provides, consumes), deployment status, and pipeline health. This is a live view that updates as components are added, modified, or deployed. No manual diagram maintenance required.
+
+=== Show
+
+**What I say:**
+
+"Let me bring this all together. We have explored the catalog, scaffolded a component, scanned dependencies, built a trusted artifact, deployed it through admission control, and tracked it in TPA. Now let me show you the complete picture."
+
+**What I do:**
+
+. Open **Developer Hub** at {rhdh_url}
+
+. Navigate to the **Parasol Insurance** system in the catalog
+
+. Show the **Topology** view (application topology plugin):
+* Show all components visually: frontend, backend, Kafka, database, and the new component we just built
+* Point out the relationships between components (depends-on, provides, consumes)
+* "This is a live view of the entire Parasol system. Every component, every relationship, every dependency. It updated automatically when we added the new component through the template."
+
+. Show the **deployment status and pipeline health** for each component:
+* Point out the status indicators: deployed, healthy, pipeline status
+* Show that the new component we just built and deployed is visible with a healthy status
+* "Both developers and platform engineers see the same view. There is no ambiguity about what is deployed, what is healthy, and how components relate."
+
+. Talk track about **scaling to more applications**:
+* "As Parasol adds more applications and teams to the platform, the catalog and topology grow automatically. Every component registered through a template appears here. Every pipeline run updates the health status. This scales from one application to hundreds without manual diagram maintenance."
+
+// TODO: Add screenshot of Developer Hub application topology showing the Parasol system
+image::rhdh-topology-parasol.png[Developer Hub application topology showing the Parasol Insurance system with all components including Kafka and database and the new AI service,link=self,window=blank,align="center",width=700,title="Application topology: complete system view in Developer Hub"]
+
+**What they should notice:**
+
+* The topology is generated automatically from catalog data. No manual diagrams.
+* The new component appears automatically because the template registered it in the catalog
+* Deployment status and pipeline health are visible for each component
+* Relationships between components are explicit and navigable
+* This is a shared view for both developers and platform engineers
+
+**Business value callout:**
+
+"At Parasol, understanding the application landscape requires asking people, reading stale diagrams, and navigating multiple tools. With Developer Hub, the topology is always current, always complete, and always accessible. When the CTO asks 'what does our system look like?', the answer is one click away."
+
+== Section 2 summary
+
+=== What we demonstrated across Modules 4-6
+
+. **Module 4: Developer Hub and catalog** — AI-assisted modernization with Developer Lightspeed, centralized discovery through the RHDH catalog with Lightspeed Q&A, self-service environment provisioning, and component scaffolding through golden path templates
+. **Module 5: Secure development workflow** — Dependency vulnerability scanning in the IDE with actionable fixes, a secure build pipeline with ACS scanning and Tekton Chains attestation, and centralized secrets management with Vault
+. **Module 6: Trusted software supply chain** — Admission control that verifies image signatures and attestations at deployment, SBOM management with TPA for continuous compliance, and application topology for system visibility
+
+=== The trust chain
+
+Section 2 tells the story of a complete trusted software supply chain: the developer discovers components in the catalog, scaffolds a new component from a template, fixes a dependency vulnerability in real time, creates a merge request that triggers a secure pipeline with ACS scanning, signing, and SLSA attestation, the admission controller verifies trust at deployment, and TPA provides ongoing SBOM management for compliance. Every step is automated, auditable, and policy-driven.
+
+=== Key takeaways
+
+* Red Hat Developer Hub transforms developer discoverability and self-service with AI-powered Q&A
+* Golden path templates replace days of ticket-driven infrastructure provisioning
+* Dependency Analytics shifts security left to the developer's IDE
+* The secure build pipeline integrates security scanning, signing, and attestation into a single flow
+* Admission control ensures only verified artifacts reach production
+* SBOM management with TPA provides continuous compliance visibility
+* The entire supply chain is automated, with one intentional manual gate: the production MR approval
+
+=== Presenter transition
+
+[NOTE]
+====
+**Presenter tip:** If continuing to Section 3, the transition should set up the AI use case: "We have built a trusted, secure application platform with full supply chain visibility. Now Parasol's CIO wants to take the next step: leveraging AI to enhance their applications. Let's see how the platform makes that possible."
+====

@@ -1,0 +1,263 @@
+= Module 3: Platform operations (operating at scale)
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+*Presenter note*: This module shows how the platform handles cross-cutting operational concerns after the application is deployed. It covers Service Mesh for traffic management and security, the OpenShift Service Mesh console (Kiali) for observability, and wraps up with a talk track on additional platform capabilities. Target duration: 15 minutes across 3 parts.
+
+[#part-1]
+== Part 1 — Traffic management and security with Service Mesh
+
+=== Know
+
+_With the Parasol application deployed and running, the platform handles cross-cutting concerns that would otherwise require significant development effort in each service. OpenShift Service Mesh provides traffic management, mutual TLS encryption, and least-privilege access controls without any application code changes._
+
+**Business challenge:**
+
+* Service-to-service communication is unencrypted and ungoverned
+* Traffic routing changes require application code modifications and redeployments
+* No consistent security policies across services
+* Compliance requirements demand encryption in transit and access controls
+
+**Current state at Parasol:**
+
+* Service-to-service communication across the Parasol application's 2 services is unencrypted
+* Each development team implements their own retry and timeout logic inconsistently
+* No centralized traffic management or routing policies
+* Compliance audits flag the lack of encryption in transit as a critical finding
+
+**Value proposition:**
+
+Service Mesh provides traffic management, mTLS encryption, and fine-grained access policies as platform capabilities. Developers do not need to implement these in their application code. The platform team configures policies once, and they apply consistently across all services. This separation of concerns reduces developer cognitive load while meeting enterprise security and compliance requirements.
+
+=== Show
+
+**What I say:**
+
+"The application is deployed, the pipeline is automated, and GitOps handles delivery. But there is a whole class of operational concerns that every application needs: encryption between services, traffic management, access control. Traditionally, developers have to build these into their application code. With Service Mesh, the platform handles them automatically."
+
+**What I do:**
+
+. Open the **OpenShift web console** at {console_url}
+
+. Navigate to **Networking** → **Service Mesh** (the OpenShift Service Mesh console, powered by Kiali):
+* This is integrated directly into the OpenShift console. No separate tool to access.
+* "The Service Mesh console is built into OpenShift. The platform engineer does not need a separate dashboard. Everything is accessible from the same console."
+
+. Select the Parasol application namespace to view the mesh for the application
+
+. Show the **Overview** page for the namespace:
+* Point out the services enrolled in the mesh (the 2 Parasol services)
+* Show the health indicators for each service (green for healthy)
+* "Both Parasol services are enrolled in the mesh. The platform manages their communication automatically."
+
+. Show **mTLS encryption** status:
+* Point out the lock icons or mTLS indicators on the service connections
+* "Every request between these services is encrypted with mutual TLS. The developers did not write a single line of TLS code. The mesh handles certificate generation, rotation, and validation automatically."
+* "This satisfies the compliance requirement for encryption in transit. The platform team enabled it once, and it applies to every service in the mesh."
+
+. Show the **Traffic** view to demonstrate traffic routing:
+* Point out the traffic flow between the 2 services
+* Show request rates, success/error percentages
+* "The platform engineer can see exactly how traffic flows between services, what the success rate is, and where errors occur. If they need to do a canary deployment or traffic split, they can configure it through the mesh without touching application code."
+
+. Briefly discuss **access policies** (talk track):
+* "Service Mesh also supports authorization policies that control which services can communicate with each other. This is the principle of least privilege applied to service-to-service communication. Only authorized services can make requests. This is configured by the platform team, not the developers."
+
+// TODO: Add screenshot of the OpenShift Service Mesh console showing the namespace overview
+image::ossm-console-overview.png[OpenShift Service Mesh console showing the Parasol application namespace with service health indicators and mTLS status,link=self,window=blank,align="center",width=700,title="Service Mesh console: namespace overview with mTLS encryption"]
+
+// TODO: Add screenshot showing traffic flow between services
+image::ossm-traffic-flow.png[OpenShift Service Mesh console showing traffic flow between the Parasol application services with request rates and success percentages,link=self,window=blank,align="center",width=700,title="Service-to-service traffic flow with encryption"]
+
+**What they should notice:**
+
+* Service Mesh is integrated into the OpenShift console. No separate tool required.
+* mTLS encryption is automatic. The developers did not write any TLS code.
+* Traffic visibility is built in. The platform engineer can see how services communicate in real time.
+* Access policies enforce least privilege at the service level without application code changes.
+* All of these capabilities are configured by the platform team and apply consistently.
+
+**Business value callout:**
+
+"At Parasol today, service-to-service communication is unencrypted, and compliance audits flag it every quarter. Implementing mTLS in application code would require changes to every service, months of development work, and ongoing maintenance. The mesh handles it as a platform capability. The platform team enabled it once, and it applies to every service automatically. The compliance gap is closed without any developer effort."
+
+**If asked:**
+
+Q: "Does this add latency to requests?"::
+A: "The sidecar proxy adds minimal latency, typically less than 1 millisecond per hop. For the vast majority of applications, this is negligible compared to the security and observability benefits."
+
+Q: "What about services that are not in the mesh?"::
+A: "Services can be enrolled in the mesh incrementally. The platform team can start with critical services and expand over time. Services outside the mesh can still communicate, but they do not get mTLS or traffic management benefits."
+
+Q: "Can we do canary deployments with this?"::
+A: "Yes. Service Mesh supports traffic splitting, where you can route a percentage of traffic to a new version while the rest goes to the stable version. This is configured through the mesh, not in application code."
+
+'''
+
+[#part-2]
+== Part 2 — Observability with the Service Mesh console
+
+=== Know
+
+_Platform engineers and developers need visibility into how services interact, where traffic flows, and what the health of the system looks like. The OpenShift Service Mesh console (powered by Kiali) provides a real-time service graph, traffic flow visualization, health monitoring, and detailed metrics for all services in the mesh._
+
+**Business challenge:**
+
+* No visibility into service-to-service communication patterns
+* Troubleshooting distributed applications requires manual log correlation
+* Performance bottlenecks are difficult to identify without traffic visualization
+* Mean time to resolution (MTTR) is high due to lack of observability
+
+**Current state at Parasol:**
+
+* Operations team has no centralized view of traffic patterns across Parasol services
+* Incident troubleshooting requires manual log correlation across multiple services
+* Performance bottlenecks are only discovered after customer complaints
+* Average MTTR for cross-service issues is measured in hours, not minutes
+
+**Value proposition:**
+
+The Service Mesh console provides an intuitive, real-time view of the entire service mesh. Platform engineers can see traffic flow as an animated graph, identify unhealthy services instantly through color coding, drill into detailed metrics (requests per second, error rates, latency distributions), and trace individual requests across services. This reduces MTTR and gives both developers and operations teams a shared understanding of application behavior.
+
+=== Show
+
+**What I say:**
+
+"Now let me show you the observability side. We have encryption and traffic management, but the platform engineer also needs to see what is happening. How is traffic flowing? Are there errors? Where are the bottlenecks? The Service Mesh console gives you all of that in real time."
+
+**What I do:**
+
+. In the **OpenShift Service Mesh console** (still in the OpenShift console under Networking → Service Mesh), navigate to the **Graph** view for the Parasol namespace:
+* Show the service graph with animated traffic flow between the Parasol services
+* "This is a live graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
+* Point out the service nodes and the connections between them
+
+. Show the **health indicators** on the graph:
+* Green nodes indicate healthy services
+* Point out request success rate indicators on the connections
+* "At a glance, the platform engineer can see that both services are healthy and traffic is flowing normally. If a service starts failing, the node turns yellow or red immediately. No need to dig through logs to discover a problem."
+
+. Click on a service node to show **detailed metrics**:
+* Show the side panel with service details
+* Point out key metrics:
+** **Requests per second** — current throughput
+** **Error rate** — percentage of failed requests (4xx and 5xx responses)
+** **Response time** — p50, p95, and p99 latency percentiles
+* "The platform engineer can see exactly how each service is performing. If latency spikes or error rates increase, they know immediately which service is affected and can drill in further."
+
+. Show the **Workload** or **Service** detail view:
+* Navigate to the detail view for one of the Parasol services
+* Show the inbound and outbound traffic metrics
+* Show the traffic breakdown by response code (200, 400, 500, etc.)
+* "This is the level of detail you get without adding a single line of instrumentation to the application. The mesh collects all of this automatically."
+
+. Demonstrate the traffic **animation and graph layout options**:
+* Toggle different graph layouts (app graph, versioned app graph, workload graph)
+* Show how the graph adapts to show different perspectives
+* "Platform engineers can view traffic by application, by workload, or by version. During a canary deployment, for example, you can see traffic split between the old and new versions in real time."
+
+// TODO: Add screenshot of the Service Mesh console graph with animated traffic flow
+image::ossm-graph-traffic.png[OpenShift Service Mesh console showing the service graph with animated traffic flow between Parasol services and health indicators,link=self,window=blank,align="center",width=700,title="Service graph with real-time traffic flow and health indicators"]
+
+// TODO: Add screenshot of service detail metrics panel
+image::ossm-service-metrics.png[OpenShift Service Mesh console showing detailed service metrics including requests per second and error rate and latency percentiles,link=self,window=blank,align="center",width=700,title="Service detail metrics: throughput and error rate and latency"]
+
+**What they should notice:**
+
+* The service graph provides immediate visual understanding of the application architecture and traffic patterns
+* Health is indicated through color coding. No need to check dashboards or parse logs to know if something is wrong.
+* Detailed metrics (throughput, errors, latency) are available for every service without any application code instrumentation
+* The mesh collects all observability data automatically through the sidecar proxies
+* Different graph views provide different perspectives on the same traffic data
+
+**Business value callout:**
+
+"At Parasol, when a cross-service issue occurs, the operations team spends hours correlating logs across services to find the root cause. With the Service Mesh console, they can see the problem in seconds: which service is failing, what the error rate is, and how it affects downstream services. This reduces mean time to resolution from hours to minutes. And none of this required any changes to the application code. The platform provides it automatically."
+
+**If asked:**
+
+Q: "Does this replace our monitoring stack?"::
+A: "No. Service Mesh observability complements your existing monitoring. It focuses specifically on service-to-service communication: traffic flow, error rates, and latency between services. Your existing Prometheus, Grafana, and AlertManager stack continues to handle infrastructure and application-level metrics."
+
+Q: "Can developers access this?"::
+A: "Yes. The Service Mesh console is accessible through the OpenShift web console with appropriate RBAC permissions. Both platform engineers and developers can view the service graph and metrics for their namespaces."
+
+Q: "What about distributed tracing?"::
+A: "Service Mesh supports distributed tracing through integration with OpenTelemetry and Jaeger. This allows you to trace individual requests as they flow through multiple services, identifying exactly where latency or errors occur in the chain."
+
+Q: "How does this scale to larger environments?"::
+A: "The graph automatically adapts to the number of services. In larger environments, you can filter by namespace, application, or label to focus on specific areas. The underlying data collection scales with the mesh."
+
+'''
+
+[#part-3]
+== Part 3 — Platform capabilities talk track
+
+=== Know
+
+_Beyond the specific capabilities demonstrated in this demo, the OpenShift application platform provides additional features that scale across the organization. This section provides a talk track for discussing these broader capabilities without a live demonstration._
+
+**Additional platform capabilities:**
+
+* **Integration with existing CI systems** — Organizations using Jenkins, GitHub Actions, or GitLab CI can integrate with OpenShift Pipelines or use their existing CI alongside the platform capabilities shown here
+* **Serverless and event-driven architectures** — OpenShift Serverless (Knative) enables scale-to-zero workloads and event-driven patterns for use cases like document processing or AI inference
+* **Advanced deployment strategies** — Blue-green, canary, and A/B deployments through Service Mesh and Argo CD rollouts
+* **Multi-cluster management** — Red Hat Advanced Cluster Management for Kubernetes for managing policies and workloads across multiple OpenShift clusters
+* **AI/ML workloads** — Red Hat OpenShift AI for model training, serving, and integration with the application platform
+
+=== Show
+
+[NOTE]
+====
+**Presenter note:** This section is a talk track only. Use these talking points to address broader platform capabilities based on audience interest and remaining time.
+====
+
+**What I say:**
+
+"Before we wrap up, I want to highlight that what we showed today is just the starting point. The OpenShift application platform extends well beyond what we demonstrated:
+
+For teams that already use Jenkins or GitHub Actions, the platform integrates with your existing CI. You do not have to rip and replace. Tekton is there as an option, and many teams use both during a transition.
+
+For workloads that do not need to run all the time, OpenShift Serverless provides scale-to-zero capabilities. Think about batch processing, event-driven workflows, or AI inference endpoints that only spin up when requests come in.
+
+And for organizations looking to adopt AI, this platform is the foundation. The same automated pipelines, GitOps practices, and observability tools apply to AI workloads. Red Hat OpenShift AI adds model training and serving capabilities that plug directly into this platform.
+
+The key takeaway is that OpenShift is not just a container runtime. It is an application platform that grows with your organization's needs."
+
+**If asked:**
+
+Q: "How does this work in a multi-cloud environment?"::
+A: "OpenShift runs consistently across public clouds (AWS, Azure, GCP), private data centers, and edge locations. The developer and platform engineer experience is identical regardless of where the cluster runs. Red Hat Advanced Cluster Management for Kubernetes adds centralized policy and workload management across all clusters."
+
+Q: "What about cost management?"::
+A: "The platform consolidates multiple tools into a single, integrated experience. Instead of separately procuring, integrating, and supporting a CI system, a GitOps tool, a service mesh, and an observability stack, these are all included with OpenShift. This reduces total cost of ownership."
+
+Q: "How do we get started?"::
+A: "Most organizations start with one team and one application, exactly the pattern we showed today. Adopt DevSpaces for the developer experience, add a pipeline for CI, and layer on GitOps and Service Mesh as the team matures. The platform grows with you."
+
+== Section 1 summary
+
+=== What we demonstrated across Modules 1-3
+
+. **Module 1: Developer experience** — Application modernization with MTA, one-click DevSpaces access from the topology view, fast iteration with Quarkus dev mode, and platform engineer governance of DevSpaces through the operator and devfile registry
+. **Module 2: CI/CD pipeline** — Automated pipeline triggering, SAST/Sonarqube quality gate enforcement, AI-assisted test generation, and GitOps-driven delivery with Argo CD
+. **Module 3: Platform operations** — mTLS encryption and traffic management with Service Mesh, real-time observability through the Service Mesh console, and broader platform capabilities
+
+=== The continuous story
+
+A new developer joined Parasol, clicked one button to open the app in DevSpaces, added a feature in seconds with Quarkus dev mode, pushed code that triggered an automated pipeline, fixed a quality issue with AI assistance, and deployed through GitOps, all on a platform that handles encryption, traffic management, and observability automatically. This is what an application platform delivers.
+
+=== Key takeaways
+
+* OpenShift is more than containers: it is an application platform
+* The platform reduces developer cognitive load at every stage of the lifecycle
+* Automated guardrails enforce quality and security without slowing developers down
+* GitOps and Service Mesh provide enterprise-grade delivery and operations
+* The same platform foundations support AI adoption and multi-cloud strategies
+
+=== Presenter wrap-up
+
+[NOTE]
+====
+**Presenter tip:** End with a clear call to action relevant to your audience. For prospects, suggest a workshop or proof of concept. For existing customers, recommend specific capabilities to adopt next based on what resonated during the demo. If continuing to Section 2, transition with: "Everything we showed is the foundational platform. In Section 2, we layer on advanced developer services: a developer portal, secure supply chain, and compliance automation."
+====

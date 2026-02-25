@@ -1,0 +1,316 @@
+= Module 5: Secure development workflow
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+*Presenter note*: This module continues the Section 2 story. The developer works on their new component in DevSpaces, uses the Dependency Analytics plugin to discover and fix a vulnerability, then creates a merge request that triggers the secure build pipeline with ACS scanning, image signing, SBOM generation, and SLSA attestation. External secrets are managed through Vault. Note: no commit signing in this flow due to URL copy-paste constraints. Target duration: 15 minutes across 3 parts.
+
+[#part-1]
+== Part 1 — Development with DevSpaces and Dependency Analytics
+
+=== Know
+
+_The developer opens their new component in DevSpaces and begins development. In Section 2, DevSpaces includes the Dependency Analytics plugin, which provides real-time vulnerability scanning of project dependencies directly in the IDE. This gives developers immediate feedback on security issues before they even commit code._
+
+**Business challenge:**
+
+* Vulnerable dependencies are discovered late in the pipeline, requiring expensive rework
+* Developers have no visibility into the security posture of their dependencies during development
+* Known CVEs in transitive dependencies go undetected until production scanning
+* Manual dependency review processes do not scale across hundreds of developers
+
+**Current state at Parasol:**
+
+* Dependency vulnerabilities are only detected during CI pipeline scans
+* Developers discover security issues days after committing code, requiring context switching
+* Transitive dependency risks are invisible during the development process
+* No proactive guidance on which dependency versions are safe to use
+
+**Value proposition:**
+
+The Dependency Analytics plugin in DevSpaces scans project dependencies in real-time as the developer works. It identifies known CVEs, license issues, and outdated dependencies directly in the IDE, providing recommendations for safe versions. This shifts security left to the earliest possible point, the developer's inner loop, reducing the cost and friction of security remediation.
+
+=== Show
+
+**What I say:**
+
+"Our developer has their new component open in DevSpaces from Module 4. Before they even start writing business logic, let's look at what the Dependency Analytics plugin is already telling them about the project's dependencies."
+
+**What I do:**
+
+. In the **DevSpaces** workspace (continuing from Module 4), open the project's dependency file:
+* Open `pom.xml` for a Quarkus/Java project
+* "The Dependency Analytics plugin scans this file automatically. It checks every dependency against known vulnerability databases in real time."
+
+. Show the **inline annotations** from Dependency Analytics:
+* Point out dependencies with vulnerability indicators (warning icons, colored underlines)
+* Show a dependency flagged with a known CVE:
+** The severity level (Critical, High, Medium, Low)
+** The CVE identifier
+** A brief description of the vulnerability
+* "The developer can see immediately that one of their dependencies has a known vulnerability. They did not have to run a separate scan or wait for the pipeline. The information is right here in the IDE."
+
+. Click on the flagged dependency to show **details and remediation**:
+* Show the vulnerability detail panel:
+** CVE identifier and description
+** Affected versions
+** Recommended safe version to upgrade to
+* "Dependency Analytics does not just flag the problem. It tells the developer exactly which version to upgrade to. One click to see the fix."
+
+. **Fix the vulnerability** by updating the dependency version:
+* Change the dependency version in `pom.xml` to the recommended safe version
+* Show the warning disappearing after the update
+* "The developer updated one line in the dependency file, and the vulnerability is resolved. In the old workflow, this would have been caught days later in a pipeline scan, requiring the developer to context-switch back to fix it."
+
+. Show that the remaining dependencies are clean:
+* Point out dependencies with green indicators (no known vulnerabilities)
+* "The rest of the dependencies are clean. The developer has confidence that their project's dependency tree is secure before they even commit."
+
+// TODO: Add screenshot of DevSpaces showing Dependency Analytics vulnerability annotations
+image::devspaces-dependency-analytics.png[DevSpaces IDE showing Dependency Analytics inline annotations highlighting a vulnerable dependency with CVE details and remediation guidance,link=self,window=blank,align="center",width=700,title="Dependency Analytics catches a vulnerability in real time"]
+
+**What they should notice:**
+
+* Vulnerability scanning happens in real time, directly in the IDE. No separate tool, no pipeline wait.
+* The plugin provides actionable remediation: specific version to upgrade to
+* The fix is a single-line change in the dependency file
+* The developer fixed the vulnerability before committing, avoiding pipeline failure and context switching
+* This is "shift left" in action: security at the earliest possible point
+
+**Business value callout:**
+
+"At Parasol, dependency vulnerabilities are only caught during pipeline scans, days after the developer wrote the code. By then, the developer has moved on to other work and has to context-switch back to fix it. Dependency Analytics catches the issue in real time, while the developer is actively working on the file. The fix takes seconds instead of hours. Multiply that across 200 developers and thousands of dependencies, and the cost savings are significant."
+
+**If asked:**
+
+Q: "What vulnerability databases does it use?"::
+A: "Dependency Analytics uses Red Hat's vulnerability data, which includes CVE databases, Red Hat security advisories, and known exploit information. It covers both direct and transitive dependencies."
+
+Q: "Does this work for languages other than Java?"::
+A: "Yes. Dependency Analytics supports Java (Maven, Gradle), JavaScript (npm), Python (pip), and Go. The plugin scans the appropriate dependency file for each language."
+
+Q: "What about transitive dependencies?"::
+A: "Dependency Analytics scans the full dependency tree, including transitive dependencies. A vulnerability in a library that your library depends on is still flagged."
+
+'''
+
+[#part-2]
+== Part 2 — Merge request and secure build pipeline
+
+=== Know
+
+_When the developer is done with their inner loop development, they create a merge request. This triggers the preprod build pipeline, which includes not just building and testing but also ACS vulnerability scanning, image signing, SBOM generation, and SLSA attestation via Tekton Chains. The pipeline also triggers a merge request to the Argo CD production configuration repository._
+
+**Business challenge:**
+
+* Software supply chain attacks are increasing in frequency and sophistication
+* No automated verification that build artifacts are genuine and untampered
+* SBOMs are not generated consistently, making vulnerability tracking impossible at scale
+* Compliance frameworks increasingly require provenance attestation for all deployed software
+
+**Current state at Parasol:**
+
+* Build artifacts are not signed or verified before deployment
+* No software bill of materials (SBOM) is generated for any application
+* Supply chain provenance is undocumented, no way to verify what went into a build
+* Compliance audits require manual evidence gathering for build and deployment processes
+
+**Value proposition:**
+
+The secure build pipeline integrates multiple trust and compliance controls into a single automated flow. When a merge request triggers the pipeline: Red Hat Advanced Cluster Security (ACS) scans for vulnerabilities and enforces policies; Tekton Chains signs the container image, generates an SBOM, and creates SLSA attestation; and the pipeline creates a merge request to the Argo CD production configuration repository. Every artifact has a verifiable chain of custody from source to deployment.
+
+=== Show
+
+**What I say:**
+
+"The developer has fixed the dependency vulnerability and finished their code changes. Now they create a merge request. Watch what happens in the pipeline. This is not just a build, it is a full trusted software supply chain."
+
+**What I do:**
+
+. In **DevSpaces**, commit and push the changes, then create a merge request:
++
+[source,bash,role=execute]
+----
+git add -A && git commit -m "Add claims routing service with dependency fix" && git push origin main
+----
+
+. Switch to **GitLab** at {gitlab_url} to show the merge request:
+* Show the MR with the code diff (including the dependency version fix)
+* "The developer created a merge request. This automatically triggers the secure build pipeline."
+
+. Switch to **Developer Hub** at {rhdh_url} and navigate to the component's **CI/CD** tab:
+* Show the pipeline run triggered by the merge request
+* "The developer sees the pipeline status right here in Developer Hub. No need to switch to the OpenShift console. Developer Hub is the single pane of glass for everything: catalog, pipelines, Argo CD status, and container images."
+
+. Walk through each stage as it appears in the Developer Hub pipeline view:
+* **Source checkout and build** — Code pulled, Quarkus application compiled
+* **Unit tests** — Tests executed and passing
+* **ACS vulnerability scan and policy check** — Red Hat Advanced Cluster Security scans the built image
+* Point out: "ACS checks the image against known vulnerability databases and organizational policies. If the image violates a policy, the pipeline stops here."
+* **Image push** — Image pushed to the container registry
+* **Tekton Chains** — Automated post-build trust steps:
+** Image signing (cryptographic signature applied)
+** SBOM generation (software bill of materials created)
+** SLSA attestation (provenance record created)
+* "Tekton Chains runs automatically after the image is built. It signs the image, generates an SBOM listing every component inside, and creates a SLSA attestation that proves how the image was built. None of this requires developer action."
+
+. Show the **ACS scan results**:
+* Open ACS at {acs_url} or show the scan results in the pipeline logs
+* Point out the vulnerability summary: vulnerabilities found, severity levels, policy pass/fail
+* "ACS found some low-severity vulnerabilities but the policy passed. The platform team defines the threshold. Critical vulnerabilities would block the pipeline."
+
+. Explain the **production MR** created by the pipeline:
+* "The pipeline also created a merge request to the Argo CD production configuration repository. This MR updates the production deployment to use the new signed image. When the platform engineer merges that MR, the image lands in production. We will see that in Module 6."
+
+// TODO: Add screenshot of Developer Hub showing the secure pipeline running
+image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure build pipeline with ACS scan and Tekton Chains stages,link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
+
+// TODO: Add screenshot of ACS scan results
+image::acs-scan-results.png[Red Hat Advanced Cluster Security scan results showing vulnerability summary and policy compliance for the built image,link=self,window=blank,align="center",width=700,title="ACS vulnerability scan results and policy compliance"]
+
+**What they should notice:**
+
+* The pipeline includes security scanning (ACS), image signing, SBOM generation, and SLSA attestation automatically
+* The developer did not configure any of this. The pipeline template includes all trust steps.
+* ACS enforces organizational policies. Critical vulnerabilities block the pipeline.
+* Tekton Chains signs the image, generates the SBOM, and creates attestation without developer action
+* The pipeline also creates a production MR in the GitOps repository, connecting CI to CD
+
+**Business value callout:**
+
+"Every artifact that comes out of this pipeline has a cryptographic signature proving it is genuine, an SBOM listing every component inside it, and a SLSA attestation proving how it was built. At Parasol today, none of this exists. Compliance audits require weeks of manual evidence gathering. With this pipeline, compliance evidence is generated automatically for every build."
+
+**If asked:**
+
+Q: "What is SLSA attestation?"::
+A: "SLSA (Supply-chain Levels for Software Artifacts) is a framework for ensuring software supply chain integrity. The attestation proves how the artifact was built: which source code, which build system, which steps. It is a verifiable record of provenance."
+
+Q: "Can we customize which policies ACS enforces?"::
+A: "Yes. ACS policies are fully configurable by the platform team. They can set thresholds for vulnerability severity, block specific CVEs, enforce base image requirements, and more. Policies apply consistently across all pipelines."
+
+Q: "What happens if the ACS scan fails?"::
+A: "The pipeline stops. The image is not pushed, not signed, and not attested. The developer gets a clear report of what failed and why. They fix the issue and push again."
+
+'''
+
+[#part-3]
+== Part 3 — External secrets with Vault
+
+=== Know
+
+_Applications need secrets, database credentials, API keys, certificates, but storing them in Git or environment variables is a security risk. Parasol uses HashiCorp Vault with the External Secrets Operator to inject secrets into applications at runtime, keeping sensitive data out of source control and configuration manifests._
+
+**Business challenge:**
+
+* Secrets stored in Git repositories or environment variables are a security liability
+* No centralized secrets management across applications and environments
+* Secret rotation requires manual updates to application configurations
+* Compliance requirements mandate secrets management with audit trails
+
+**Current state at Parasol:**
+
+* Some teams store secrets in Git (encrypted but still in source control)
+* Others use Kubernetes secrets directly, with no centralized management
+* Secret rotation is manual and error-prone, sometimes causing outages
+* No audit trail for who accessed which secrets and when
+
+**Value proposition:**
+
+The External Secrets Operator integrates with HashiCorp Vault to provide centralized, audited secrets management. Secrets are stored in Vault and automatically synced to Kubernetes secrets at runtime. Developers reference secrets by name in their manifests without ever seeing the actual values. Secret rotation happens in Vault and propagates automatically, with full audit trails for compliance.
+
+=== Show
+
+**What I say:**
+
+"Before we move on to production deployment, let me address a critical concern: secrets management. Our application needs database credentials, API keys, and other sensitive data. Where do those secrets come from, and how do we keep them secure?"
+
+**What I do:**
+
+. Open **Vault** at {vault_url}:
+* Show the Parasol secrets organized by environment (dev, staging, production)
+* Point out example secrets: database credentials, API keys, certificate data
+* "All secrets are stored centrally in Vault, organized by application and environment. The developer never sees these values in their code or manifests."
+
+. Show an **ExternalSecret** resource in the application manifests:
+* Switch to DevSpaces or the Git repository and open the Kubernetes manifests
+* Show the `ExternalSecret` resource that references a Vault path:
++
+[source,yaml]
+----
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: parasol-db-credentials
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: parasol-db-credentials
+  data:
+    - secretKey: username
+      remoteRef:
+        key: parasol/dev/database
+        property: username
+    - secretKey: password
+      remoteRef:
+        key: parasol/dev/database
+        property: password
+----
++
+* "The manifest references a path in Vault, not the actual secret value. The External Secrets Operator syncs the value at runtime."
+
+. Show the **synced Kubernetes secret** in the OpenShift console:
+* Navigate to the application namespace and show the Kubernetes secret created by the operator
+* Point out that the secret exists in the cluster but was never committed to Git
+* "The operator automatically created this Kubernetes secret from the Vault data. The application consumes it like any normal secret. But the actual values never appear in source control."
+
+. **Talk track** about rotation and audit:
+* "When the platform team rotates a secret in Vault, the External Secrets Operator syncs the new value automatically based on the refresh interval. No application restart required, no manual update. And every access to every secret is audited in Vault's audit log."
+
+// TODO: Add screenshot of Vault showing Parasol secrets organized by environment
+image::vault-parasol-secrets.png[HashiCorp Vault showing Parasol Insurance secrets organized by environment with database credentials and API keys,link=self,window=blank,align="center",width=700,title="Centralized secrets management in Vault"]
+
+**What they should notice:**
+
+* Secrets are never stored in Git or hardcoded in application code
+* The ExternalSecret resource references a Vault path, not an actual value
+* The operator handles syncing automatically, keeping the cluster in sync with Vault
+* Secret rotation is transparent to the application
+* Full audit trail for compliance
+
+**Business value callout:**
+
+"At Parasol, some teams store secrets in Git, others use Kubernetes secrets directly. Neither approach provides centralized management, rotation, or audit trails. With Vault and the External Secrets Operator, every secret is centrally managed, automatically rotated, and fully audited. The developer never sees the actual values, and compliance requirements are satisfied automatically."
+
+**If asked:**
+
+Q: "What happens if Vault is unavailable?"::
+A: "The Kubernetes secrets that were already synced continue to work. The External Secrets Operator retries on the next refresh interval. Applications are not affected by temporary Vault outages because they consume the Kubernetes secret, not Vault directly."
+
+Q: "Can different teams have different access to secrets?"::
+A: "Yes. Vault supports fine-grained access control policies. Each team can only access secrets for their applications and environments. The platform team manages the access policies."
+
+Q: "Do we have to use Vault specifically?"::
+A: "The External Secrets Operator supports multiple backends: HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, Google Secret Manager, and others. Vault is the most common choice for on-premises deployments."
+
+== Module 5 summary
+
+=== What we demonstrated
+
+In this module, you saw how the secure development workflow protects the software supply chain:
+
+. **Dependency Analytics** — Real-time vulnerability scanning of dependencies directly in the developer's IDE, with actionable remediation to fix issues before committing
+. **Secure build pipeline** — ACS scanning, image signing, SBOM generation, and SLSA attestation integrated into a single automated pipeline, triggered by a merge request
+. **External secrets management** — Vault integration keeps sensitive data out of source control with centralized management, automatic rotation, and audit trails
+
+=== Setting up Module 6
+
+The secure build pipeline has produced a signed image with full attestation and created a merge request to the production configuration repository. In Module 6, we will see how the admission controller verifies these attestations before allowing deployment to production, and how SBOMs are managed through the Trusted Profile Analyzer.
+
+=== Presenter transition
+
+[NOTE]
+====
+**Presenter tip:** The transition to Module 6 should emphasize the trust chain: "We have built a signed, attested artifact with a complete SBOM. The pipeline has created a merge request for production deployment. Now let's see how the platform verifies that trust chain at deployment time."
+====

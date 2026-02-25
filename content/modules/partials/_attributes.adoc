@@ -1,0 +1,54 @@
+// Shared attributes for the Application Platform Demo
+// These map to Showroom runtime variables from RHDP provisioning
+
+// Environment URLs — Section 1 (Foundational)
+:console_url: {openshift_console_url}
+:api_url: {openshift_api_url}
+:devspaces_url: {devspaces_dashboard_url}
+:gitea_url: {gitea_console_url}
+:argocd_url: {argocd_console_url}
+:kiali_url: {kiali_console_url}
+:pipeline_url: {openshift_console_url}/pipelines
+
+// Environment URLs — Section 2 (Advanced Developer Services)
+:rhdh_url: {rhdh_console_url}
+:acs_url: {acs_console_url}
+:tpa_url: {tpa_console_url}
+:vault_url: {vault_console_url}
+:gitlab_url: {gitlab_console_url}
+
+// Environment URLs — Section 3 (Intelligent Applications)
+:llm_endpoint_url: {llm_serving_url}
+
+// User credentials
+:user: {user_name}
+:password: {user_password}
+:admin_user: {cluster_admin_user}
+:admin_password: {cluster_admin_password}
+:gitea_user: {gitea_admin_username}
+:gitea_password: {gitea_admin_password}
+:argocd_user: {argocd_admin_username}
+:argocd_password: {argocd_admin_password}
+:gitlab_user: {gitlab_admin_username}
+:gitlab_password: {gitlab_admin_password}
+
+// Product versions — Section 1
+:ocp_version: 4.21
+:devspaces_version: 3.26
+:pipelines_version: 1.21
+:gitops_version: 1.19
+:serverless_version: 1.37
+:servicemesh_version: 3.2
+:quarkus_version: 3.27
+:monitoring_version: 4.21
+:mta_version: 7.2
+
+// Product versions — Section 2
+:rhdh_version: 1.5
+:acs_version: 4.8
+:tas_version: 1.2
+:tpa_version: 1.1
+:tekton_chains_version: 0.24
+
+// Product versions — Section 3
+:openshift_ai_version: 2.18

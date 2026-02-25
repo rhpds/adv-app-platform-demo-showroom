@@ -1,5 +1,11 @@
 name: modules
-title: Showroom Collection
+title: "OpenShift Advanced App Platform Demo"
 version: ~
 nav:
   - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    lab_name: "OpenShift Advanced App Platform"
+    release-version: master
+    page-pagination: true
