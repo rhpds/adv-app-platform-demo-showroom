@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module continues directly from Module 1. The developer pushes code without a unit test, the Tekton pipeline catches it via SAST/Sonarqube, the developer uses AI-assisted code generation in DevSpaces to write the test, and Argo CD handles deployment. The pipeline is viewed in the OpenShift web console and the deployment sync is viewed in the Argo CD console. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This module continues directly from Module 1. The developer pushes code with code smells (improper logging and empty exception handling), the Tekton pipeline catches them via SAST/Sonarqube, the developer fixes the issues in DevSpaces, and Argo CD handles deployment. The pipeline is viewed in the OpenShift web console and the deployment sync is viewed in the Argo CD console. Target duration: 15 minutes across 3 parts.
 
 [#part-1]
 == Part 1 — Triggering the pipeline
@@ -33,7 +33,7 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 
 **What I say:**
 
-"Our developer is happy with the discount feature they added in Module 1. They have tested it locally with Quarkus dev mode and it works. Now they are going to push the code. Watch what happens next. The developer does not need to file a ticket, notify a build engineer, or trigger anything manually. The platform handles it."
+"Our developer is happy with the claims statistics endpoint they added in Module 1. They tested it locally with Quarkus dev mode and it works. Now they are going to push the code. Watch what happens next. The developer does not need to file a ticket, notify a build engineer, or trigger anything manually. The platform handles it."
 
 **What I do:**
 
@@ -41,14 +41,14 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 +
 [source,bash,role=execute]
 ----
-git add -A && git commit -m "Add discount feature to claims service" && git push
+git add -A && git commit -m "Add claims statistics API endpoint" && git push
 ----
 +
 * "That is all the developer does. A standard git push. The platform takes it from here."
 
-. Switch to the **OpenShift web console** at {console_url}
+. Switch to the **OpenShift web console** at {console_url} (logged in as `{dev_user}` / `{password}`)
 
-. Navigate to the **Pipelines** section in the Developer perspective:
+. Navigate to the **Pipelines** section in the `{parasol_build_ns}` namespace:
 * Show the pipeline run that was triggered automatically by the git push
 * "The developer did not click a 'Build' button. The git push triggered a webhook that started the Tekton pipeline automatically."
 
@@ -62,7 +62,7 @@ git add -A && git commit -m "Add discount feature to claims service" && git push
 * "Every code change goes through the exact same stages. No shortcuts, no skipping steps, no variation between teams."
 
 . Point out that the pipeline is still running:
-* "Let's watch this for a moment. In Part 2, we will see what happens when the pipeline reaches the SAST/Sonarqube stage."
+* "Let's watch this for a moment. Remember those code shortcuts our developer took? In Part 2, we will see what happens when the pipeline reaches the SAST/Sonarqube stage."
 
 // TODO: Add screenshot of OpenShift console showing the pipeline run in progress
 image::ocp-pipeline-running.png[OpenShift web console Pipelines view showing a Tekton pipeline run triggered by git push with stages in progress,link=self,window=blank,align="center",width=700,title="Pipeline run triggered automatically by git push"]
@@ -92,76 +92,117 @@ A: "A full pipeline run with build, test, and scanning typically completes in 3-
 '''
 
 [#part-2]
-== Part 2 — Pipeline catches missing tests
+== Part 2 — Pipeline catches code smells
 
 === Know
 
-_The pipeline's SAST/Sonarqube stage fails because the developer did not write a unit test for the new discount feature in Module 1. Sonarqube's quality gate enforces minimum test coverage, and the new code path is untested. This is the platform's guardrail in action: the CI pipeline enforces testing standards that the developer's inner loop does not. The developer uses AI-assisted code generation in DevSpaces to write the missing test, pushes again, and the pipeline passes._
+_The pipeline's SAST/Sonarqube stage fails because the developer's new claims statistics endpoint contains code smells: `System.out.println` instead of proper logging and an empty catch block that silently swallows exceptions. Sonarqube's quality gate enforces coding standards, and these violations prevent the code from moving forward. This is the platform's guardrail in action: the CI pipeline enforces code quality standards that the developer's inner loop does not. The developer fixes the issues in DevSpaces, pushes again, and the pipeline passes._
 
 **Business challenge:**
 
-* Untested code reaching production causes outages and customer impact
-* Developers skip tests under deadline pressure, accumulating technical debt
-* Manual code review alone cannot catch all testing gaps
-* Fixing defects found in production is 10-100x more expensive than catching them in CI
+* Code smells accumulate as technical debt, making the codebase harder to maintain over time
+* Improper logging makes production debugging expensive and time-consuming
+* Swallowed exceptions hide failures, causing silent data corruption or incorrect behavior
+* Manual code review alone cannot catch all quality issues consistently across teams
 
 **Current state at Parasol:**
 
-* Test coverage is below 40% across the codebase
-* Developers run tests manually (if at all) before committing
-* No automated test enforcement in the build process
-* Production incidents traced to untested code changes occur monthly
+* No automated code quality enforcement in the development workflow
+* Developers use `System.out.println` for debugging and leave it in production code
+* Empty catch blocks hide errors that surface as difficult-to-diagnose production issues
+* Code review quality varies by team, with inconsistent enforcement of coding standards
 
 **Value proposition:**
 
-Automated quality gates in the pipeline catch gaps that manual processes miss. Sonarqube enforces minimum test coverage, ensuring that new code paths have corresponding tests. When the pipeline fails, AI-assisted development tools in DevSpaces help the developer fix the issue quickly, reducing friction and keeping the developer in flow. The platform enforces quality without becoming a bottleneck.
+Automated quality gates in the pipeline catch code smells that manual processes miss. Sonarqube enforces organizational coding standards — proper logging frameworks, meaningful exception handling, code complexity limits — on every commit. When the pipeline fails, the developer gets specific, actionable feedback and can fix the issues immediately in DevSpaces. The platform enforces quality without becoming a bottleneck.
 
 === Show
 
 **What I say:**
 
-"Remember, our developer added the discount feature but did not write a unit test. They were focused on shipping the feature and skipped the test. Let's see what the platform has to say about that."
+"Remember, our developer added the claims statistics endpoint and it works. But they took a couple of shortcuts: they used `System.out.println` for logging instead of a proper logging framework, and they wrapped everything in a try-catch block with an empty catch — silently swallowing any exceptions. Let's see what the platform has to say about that."
 
 **What I do:**
 
 . In the **OpenShift web console**, show the pipeline run reaching the **SAST/Sonarqube** stage:
 * The stage turns red (failed status)
-* "The pipeline caught it. The SAST/Sonarqube quality gate failed because the new discount feature has no unit test coverage."
+* "The pipeline caught it. The SAST/Sonarqube quality gate failed because of code smells in the new endpoint."
 
 . Click into the failed stage to show the failure details:
-* Show the Sonarqube report indicating insufficient test coverage for the new code
-* Point out the specific quality gate that failed: new code must meet the minimum coverage threshold
-* "This is not a suggestion. It is a hard gate. Untested code does not move forward. Period."
+* Show the Sonarqube report highlighting the two code smells:
+** **`System.out.println` usage** — Standard output should not be used for logging in production code. Use a proper logging framework instead.
+** **Empty catch block** — Exceptions should not be silently swallowed. Either handle the exception, log it, or let it propagate.
+* "These are not suggestions. They are hard gates. Code with these quality violations does not move forward. The platform enforces the same standard for every developer on every commit."
 
 . Pause for the business value connection:
-* "At Parasol today, untested code makes it to production regularly. That is how they end up with monthly incidents caused by code changes that were never properly tested. The platform has just prevented that from happening."
+* "These might seem like minor issues, but they compound. At Parasol today, when a production incident occurs, the operations team spends hours searching through logs because developers used `System.out.println` instead of a proper logger with structured output. And those empty catch blocks? They silently hide failures that surface weeks later as data inconsistencies. The platform just prevented both of those problems."
 
 . Switch back to **DevSpaces** where the developer's workspace is still open
 
-. Show the developer using **AI code assistance** to write the missing test:
-* Open the claims service test directory
-* Create a new test file (or open the existing test class)
-* Use the DevSpaces code assistance feature to generate a unit test for the discount feature:
-** Highlight the `setDiscount` method (or relevant code)
-** Invoke code assistance (e.g., right-click, "Generate test", or use the AI assistant chat)
-** Show the AI generating a unit test that validates the discount functionality
+. Fix the code smells in the `ClaimStatsResource.java` file:
+* Replace `System.out.println` with the Quarkus `Log` API
+* Remove the empty try-catch block and let the business logic execute directly
+* Show the corrected code:
+
++
+[source,java,role=copy]
+----
+package com.parasol;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.quarkus.logging.Log;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/api/claims/stats")
+@Produces(MediaType.APPLICATION_JSON)
+public class ClaimStatsResource {
+
+	@Inject
+	ClaimsResource claimsResource;
+
+	@GET
+	public Map<String, Object> getStats() {
+		Map<String, Object> stats = new HashMap<>();
+
+		Log.info("Fetching claim statistics");
+
+		var claims = claimsResource.getAllClaims();
+		stats.put("total", claims.size());
+
+		Map<String, Long> byCategory = new HashMap<>();
+		for (var claim : claims) {
+			byCategory.merge(claim.category, 1L, Long::sum);
+		}
+		stats.put("by_category", byCategory);
+
+		Map<String, Long> byStatus = new HashMap<>();
+		for (var claim : claims) {
+			byStatus.merge(claim.status, 1L, Long::sum);
+		}
+		stats.put("by_status", byStatus);
+
+		return stats;
+	}
+}
+----
 
 +
 [NOTE]
 ====
-**Presenter tip:** Walk through the generated test briefly. Point out that the AI understood the business logic (the discount value, the expected behavior) and produced a meaningful test, not just boilerplate. Emphasize that the developer reviews and can modify the generated test before accepting it.
+**Presenter tip:** Walk through the two fixes briefly. First, point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API — this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. Second, show that the empty try-catch was removed entirely — if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it.
 ====
-
-. Show the generated test code:
-* The test validates that the discount field is set correctly
-* The test covers the expected behavior of the new feature
-* "The AI understood what the code does and generated a test that validates the business logic. The developer reviews it, makes any adjustments, and accepts it."
 
 . Commit and push the fix:
 +
 [source,bash,role=execute]
 ----
-git add -A && git commit -m "Add unit test for discount feature" && git push
+git add -A && git commit -m "Fix code smells: use proper logging and remove empty catch block" && git push
 ----
 
 . Switch back to the **OpenShift web console** Pipelines view and show the new pipeline run:
@@ -169,42 +210,42 @@ git add -A && git commit -m "Add unit test for discount feature" && git push
 * Watch the stages progress: clone, build, test, SAST/Sonarqube
 * The SAST/Sonarqube stage passes this time (green status)
 * All remaining stages complete successfully
-* "The developer wrote the test with AI assistance, pushed the fix, and the pipeline passes. The quality gate is satisfied."
+* "The developer fixed the code smells, pushed the update, and the pipeline passes. The quality gate is satisfied."
 
 // TODO: Add screenshot of OpenShift console showing the failed pipeline stage
-image::ocp-pipeline-failed.png[OpenShift web console showing a failed SAST/Sonarqube pipeline stage with quality gate violation due to missing test coverage,link=self,window=blank,align="center",width=700,title="Pipeline fails: SAST/Sonarqube catches missing test coverage"]
+image::ocp-pipeline-failed.png[OpenShift web console showing a failed SAST/Sonarqube pipeline stage with quality gate violation due to code smells,link=self,window=blank,align="center",width=700,title="Pipeline fails: SAST/Sonarqube catches code smells"]
 
-// TODO: Add screenshot of DevSpaces AI code assistance generating a unit test
-image::devspaces-code-assistance-test.png[DevSpaces IDE showing AI code assistance generating a unit test for the discount feature,link=self,window=blank,align="center",width=700,title="AI code assistance generates the missing unit test"]
+// TODO: Add screenshot of the Sonarqube report showing code smell details
+image::sonarqube-code-smells.png[Sonarqube report showing code smell violations: System.out.println usage and empty catch block,link=self,window=blank,align="center",width=700,title="Sonarqube identifies improper logging and empty exception handling"]
 
 // TODO: Add screenshot of OpenShift console showing the passing pipeline
-image::ocp-pipeline-passed.png[OpenShift web console showing all pipeline stages passing after the developer added the unit test,link=self,window=blank,align="center",width=700,title="Pipeline passes after adding the unit test"]
+image::ocp-pipeline-passed.png[OpenShift web console showing all pipeline stages passing after the developer fixed the code smells,link=self,window=blank,align="center",width=700,title="Pipeline passes after fixing code smells"]
 
 **What they should notice:**
 
-* The platform caught the missing test automatically. No human reviewer needed to flag it.
-* The failure was specific and actionable: Sonarqube told the developer exactly what was missing
-* AI code assistance made the fix fast. The developer did not need to context-switch or spend time writing boilerplate test code.
+* The platform caught the code smells automatically. No human reviewer needed to flag them.
+* The failures were specific and actionable: Sonarqube told the developer exactly what to fix and why
+* The fix was straightforward: replace `System.out.println` with `Log.info` and remove the empty catch block
 * The fix followed the same workflow: code change, git push, automatic pipeline run
 * The second pipeline run passed all stages, including the previously failed quality gate
 
 **Business value callout:**
 
-"This is the platform's guardrail in action. At Parasol, untested code changes cause monthly production incidents. Each incident costs thousands in emergency response and customer impact. The platform just prevented that by catching the gap before the code went anywhere near production. And the AI assistant made the fix take seconds instead of minutes. The developer stayed in flow, the quality gate is satisfied, and the code is production-ready."
+"This is the platform's guardrail in action. At Parasol, code smells like these accumulate across hundreds of developers and thousands of commits. Each one seems minor, but together they create a codebase that is difficult to debug, difficult to maintain, and prone to silent failures. The platform just prevented that by enforcing coding standards automatically on every commit. The developer got specific feedback, fixed the issues in minutes, and the code is now production-ready with proper logging and exception handling."
 
 **If asked:**
 
 Q: "What if the developer disagrees with the quality gate?"::
 A: "Quality gates are defined by the platform team based on organizational standards. They are not optional for individual developers. However, the platform team can adjust thresholds and rules as the organization matures. The goal is to establish a baseline that everyone follows."
 
-Q: "Which AI model powers the code assistance?"::
-A: "DevSpaces code assistance can integrate with multiple model backends. Organizations can use Red Hat-hosted models or bring their own, depending on their security and data residency requirements. The AI runs within the cluster, so code does not leave the organization's infrastructure."
+Q: "What other code smells does Sonarqube catch?"::
+A: "Sonarqube enforces hundreds of coding rules across multiple dimensions: code smells (complexity, duplication, naming conventions), bugs (null pointer risks, resource leaks, logic errors), vulnerabilities (SQL injection, XSS, hardcoded credentials), and security hotspots. The platform team configures which rules are active and which are quality gate blockers."
 
-Q: "Does the AI-generated test actually work?"::
-A: "The AI generates a starting point that the developer reviews and accepts. In most cases, the generated test is functionally correct because the AI analyzes the source code to understand the expected behavior. The developer can modify the test before committing."
+Q: "Why not catch these in the IDE before pushing?"::
+A: "IDE plugins like SonarLint can surface some issues during development, and organizations can enable that as well. But the pipeline quality gate is the authoritative enforcement point — it ensures standards are met regardless of what tools the developer has configured locally. Defense in depth: catch what you can early, enforce what you must in the pipeline."
 
-Q: "What other quality gates can the pipeline enforce?"::
-A: "Beyond test coverage, Sonarqube can enforce code quality rules (complexity, duplication, code smells), security vulnerability detection (SAST), and custom organizational rules. The pipeline can also include additional stages like dependency scanning, license compliance, and image vulnerability scanning."
+Q: "What about more complex issues like security vulnerabilities?"::
+A: "Sonarqube handles SAST (Static Application Security Testing) in addition to code smell detection. In Section 2 of this demo, we add additional security layers: ACS for container image scanning, Tekton Chains for image signing, and admission control for deployment verification. The pipeline is extensible."
 
 '''
 
@@ -241,10 +282,13 @@ GitOps with Argo CD makes Git the single source of truth for deployments. Every 
 
 **What I do:**
 
-. Open the **Argo CD console** at {argocd_url}:
-* Log in with:
-** Username: `{argocd_user}`
-** Password: `{argocd_password}`
+. Open the **Argo CD console** (rhdh-gitops instance) at {argocd_url}:
+* Log in as `admin`. Retrieve the password from the `rhdh-gitops-cluster` secret:
++
+[source,bash]
+----
+oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
+----
 
 . Show the Parasol application in the Argo CD dashboard:
 * Point out the sync status changing as Argo CD detects the new image
@@ -262,28 +306,28 @@ GitOps with Argo CD makes Git the single source of truth for deployments. Every 
 * "All of these are managed declaratively through GitOps. The developer does not deploy individual components. Argo CD manages the entire application stack."
 
 . Open the running **Parasol application** to verify the new feature is live:
-* Navigate to the claims service
-* Show the discount feature that the developer added in Module 1
-* Verify the feature is working in the deployed application
-* "The discount feature that our developer added is now live. It has been built, tested, scanned, and deployed, all automatically. The developer pushed code and the platform handled everything else."
+* Navigate to the claims statistics endpoint at `/api/claims/stats`
+* Show the claims statistics data that the developer's new endpoint returns
+* Verify the endpoint is working in the deployed application
+* "The claims statistics API that our developer added is now live. It has been built, scanned for quality, and deployed, all automatically. The developer pushed code and the platform handled everything else."
 
 // TODO: Add screenshot of Argo CD console showing sync status
 image::argocd-sync-status.png[Argo CD console showing the Parasol application transitioning from OutOfSync to Synced with the resource tree visible,link=self,window=blank,align="center",width=700,title="Argo CD syncing the Parasol application after pipeline completion"]
 
-// TODO: Add screenshot of the running Parasol app showing the discount feature live
-image::parasol-discount-feature-live.png[Parasol Insurance application showing the discount feature live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Discount feature deployed and live in the Parasol application"]
+// TODO: Add screenshot of the running Parasol app showing the claims stats endpoint live
+image::parasol-claims-stats-live.png[Parasol Insurance application showing the claims statistics API endpoint live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims statistics API deployed and live in the Parasol application"]
 
 **What they should notice:**
 
 * The deployment happened automatically after the pipeline passed. No tickets, no manual steps.
 * Argo CD provides a visual resource tree showing the entire application stack and its health
 * The developer can see the deployment status without needing specialized knowledge
-* The feature that was added in Module 1, caught by the pipeline in Part 2, and fixed with AI assistance is now live in production
+* The claims statistics endpoint that was added in Module 1, caught by the pipeline for code smells in Part 2, and fixed by the developer is now live in production
 * The entire journey from code change to production deployment happened in a single demo session
 
 **Business value callout:**
 
-"Let me recap the journey. In Module 1, a developer added a feature in minutes using DevSpaces and Quarkus dev mode. They pushed the code, and the platform's CI/CD pipeline caught a missing test. The developer used AI assistance to write the test in seconds, pushed again, and the pipeline passed. Argo CD deployed the change automatically through GitOps. What used to take Parasol 3-5 days of manual handoffs, tickets, and approvals just happened in minutes, with zero human bottlenecks and full quality enforcement."
+"Let me recap the journey. In Module 1, a developer added a claims statistics endpoint in minutes using DevSpaces and Quarkus dev mode. They pushed the code, and the platform's CI/CD pipeline caught code smells — improper logging and an empty catch block. The developer fixed both issues in minutes, pushed again, and the pipeline passed. Argo CD deployed the change automatically through GitOps. What used to take Parasol 3-5 days of manual handoffs, tickets, and approvals just happened in minutes, with zero human bottlenecks and full quality enforcement."
 
 **If asked:**
 
@@ -306,8 +350,8 @@ A: "Argo CD detects configuration drift and can automatically correct it. If som
 In this module, you saw how the platform's CI/CD pipeline enforces quality and automates delivery:
 
 . **Automated pipeline triggering** — A simple git push triggered a full Tekton pipeline with build, test, and SAST/Sonarqube stages, visible in the OpenShift web console
-. **Quality enforcement** — The Sonarqube quality gate caught the missing unit test, preventing untested code from reaching production
-. **AI-assisted development** — DevSpaces code assistance helped the developer write the missing test in seconds, keeping them in flow
+. **Quality enforcement** — The Sonarqube quality gate caught code smells (improper logging and empty exception handling), preventing low-quality code from reaching production
+. **Fast remediation** — The developer fixed the code smells directly in DevSpaces, replacing `System.out.println` with proper logging and removing the empty catch block
 . **GitOps delivery** — Argo CD managed the deployment declaratively, with the sync process visible in the Argo CD console
 
 === Setting up Module 3

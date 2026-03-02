@@ -133,7 +133,7 @@ The secure build pipeline integrates multiple trust and compliance controls into
 git add -A && git commit -m "Add claims routing service with dependency fix" && git push origin main
 ----
 
-. Switch to **GitLab** at {gitlab_url} to show the merge request:
+. Switch to **GitLab** at {gitlab_url} (log in as `{dev_user}` / `{password}`) to show the merge request:
 * Show the MR with the code diff (including the dependency version fix)
 * "The developer created a merge request. This automatically triggers the secure build pipeline."
 
@@ -225,7 +225,7 @@ The External Secrets Operator integrates with HashiCorp Vault to provide central
 
 **What I do:**
 
-. Open **Vault** at {vault_url}:
+. Open **Vault** at {vault_url} and log in with the root token (retrieve it with `oc get secret vault-token -n vault -o jsonpath='\{.data.root_token}' | base64 -d`):
 * Show the Parasol secrets organized by environment (dev, staging, production)
 * Point out example secrets: database credentials, API keys, certificate data
 * "All secrets are stored centrally in Vault, organized by application and environment. The developer never sees these values in their code or manifests."

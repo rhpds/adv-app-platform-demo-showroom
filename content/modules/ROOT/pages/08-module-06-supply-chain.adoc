@@ -37,7 +37,7 @@ The Trusted Artifact Signer (TAS) admission controller acts as the final gate be
 
 **What I do:**
 
-. Open **GitLab** at {gitlab_url} and navigate to the **Argo CD production configuration repository**:
+. Open **GitLab** at {gitlab_url} (log in as `{pe_user}` / `{password}` — platform engineer persona) and navigate to the **Argo CD production configuration repository**:
 * Show the merge request created automatically by the pipeline
 * Point out that the MR updates the image reference to the new signed image
 * "This MR was created by the pipeline. It updates the production deployment to use the newly built and signed image."

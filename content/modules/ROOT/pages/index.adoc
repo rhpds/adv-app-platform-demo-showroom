@@ -15,7 +15,7 @@ This demonstration shows why Red Hat OpenShift is more than container management
 Establish the core value of OpenShift as an application platform. Application modernization, standardized development with DevSpaces, Quarkus dev mode, Tekton pipelines with quality enforcement, Argo CD delivery, and platform operations with Service Mesh and observability.
 
 * xref:03-module-01-developer-experience.adoc[Module 1: Developer experience] — MTA migration context, one-click DevSpaces from the topology view, Quarkus dev mode, and platform engineer governance
-* xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline] — Tekton pipeline triggering, SAST/Sonarqube quality gates, AI-assisted test generation, and GitOps delivery with Argo CD
+* xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline] — Tekton pipeline triggering, SAST/Sonarqube quality gates that catch code smells, and GitOps delivery with Argo CD
 * xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, and broader platform capabilities
 
 **Section 2: Advanced developer services**
@@ -28,7 +28,7 @@ Move from "good to great." Red Hat Developer Hub as the single pane of glass for
 
 **Section 3: Intelligent applications**
 
-Show that AI-enhanced applications follow the same golden path. Developers consume LLM endpoints served by Red Hat AI, process business data from Kafka (Red Hat AMQ Streams), and deploy through the same trusted pipeline.
+Show that AI-enhanced applications follow the same golden path. Developers consume LLM endpoints as standard API calls, process business data from Kafka (Red Hat AMQ Streams), and deploy through the same trusted pipeline. The platform does not care where the model runs — on-premises with Red Hat AI or through a hosted provider.
 
 * xref:09-module-07-ai-applications.adoc[Module 7: AI-enhanced applications] — Building an AI-powered email routing service with DevHub templates, LLM integration, Kafka data processing, and trusted delivery
 

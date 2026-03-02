@@ -29,15 +29,15 @@ A new developer joins Parasol Insurance and experiences the full application lif
 
 . **Application modernization (context setting)** — Parasol has already migrated their legacy Java EE application to OpenShift using the Migration Toolkit for Applications (MTA). This migration is discussed but not shown live. It sets the stage for everything that follows.
 
-. **Developer inner loop** — The new developer clicks a single button in the OpenShift topology view to open the Parasol app in DevSpaces. They add a simple feature using Quarkus dev mode. The developer does not write a unit test for the new feature.
+. **Developer inner loop** — The new developer clicks a single button in the OpenShift topology view to open the Parasol app in DevSpaces. They add a new claims statistics API endpoint using Quarkus dev mode. The code works but contains code smells: `System.out.println` instead of proper logging and an empty catch block that silently swallows exceptions.
 
 . **Platform engineer perspective** — The platform engineer manages DevSpaces environments centrally, using the devfile registry as a starting point and the DevSpaces operator for governance.
 
-. **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the missing unit test. The developer uses AI-assisted code generation in DevSpaces to write the test, pushes again, and the pipeline passes. Argo CD handles the deployment.
+. **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the code smells. The developer fixes the issues by replacing `System.out.println` with the Quarkus `Log` API and removing the empty catch block, pushes again, and the pipeline passes. Argo CD handles the deployment.
 
 . **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through Service Mesh, real-time observability through the Service Mesh console (Kiali), and additional platform capabilities.
 
-**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, DevSpaces code assistance, Argo CD, Service Mesh, Kiali
+**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, Sonarqube, Argo CD, Service Mesh, Kiali
 
 === Section 2: Advanced developer services (Modules 4-6)
 
@@ -59,9 +59,9 @@ _Show that AI-enhanced applications follow the same golden path. No special tool
 
 Fast forward: applications are running smoothly, and the CIO wants to leverage an existing LLM to enhance customer-facing applications.
 
-. **AI-enhanced applications** — A developer uses a DevHub template to scaffold a new Quarkus service that consumes customer emails from a Kafka topic (Red Hat AMQ Streams for Apache Kafka), evaluates them using an LLM endpoint served by Red Hat AI, and routes them to the correct processing queue. The developer integrates the new service with the main Parasol application through the standard merge request workflow. The same trusted pipeline validates and deploys the AI-enhanced feature.
+. **AI-enhanced applications** — A developer uses a DevHub template to scaffold a new Quarkus service that consumes customer emails from a Kafka topic (Red Hat AMQ Streams for Apache Kafka), evaluates them using an LLM endpoint, and routes them to the correct processing queue. The application platform consumes the LLM as an API — it does not matter whether the model runs on-premises with Red Hat AI or through a hosted provider. The developer integrates the new service with the main Parasol application through the standard merge request workflow. The same trusted pipeline validates and deploys the AI-enhanced feature.
 
-**Platform capabilities demonstrated:** RHDH templates for AI components, Red Hat AI (model serving), Red Hat AMQ Streams for Apache Kafka, trusted pipeline (reusing Section 2 supply chain)
+**Platform capabilities demonstrated:** RHDH templates for AI components, LLM consumption (via API endpoint), Red Hat AMQ Streams for Apache Kafka, trusted pipeline (reusing Section 2 supply chain)
 
 Each section can be presented independently or combined for a comprehensive platform story. The progressive structure supports persona-based solution selling: start with the foundational story for customers evaluating the platform, advance to Section 2 for customers ready to differentiate, and show Section 3 for customers exploring AI.
 
@@ -102,8 +102,8 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 * **Application modernization** accelerates migration from legacy platforms to cloud native architectures using MTA
 * **Cloud development environments** (DevSpaces) eliminate setup friction and standardize the developer workspace
 * **Application runtimes** (Quarkus) accelerate coding with enterprise-grade libraries, live reload, and continuous testing
-* **Automated CI/CD pipelines** (Tekton) catch defects early through automated testing and SAST/Sonarqube quality gates
-* **AI-assisted development** (DevSpaces code assistance) helps developers write tests and fix issues directly in their cloud IDE
+* **Automated CI/CD pipelines** (Tekton) catch defects and code smells early through automated testing and SAST/Sonarqube quality gates
+* **AI-assisted development** (DevSpaces code assistance) helps developers fix issues directly in their cloud IDE
 * **GitOps-driven delivery** (Argo CD) ensures consistent, auditable deployments across environments
 * **Traffic management and security** (Service Mesh) provide mTLS encryption and fine-grained traffic control without application code changes
 * **Observability** (Service Mesh console/Kiali) gives real-time visibility into service health and traffic patterns
@@ -120,7 +120,7 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 
 **Intelligent applications (Section 3)**
 
-* **Red Hat AI** provides model serving for LLM endpoints consumed by applications
+* **LLM consumption** — Applications consume LLM endpoints as API calls; the model can run on-premises with Red Hat AI (RHEL AI or OpenShift AI) or through a hosted provider
 * **Red Hat AMQ Streams** (Apache Kafka) enables event-driven data processing for AI-enhanced components
 * **Golden path templates** extend to AI-enhanced components, making AI integration a standard development activity governed by the same trusted supply chain
 
@@ -144,7 +144,7 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 **AI application development**
 
 * AI integration follows the same golden path as any other component, no special processes
-* Developers consume model endpoints served by Red Hat AI and process data from Kafka
+* Developers consume LLM endpoints as standard API calls and process data from Kafka
 * AI workloads governed by the same trusted supply chain as all other software
 
 **Platform differentiation**
@@ -195,7 +195,7 @@ Section 2 demonstrates a complete trusted software supply chain: Dependency Anal
 
 **"How does this set us up for AI?"**
 
-Section 3 demonstrates this directly: a developer uses the same DevHub templates, DevSpaces environments, and CI/CD pipelines to build an AI-enhanced component that consumes an LLM endpoint served by Red Hat AI and processes business data from Kafka. The platform makes AI integration a standard development activity, not a special case. The same trusted supply chain governs AI workloads.
+Section 3 demonstrates this directly: a developer uses the same DevHub templates, DevSpaces environments, and CI/CD pipelines to build an AI-enhanced component that consumes an LLM endpoint and processes business data from Kafka. The platform makes AI integration a standard development activity, not a special case. It does not matter whether the model runs on-premises with Red Hat AI or through a hosted provider — the application just calls an API. The same trusted supply chain governs AI workloads.
 
 **"What is the ROI?"**
 

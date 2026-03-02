@@ -1,36 +1,41 @@
 // Shared attributes for the Application Platform Demo
-// These map to Showroom runtime variables from RHDP provisioning
+// These map to Showroom runtime variables from RHDP provisioning (showroom-userdata)
 
-// Environment URLs — Section 1 (Foundational)
-:console_url: {openshift_console_url}
-:api_url: {openshift_api_url}
-:devspaces_url: {devspaces_dashboard_url}
-:gitea_url: {gitea_console_url}
-:argocd_url: {argocd_console_url}
-:kiali_url: {kiali_console_url}
-:pipeline_url: {openshift_console_url}/pipelines
+// Environment URLs — constructed from showroom-userdata variables
+:console_url: {openshift_cluster_console_url}
+:api_url: {openshift_api_server_url}
+:subdomain: {openshift_cluster_ingress_domain}
+:devspaces_url: https://devspaces.{openshift_cluster_ingress_domain}
+:gitlab_url: https://gitlab-gitlab.{openshift_cluster_ingress_domain}
+:sonarqube_url: https://sonarqube-sonarqube.{openshift_cluster_ingress_domain}
+
+// Argo CD — two instances
+:argocd_bootstrap_url: https://openshift-gitops-server-openshift-gitops.{openshift_cluster_ingress_domain}
+:argocd_url: https://rhdh-gitops-server-rhdh-gitops.{openshift_cluster_ingress_domain}
 
 // Environment URLs — Section 2 (Advanced Developer Services)
-:rhdh_url: {rhdh_console_url}
-:acs_url: {acs_console_url}
-:tpa_url: {tpa_console_url}
-:vault_url: {vault_console_url}
-:gitlab_url: {gitlab_console_url}
+:rhdh_url: https://backstage-developer-hub-rhdh.{openshift_cluster_ingress_domain}
+:tpa_url: {tpa_url}
+:vault_url: https://vault-vault.{openshift_cluster_ingress_domain}
+:vault_secrets_url: https://vault-vault.{openshift_cluster_ingress_domain}/ui/vault/secrets/kv/list/secrets/
 
 // Environment URLs — Section 3 (Intelligent Applications)
-:llm_endpoint_url: {llm_serving_url}
+:llm_endpoint_url: {litellm_api_base_url}
+:llm_api_key: {litellm_virtual_key}
 
-// User credentials
-:user: {user_name}
-:password: {user_password}
-:admin_user: {cluster_admin_user}
-:admin_password: {cluster_admin_password}
-:gitea_user: {gitea_admin_username}
-:gitea_password: {gitea_admin_password}
-:argocd_user: {argocd_admin_username}
-:argocd_password: {argocd_admin_password}
-:gitlab_user: {gitlab_admin_username}
-:gitlab_password: {gitlab_admin_password}
+// Demo personas — use {password} (common_password) for both
+:dev_user: dev1
+:pe_user: pe1
+:password: {common_password}
+
+// Admin credentials (for SonarQube, Kiali, debugging)
+:admin_user: {openshift_cluster_admin_username}
+:admin_password: {openshift_cluster_admin_password}
+
+// Namespaces
+:parasol_build_ns: parasol-insurance-build
+:parasol_dev_ns: parasol-insurance-dev
+:parasol_prod_ns: parasol-insurance-prod
 
 // Product versions — Section 1
 :ocp_version: 4.21
@@ -49,6 +54,3 @@
 :tas_version: 1.2
 :tpa_version: 1.1
 :tekton_chains_version: 0.24
-
-// Product versions — Section 3
-:openshift_ai_version: 2.18

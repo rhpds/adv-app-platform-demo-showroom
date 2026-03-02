@@ -37,15 +37,15 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 
 **What I do:**
 
-. Open the **OpenShift web console** at {console_url}
+. Open the **OpenShift web console** at {console_url} and log in as `{pe_user}` / `{password}` (platform engineer persona)
 
-. Navigate to **Networking** → **Service Mesh** (the OpenShift Service Mesh console, powered by Kiali):
+. Navigate to the **Service Mesh** top-level menu and select **Overview** (the Service Mesh console, powered by Kiali):
 * This is integrated directly into the OpenShift console. No separate tool to access.
 * "The Service Mesh console is built into OpenShift. The platform engineer does not need a separate dashboard. Everything is accessible from the same console."
 
 . Select the Parasol application namespace to view the mesh for the application
 
-. Show the **Overview** page for the namespace:
+. Show the **Overview** page:
 * Point out the services enrolled in the mesh (the 2 Parasol services)
 * Show the health indicators for each service (green for healthy)
 * "Both Parasol services are enrolled in the mesh. The platform manages their communication automatically."
@@ -127,7 +127,7 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 **What I do:**
 
-. In the **OpenShift Service Mesh console** (still in the OpenShift console under Networking → Service Mesh), navigate to the **Graph** view for the Parasol namespace:
+. In the **Service Mesh** menu, navigate to **Traffic Graph** and select the Parasol namespace:
 * Show the service graph with animated traffic flow between the Parasol services
 * "This is a live graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
 * Point out the service nodes and the connections between them
@@ -203,7 +203,7 @@ _Beyond the specific capabilities demonstrated in this demo, the OpenShift appli
 * **Serverless and event-driven architectures** — OpenShift Serverless (Knative) enables scale-to-zero workloads and event-driven patterns for use cases like document processing or AI inference
 * **Advanced deployment strategies** — Blue-green, canary, and A/B deployments through Service Mesh and Argo CD rollouts
 * **Multi-cluster management** — Red Hat Advanced Cluster Management for Kubernetes for managing policies and workloads across multiple OpenShift clusters
-* **AI/ML workloads** — Red Hat OpenShift AI for model training, serving, and integration with the application platform
+* **AI/ML workloads** — Applications consume LLM endpoints as API calls; models can run on-premises with Red Hat AI (RHEL AI or OpenShift AI) or through hosted providers, and integrate seamlessly with the application platform
 
 === Show
 
@@ -220,7 +220,7 @@ For teams that already use Jenkins or GitHub Actions, the platform integrates wi
 
 For workloads that do not need to run all the time, OpenShift Serverless provides scale-to-zero capabilities. Think about batch processing, event-driven workflows, or AI inference endpoints that only spin up when requests come in.
 
-And for organizations looking to adopt AI, this platform is the foundation. The same automated pipelines, GitOps practices, and observability tools apply to AI workloads. Red Hat OpenShift AI adds model training and serving capabilities that plug directly into this platform.
+And for organizations looking to adopt AI, this platform is the foundation. The same automated pipelines, GitOps practices, and observability tools apply to AI workloads. Whether the LLM runs on-premises with Red Hat AI or through a hosted provider, the application platform treats it as an API endpoint that any component can consume.
 
 The key takeaway is that OpenShift is not just a container runtime. It is an application platform that grows with your organization's needs."
 
@@ -240,12 +240,12 @@ A: "Most organizations start with one team and one application, exactly the patt
 === What we demonstrated across Modules 1-3
 
 . **Module 1: Developer experience** — Application modernization with MTA, one-click DevSpaces access from the topology view, fast iteration with Quarkus dev mode, and platform engineer governance of DevSpaces through the operator and devfile registry
-. **Module 2: CI/CD pipeline** — Automated pipeline triggering, SAST/Sonarqube quality gate enforcement, AI-assisted test generation, and GitOps-driven delivery with Argo CD
+. **Module 2: CI/CD pipeline** — Automated pipeline triggering, SAST/Sonarqube quality gate enforcement catching code smells, and GitOps-driven delivery with Argo CD
 . **Module 3: Platform operations** — mTLS encryption and traffic management with Service Mesh, real-time observability through the Service Mesh console, and broader platform capabilities
 
 === The continuous story
 
-A new developer joined Parasol, clicked one button to open the app in DevSpaces, added a feature in seconds with Quarkus dev mode, pushed code that triggered an automated pipeline, fixed a quality issue with AI assistance, and deployed through GitOps, all on a platform that handles encryption, traffic management, and observability automatically. This is what an application platform delivers.
+A new developer joined Parasol, clicked one button to open the app in DevSpaces, added a claims statistics endpoint in seconds with Quarkus dev mode, pushed code that triggered an automated pipeline, fixed code smells flagged by Sonarqube, and deployed through GitOps, all on a platform that handles encryption, traffic management, and observability automatically. This is what an application platform delivers.
 
 === Key takeaways
 

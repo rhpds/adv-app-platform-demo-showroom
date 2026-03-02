@@ -25,7 +25,7 @@ _Parasol Insurance receives thousands of customer emails daily. Currently, email
 
 **Current state at Parasol:**
 
-* An LLM is deployed and serving an endpoint (based on Red Hat OpenShift AI)
+* An LLM is available as an API endpoint (in this demo, hosted on the Red Hat Demo Platform; in production, this could be Red Hat AI on-premises or any hosted model provider)
 * Customer emails flow through Kafka topics, but uncategorized emails pile up in an "unknown" topic
 * Claims administrators manually review and route these emails to the correct queues
 * The platform team wants AI integrations to follow the same golden path as any other component
@@ -47,7 +47,7 @@ The application platform makes AI integration a standard development activity, n
 
 Right now, Parasol receives thousands of customer emails every day. Their current system uses simple rule-based logic to categorize them, but a significant number of emails end up in an 'unknown' bucket because the rules cannot handle the complexity of natural language. Claims administrators spend hours every day manually triaging these emails, figuring out whether each one is from an existing customer needing follow-up, a potential new customer, or just a general inquiry.
 
-The data science team has already deployed an LLM on OpenShift AI. It is serving an endpoint, ready to be consumed. The question is: how does a developer build this integration without creating shadow AI outside of IT's guardrails?
+An LLM is already available as an API endpoint, ready to be consumed. It does not matter whether the model runs on-premises with Red Hat AI or through a hosted provider — the application platform treats it the same way. The question is: how does a developer build this integration without creating shadow AI outside of IT's guardrails?
 
 The answer is that they use the exact same platform patterns we have been showing. Developer Hub templates, DevSpaces, CI/CD pipelines, GitOps. AI is not a special case. It is just another component in the system. Let me show you how."
 
@@ -57,11 +57,11 @@ The answer is that they use the exact same platform patterns we have been showin
 
 **If asked:**
 
-Q: "Who deployed the LLM?"::
-A: "The data science team deployed and fine-tuned the model using Red Hat OpenShift AI. The model is served as an API endpoint that any application can consume. The developer does not need to know the details of model training or serving. They just need the endpoint URL and an API key, both of which are provided."
+Q: "Where is the LLM running?"::
+A: "The model is available as an API endpoint. In this demo, it is hosted on the Red Hat Demo Platform, which uses OpenShift AI for model serving. In production, organizations can run models on-premises with Red Hat AI (which includes RHEL AI and OpenShift AI) or consume models from hosted providers. The application platform does not care where the model lives — the developer just needs an endpoint URL and an API key."
 
 Q: "What about model governance and responsible AI?"::
-A: "Model governance is handled by the data science and platform teams through Red Hat OpenShift AI. The application developer consumes a governed, approved endpoint. The same trusted software supply chain from Section 2 ensures the AI-enhanced component is scanned, signed, and attested before reaching production."
+A: "Model governance is handled by the data science and platform teams through whatever model serving infrastructure they use. The application developer consumes a governed, approved endpoint. The same trusted software supply chain from Section 2 ensures the AI-enhanced component is scanned, signed, and attested before reaching production."
 
 Q: "What if the LLM makes a wrong routing decision?"::
 A: "That is exactly why we include an audit log. The claims administrator can review every decision the LLM made, see the reasoning, and override if needed. The 'email_followup' topic acts as a safety net for cases where the LLM is not confident enough to route definitively."
@@ -101,7 +101,7 @@ The DevHub software template for AI components includes everything the developer
 
 **What I do:**
 
-. Open Red Hat Developer Hub at {rhdh_url}
+. Open Red Hat Developer Hub at {rhdh_url} and log in as `{dev_user}` / `{password}`
 
 . Navigate to the **Create** section in the left sidebar
 
@@ -281,7 +281,7 @@ git push -o merge_request.create -o merge_request.target=main origin feature/ai-
 +
 * "The developer has submitted a merge request. In a real workflow, the platform engineer would review this before it reaches production."
 
-. Switch to **GitLab** at {gitlab_url} to show the merge request:
+. Switch to **GitLab** at {gitlab_url} (log in as `{dev_user}` / `{password}`) to show the merge request:
 * Show the MR with the code diff
 * Show the CI/CD pipeline running automatically on the MR
 * "The same secure pipeline from Section 2 runs here: build, test, ACS scan, image signing, SBOM generation."
@@ -329,7 +329,7 @@ Q: "How does the claims administrator override an AI decision?"::
 A: "The audit log includes an override action for each routing decision. The administrator can reassign an email to a different topic and flag the decision for the data science team to review. Over time, these overrides become feedback for improving the model."
 
 Q: "What about data privacy for the email content?"::
-A: "The LLM processes the email content in the organization's own OpenShift cluster. No data leaves the infrastructure. The model is deployed on-premises through Red Hat OpenShift AI, so Parasol maintains full data sovereignty."
+A: "That depends on the deployment model. If the organization runs the LLM on-premises with Red Hat AI, no data leaves their infrastructure and they maintain full data sovereignty. If they use a hosted provider, they need to evaluate the provider's data handling policies. The application platform supports both models — the endpoint URL is just configuration."
 
 Q: "Can this pattern be applied to other AI use cases?"::
 A: "The template is reusable. Any team can scaffold a new AI-powered service that consumes Kafka data and calls the LLM endpoint. The platform team can create additional templates for different patterns: batch processing, real-time inference, agent-based workflows. The golden path scales across use cases."

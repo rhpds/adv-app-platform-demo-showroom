@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module sets the scene with application modernization context, then follows a new developer joining Parasol who opens the app in DevSpaces and adds a feature using Quarkus dev mode. The developer intentionally does not add a unit test, which sets up the pipeline failure in Module 2. The module closes with a platform engineer perspective on managing DevSpaces environments. Target duration: 15 minutes across 4 parts.
+*Presenter note*: This module sets the scene with application modernization context, then follows a new developer joining Parasol who opens the app in DevSpaces and adds a new API endpoint using Quarkus dev mode. The code works but contains code smells (improper logging and empty exception handling), which sets up the pipeline failure in Module 2. The module closes with a platform engineer perspective on managing DevSpaces environments. Target duration: 15 minutes across 4 parts.
 
 [#part-1]
 == Part 1 — Setting the scene: Application modernization
@@ -101,9 +101,9 @@ Cloud-based development environments eliminate local setup entirely. Every devel
 
 **What I do:**
 
-. Open the **OpenShift web console** at {console_url} and navigate to the **Developer** perspective
+. Open the **OpenShift web console** at {console_url} and log in as `{dev_user}` / `{password}`
 
-. Show the **Topology** view for the Parasol application namespace:
+. Navigate to **Workloads → Topology** and select the `{parasol_dev_ns}` namespace:
 * Point out the "blue donut" icons representing the running application components
 * "This is the Parasol application running on OpenShift. The developer can see all the components and their status at a glance."
 
@@ -167,21 +167,21 @@ A: "Dev Spaces supports connecting from VS Code desktop as well. Developers can 
 
 === Know
 
-_Our new developer is now in their cloud workspace and ready to contribute. They have been assigned their first task: add a new feature to the Parasol claims service. Using Quarkus dev mode, they can write code and see changes reflected immediately without manual builds or restarts. However, in their eagerness to ship, the developer does not write a unit test for the new feature, which will have consequences in Module 2._
+_Our new developer is now in their cloud workspace and ready to contribute. They have been assigned their first task: add a new claims statistics API endpoint to the Parasol application. Using Quarkus dev mode, they can write code and see changes reflected immediately without manual builds or restarts. However, in their eagerness to ship, the developer takes some shortcuts — using `System.out.println` instead of proper logging and wrapping code in an empty catch block — code smells that will have consequences in Module 2._
 
 **Business challenge:**
 
 * Inner loop (code-build-test) averages 20-30 minutes per iteration
 * Developers lose flow state waiting for builds to complete
 * Slow feedback loops discourage experimentation and innovation
-* Lack of testing discipline means defects are caught late in the cycle
+* Code quality issues slip through when developers prioritize speed over best practices
 
 **Current state at Parasol:**
 
 * Average developer makes 8-12 code changes per day, each requiring a full rebuild
 * 3-5 hours per developer per day spent waiting for build and test cycles
-* No continuous testing, developers run tests manually (if at all) before committing
-* Defects frequently discovered in integration, requiring expensive context switching to fix
+* No automated code quality enforcement, so shortcuts like improper logging and swallowed exceptions accumulate as technical debt
+* Defects and maintenance burden grow as code smells compound across the codebase
 
 **Value proposition:**
 
@@ -191,14 +191,11 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 
 **What I say:**
 
-"Our new developer has their workspace ready and has been assigned their first task: add a discount field to the claims service. Let me show you how fast this inner loop is with Quarkus dev mode. The developer writes code, saves, and the application updates immediately, no manual builds, no restarts, no waiting."
+"Our new developer has their workspace ready and has been assigned their first task: add a claims statistics API endpoint. This endpoint will aggregate claim data by category and status for the operations dashboard. Let me show you how fast this inner loop is with Quarkus dev mode. The developer writes code, saves, and the application updates immediately, no manual builds, no restarts, no waiting."
 
 **What I do:**
 
-. In the Dev Spaces workspace, open the Parasol claims service source file:
-* Navigate to `src/main/java/com/parasol/claims/ClaimsResource.java`
-
-. Start the application in development mode using the terminal:
+. In the Dev Spaces workspace, start the application in development mode using the terminal:
 +
 [source,bash,role=execute]
 ----
@@ -211,21 +208,64 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 
 . Open the running application in a browser preview to show the current claims API response
 
-. Make a code change to add the new feature:
+. Create the new claims statistics endpoint. Add a new file `src/main/java/com/parasol/ClaimStatsResource.java`:
 +
 [source,java,role=copy]
 ----
-// Add a discount field to the claims response
-claim.setDiscount(0.15);
+package com.parasol;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/api/claims/stats")
+@Produces(MediaType.APPLICATION_JSON)
+public class ClaimStatsResource {
+
+	@Inject
+	ClaimsResource claimsResource;
+
+	@GET
+	public Map<String, Object> getStats() {
+		Map<String, Object> stats = new HashMap<>();
+
+		System.out.println("Fetching claim statistics");
+
+		try {
+			var claims = claimsResource.getAllClaims();
+			stats.put("total", claims.size());
+
+			Map<String, Long> byCategory = new HashMap<>();
+			for (var claim : claims) {
+				byCategory.merge(claim.category, 1L, Long::sum);
+			}
+			stats.put("by_category", byCategory);
+
+			Map<String, Long> byStatus = new HashMap<>();
+			for (var claim : claims) {
+				byStatus.merge(claim.status, 1L, Long::sum);
+			}
+			stats.put("by_status", byStatus);
+		} catch (Exception e) {
+		}
+
+		return stats;
+	}
+}
 ----
 
 . Save the file and immediately show:
 * The application reloads automatically (no restart required)
-* The browser preview reflects the change in seconds
+* Open `/api/claims/stats` in the browser preview to show the new endpoint returning claim statistics
 * No manual build step, no repackaging, no redeployment
 
-. Point out that the developer has added a feature but has NOT written a unit test:
-* "Notice that our developer has added the discount feature and verified it works in dev mode. But they have not written a unit test for this new functionality. That is going to matter when we get to the CI/CD pipeline in Module 2."
+. Point out that the developer's code works but has code smells:
+* "Notice that our developer has added the claims statistics endpoint and verified it works in dev mode. But look at the code: they used `System.out.println` instead of a proper logger, and they wrapped the entire logic in a try-catch block with an empty catch — silently swallowing any exceptions. The code works, but these are exactly the kind of shortcuts that accumulate as technical debt. That is going to matter when we get to the CI/CD pipeline in Module 2."
 
 // TODO: Add screenshot of Quarkus dev mode showing live reload
 image::quarkus-dev-mode-live-reload.png[Development mode terminal showing live reload with instant feedback on code changes,link=self,window=blank,align="center",width=700,title="Quarkus dev mode with live reload"]
@@ -235,7 +275,7 @@ image::quarkus-dev-mode-live-reload.png[Development mode terminal showing live r
 * Code changes are reflected in seconds, not minutes
 * No manual build, package, or deploy steps in the inner loop
 * The developer stays in flow state, never leaving the IDE
-* The developer did NOT write a unit test for the new feature (this is intentional and sets up Module 2)
+* The code works but contains code smells: `System.out.println` instead of proper logging and an empty catch block (this is intentional and sets up Module 2)
 
 **Business value callout:**
 
@@ -246,8 +286,8 @@ image::quarkus-dev-mode-live-reload.png[Development mode terminal showing live r
 Q: "Does this work with other languages besides Java?"::
 A: "Red Hat supports multiple runtimes including Node.js, Python, .NET, and Go through OpenShift application runtimes. The live reload experience varies by framework, but the principle of fast feedback is consistent."
 
-Q: "What about continuous testing?"::
-A: "Quarkus dev mode supports continuous testing where tests run automatically after each code change. In this demo, our developer has not written a test yet, which is a realistic scenario. In Module 2, we will see how the CI/CD pipeline catches this gap."
+Q: "Why not catch the code smells in dev mode?"::
+A: "Quarkus dev mode focuses on fast feedback for functional changes: does the code compile, does it run, does it produce the right output. Code quality enforcement happens in the CI/CD pipeline, where SonarQube applies organizational coding standards. This separation keeps the inner loop fast while the outer loop enforces quality."
 
 Q: "What about debugging?"::
 A: "Development mode includes full debugging support. Developers can set breakpoints, inspect variables, and step through code directly in the cloud IDE. The experience is identical to a local IDE."
@@ -292,7 +332,7 @@ DevSpaces gives platform engineers centralized control over developer environmen
 * Browse a Quarkus stack entry to show what it includes: base container image, tools, extensions, endpoints
 * "The platform engineer does not start from scratch. They take a community-maintained stack and customize it for their organization's requirements."
 
-. Switch to the **OpenShift web console** at {console_url} and navigate to the **Administrator** perspective
+. Switch to the **OpenShift web console** at {console_url} and log in as `{pe_user}` / `{password}` (platform engineer persona)
 
 . Navigate to **Operators** → **Installed Operators** → **Red Hat OpenShift Dev Spaces**
 
@@ -353,11 +393,11 @@ In this module, you saw how Parasol Insurance modernized their application and t
 
 === Setting up Module 2
 
-Our new developer has added a feature and verified it works in dev mode. But they have not written a unit test. When they push this code and it triggers the CI/CD pipeline in Module 2, that missing test is going to cause a pipeline failure. This is where the platform's guardrails come in: the pipeline enforces quality standards that the developer's inner loop does not.
+Our new developer has added a claims statistics endpoint and verified it works in dev mode. But the code has shortcuts: `System.out.println` instead of proper logging and an empty catch block that silently swallows exceptions. When they push this code and it triggers the CI/CD pipeline in Module 2, SonarQube is going to flag those code smells. This is where the platform's guardrails come in: the pipeline enforces code quality standards that the developer's inner loop does not.
 
 === Presenter transition
 
 [NOTE]
 ====
-**Presenter tip:** The transition to Module 2 should feel natural: "Our developer is happy with their change and is going to push it. Let's see what happens when the platform's CI/CD pipeline picks it up." This creates anticipation and a continuous narrative thread.
+**Presenter tip:** The transition to Module 2 should feel natural: "Our developer is happy with their new endpoint — it works and returns the right data. They are going to push it. But remember those shortcuts in the code? Let's see what the platform's CI/CD pipeline has to say about that." This creates anticipation and a continuous narrative thread.
 ====

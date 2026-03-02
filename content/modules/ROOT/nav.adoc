@@ -13,7 +13,7 @@
 
 * xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline]
 ** xref:04-module-02-cicd-pipeline.adoc#part-1[Part 1: Triggering the pipeline]
-** xref:04-module-02-cicd-pipeline.adoc#part-2[Part 2: Pipeline catches missing tests]
+** xref:04-module-02-cicd-pipeline.adoc#part-2[Part 2: Pipeline catches code smells]
 ** xref:04-module-02-cicd-pipeline.adoc#part-3[Part 3: GitOps-driven delivery with Argo CD]
 
 * xref:05-module-03-platform-operations.adoc[Module 3: Platform operations]
