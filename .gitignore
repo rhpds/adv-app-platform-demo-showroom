@@ -1,6 +1,9 @@
 # Ignore macOS system files
 .DS_Store
 
+# claude
+.claude
+
 # Ignore node_modules directory
 node_modules/
 
