@@ -37,7 +37,7 @@ The Trusted Artifact Signer (TAS) admission controller acts as the final gate be
 
 **What I do:**
 
-. Open **GitLab** at {gitlab_url} (log in as `{pe_user}` / `{password}` — platform engineer persona) and navigate to the **Argo CD production configuration repository**:
+. Open **GitLab** at {gitlab_url}[{gitlab_url}^] (log in as `{pe_user}` / `{password}` — platform engineer persona) and navigate to the **Argo CD production configuration repository**:
 * Show the merge request created automatically by the pipeline
 * Point out that the MR updates the image reference to the new signed image
 * "This MR was created by the pipeline. It updates the production deployment to use the newly built and signed image."
@@ -46,7 +46,7 @@ The Trusted Artifact Signer (TAS) admission controller acts as the final gate be
 * Click **Merge**
 * "The platform engineer reviews and merges the MR. This is the only manual step in the process, an intentional approval gate for production changes."
 
-. Switch to **Developer Hub** at {rhdh_url} and navigate to the component's **Argo CD** tab (or deployment view):
+. Switch to **Developer Hub** at {rhdh_url}[{rhdh_url}^] and navigate to the component's **Argo CD** tab (or deployment view):
 * Show the production application detecting the change (OutOfSync)
 * Show Argo CD beginning to sync the new image to the production environment
 * "The developer sees the Argo CD sync status right here in Developer Hub. The same single pane of glass that shows the catalog, pipelines, and container images also shows deployment status. No need to switch to the Argo CD console."
@@ -138,7 +138,7 @@ TPA provides a single pane of glass for all SBOM data across the organization. W
 
 **What I do:**
 
-. Open **TPA** at {tpa_url}
+. Open **TPA** at {tpa_url}[{tpa_url}^]
 
 . Show the **SBOM inventory**:
 * Navigate to the list of SBOMs
@@ -219,7 +219,7 @@ The Developer Hub application topology view automatically generates a visual rep
 
 **What I do:**
 
-. Open **Developer Hub** at {rhdh_url}
+. Open **Developer Hub** at {rhdh_url}[{rhdh_url}^]
 
 . Navigate to the **Parasol Insurance** system in the catalog
 

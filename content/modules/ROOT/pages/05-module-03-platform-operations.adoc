@@ -37,7 +37,7 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 
 **What I do:**
 
-. Open the **OpenShift web console** at {console_url} and log in as `{pe_user}` / `{password}` (platform engineer persona)
+. Open the **OpenShift web console** at {console_url}[{console_url}^] and log in as `{pe_user}` / `{password}` (platform engineer persona)
 
 . Navigate to the **Service Mesh** top-level menu and select **Overview** (the Service Mesh console, powered by Kiali):
 * This is integrated directly into the OpenShift console. No separate tool to access.

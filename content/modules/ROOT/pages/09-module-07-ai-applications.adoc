@@ -101,7 +101,7 @@ The DevHub software template for AI components includes everything the developer
 
 **What I do:**
 
-. Open Red Hat Developer Hub at {rhdh_url} and log in as `{dev_user}` / `{password}`
+. Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}`
 
 . Navigate to the **Create** section in the left sidebar
 
@@ -234,7 +234,7 @@ The integration follows the same workflow the developer already knows: find the 
 
 **What I do:**
 
-. Switch back to **Red Hat Developer Hub** at {rhdh_url}
+. Switch back to **Red Hat Developer Hub** at {rhdh_url}[{rhdh_url}^]
 
 . Navigate to the **Catalog** and search for the main Parasol application:
 * Show the Parasol system with all its components listed
@@ -281,13 +281,13 @@ git push -o merge_request.create -o merge_request.target=main origin feature/ai-
 +
 * "The developer has submitted a merge request. In a real workflow, the platform engineer would review this before it reaches production."
 
-. Switch to **GitLab** at {gitlab_url} (log in as `{dev_user}` / `{password}`) to show the merge request:
+. Switch to **GitLab** at {gitlab_url}[{gitlab_url}^] (log in as `{dev_user}` / `{password}`) to show the merge request:
 * Show the MR with the code diff
 * Show the CI/CD pipeline running automatically on the MR
 * "The same secure pipeline from Section 2 runs here: build, test, ACS scan, image signing, SBOM generation."
 * Approve and merge the MR (simulating the platform engineer review)
 
-. Show the deployment in the **OpenShift console** at {console_url}:
+. Show the deployment in the **OpenShift console** at {console_url}[{console_url}^]:
 * Navigate to the Parasol application namespace
 * Show the running pods, including the new `email-router-ai` pod
 * Show the updated main application pod with the new version

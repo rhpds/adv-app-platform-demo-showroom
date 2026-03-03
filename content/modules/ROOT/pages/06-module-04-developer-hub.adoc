@@ -92,7 +92,7 @@ RHDH provides a centralized, searchable catalog of all applications, components,
 
 **What I do:**
 
-. Open **Red Hat Developer Hub** at {rhdh_url} and log in as `{dev_user}` / `{password}`
+. Open **Red Hat Developer Hub** at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}`
 
 . Navigate to the **Catalog** in the left sidebar:
 * Show the list of registered entities (applications, components, APIs)

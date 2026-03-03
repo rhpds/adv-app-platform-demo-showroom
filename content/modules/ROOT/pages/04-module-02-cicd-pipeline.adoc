@@ -46,7 +46,7 @@ git add -A && git commit -m "Add claims statistics API endpoint" && git push
 +
 * "That is all the developer does. A standard git push. The platform takes it from here."
 
-. Switch to the **OpenShift web console** at {console_url} (logged in as `{dev_user}` / `{password}`)
+. Switch to the **OpenShift web console** at {console_url}[{console_url}^] (logged in as `{dev_user}` / `{password}`)
 
 . Navigate to the **Pipelines** section in the `{parasol_build_ns}` namespace:
 * Show the pipeline run that was triggered automatically by the git push
@@ -282,7 +282,7 @@ GitOps with Argo CD makes Git the single source of truth for deployments. Every 
 
 **What I do:**
 
-. Open the **Argo CD console** (rhdh-gitops instance) at {argocd_url}:
+. Open the **Argo CD console** (rhdh-gitops instance) at {argocd_url}[{argocd_url}^]:
 * Log in as `admin`. Retrieve the password from the `rhdh-gitops-cluster` secret:
 +
 [source,bash]

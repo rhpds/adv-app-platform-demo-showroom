@@ -101,7 +101,7 @@ Cloud-based development environments eliminate local setup entirely. Every devel
 
 **What I do:**
 
-. Open the **OpenShift web console** at {console_url} and log in as `{dev_user}` / `{password}`
+. Open the **OpenShift web console** at {console_url}[{console_url}^] and log in as `{dev_user}` / `{password}`
 
 . Navigate to **Workloads → Topology** and select the `{parasol_dev_ns}` namespace:
 * Point out the "blue donut" icons representing the running application components
@@ -332,7 +332,7 @@ DevSpaces gives platform engineers centralized control over developer environmen
 * Browse a Quarkus stack entry to show what it includes: base container image, tools, extensions, endpoints
 * "The platform engineer does not start from scratch. They take a community-maintained stack and customize it for their organization's requirements."
 
-. Switch to the **OpenShift web console** at {console_url} and log in as `{pe_user}` / `{password}` (platform engineer persona)
+. Switch to the **OpenShift web console** at {console_url}[{console_url}^] and log in as `{pe_user}` / `{password}` (platform engineer persona)
 
 . Navigate to **Operators** → **Installed Operators** → **Red Hat OpenShift Dev Spaces**
 
