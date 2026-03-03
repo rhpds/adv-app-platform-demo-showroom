@@ -47,23 +47,23 @@ Other services (SonarQube, Argo CD, Vault) require their own admin credentials �
 
 === OpenShift console
 
-* URL: {console_url}
+* URL: {console_url}[{console_url}^]
 * Developer persona: `{dev_user}` / `{password}`
 * Platform engineer persona: `{pe_user}` / `{password}`
 
 === Dev Spaces
 
-* URL: {devspaces_url}
+* URL: {devspaces_url}[{devspaces_url}^]
 * Login as `{dev_user}` / `{password}` (developer persona)
 
 === GitLab (Git server)
 
-* URL: {gitlab_url}
+* URL: {gitlab_url}[{gitlab_url}^]
 * Login as `{dev_user}` / `{password}` (developer persona) or `{pe_user}` / `{password}` (platform engineer persona)
 
 === SonarQube
 
-* URL: {sonarqube_url}
+* URL: {sonarqube_url}[{sonarqube_url}^]
 * Login as `admin`
 * Password: retrieve from the `sonarqube-admin` secret in the `sonarqube` namespace:
 +
@@ -78,7 +78,7 @@ There are two Argo CD instances in this environment:
 
 **rhdh-gitops (application delivery — use this for the demo)**
 
-* URL: {argocd_url}
+* URL: {argocd_url}[{argocd_url}^]
 * This is where the Parasol application is deployed through GitOps. Demoers will use this instance when showing continuous deployment in Modules 2 and 3.
 * Login as `admin`
 * Password: retrieve from the `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace:
@@ -90,7 +90,7 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 
 **openshift-gitops (bootstrap — for debugging only)**
 
-* URL: {argocd_bootstrap_url}
+* URL: {argocd_bootstrap_url}[{argocd_bootstrap_url}^]
 * This instance manages the environment itself (app-of-apps pattern). Useful for troubleshooting if demo components are not deploying correctly. Not shown during the demo.
 * Login as `admin`
 * Password: retrieve from the `openshift-gitops-cluster` secret in the `openshift-gitops` namespace:
@@ -112,18 +112,18 @@ oc get secret openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.a
 
 === Red Hat Developer Hub (Sections 2-3)
 
-* URL: {rhdh_url}
+* URL: {rhdh_url}[{rhdh_url}^]
 * Login as `{dev_user}` / `{password}` (developer persona)
 
 === Trusted Profile Analyzer (Section 2)
 
-* URL: {tpa_url}
+* URL: {tpa_url}[{tpa_url}^]
 * Login with OpenShift credentials
 
 === Vault (Section 2)
 
-* URL: {vault_url}
-* Secrets browser: {vault_secrets_url}
+* URL: {vault_url}[{vault_url}^]
+* Secrets browser: {vault_secrets_url}[{vault_secrets_url}^]
 * Login with the root token. Retrieve it from the `vault-token` secret in the `vault` namespace:
 +
 [source,bash]
@@ -133,7 +133,7 @@ oc get secret vault-token -n vault -o jsonpath='{.data.root_token}' | base64 -d
 
 === LLM endpoint (Section 3)
 
-* API base URL: {llm_endpoint_url}
+* API base URL: {llm_endpoint_url}[{llm_endpoint_url}^]
 * API key: {llm_api_key}
 
 == Demo application
@@ -157,29 +157,29 @@ In Section 3, the application is extended with an AI-enhanced component that con
 
 === Section 1
 
-. Log into the OpenShift console at {console_url} as `{dev_user}` / `{password}`
+. Log into the OpenShift console at {console_url}[{console_url}^] as `{dev_user}` / `{password}`
 . Navigate to **Workloads → Topology** and select the `{parasol_dev_ns}` namespace. Confirm you see the Parasol application topology (pods will be in ImagePullBackOff initially — this is expected)
-. Open Dev Spaces at {devspaces_url} and log in as `{dev_user}` / `{password}` — confirm the dashboard loads
+. Open Dev Spaces at {devspaces_url}[{devspaces_url}^] and log in as `{dev_user}` / `{password}` — confirm the dashboard loads
 . Verify the AI code assistant works: in **Workloads → Topology** for the `{parasol_dev_ns}` namespace, click the "Edit source code" icon on the Parasol application blue donut. Once DevSpaces opens, wait for the Continue plugin to initialize (this may take a few minutes on first launch)
-. Open SonarQube at {sonarqube_url} and log in as `admin` (retrieve password from `sonarqube-admin` secret in the `sonarqube` namespace)
-. Open the rhdh-gitops Argo CD at {argocd_url} and log in as `admin` (retrieve password from `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace)
+. Open SonarQube at {sonarqube_url}[{sonarqube_url}^] and log in as `admin` (retrieve password from `sonarqube-admin` secret in the `sonarqube` namespace)
+. Open the rhdh-gitops Argo CD at {argocd_url}[{argocd_url}^] and log in as `admin` (retrieve password from `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace)
 . Verify the Tekton pipeline is visible in the OpenShift console: navigate to **Pipelines** in the `{parasol_build_ns}` namespace
 . Log into the OpenShift console as `{pe_user}` / `{password}` and open **Service Mesh → Overview** to confirm it loads, then check **Service Mesh → Traffic Graph** to confirm the traffic graph renders
 
 === Section 2 (in addition to Section 1)
 
-. Open Red Hat Developer Hub at {rhdh_url} and log in as `{dev_user}` / `{password}` — confirm the catalog loads
+. Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}` — confirm the catalog loads
 . Verify the Parasol system and its components are registered in the catalog
 . Confirm software templates are available in the "Create" section
-. Open TPA at {tpa_url} and confirm SBOM data is visible
-. Verify Vault is accessible at {vault_url}:
+. Open TPA at {tpa_url}[{tpa_url}^] and confirm SBOM data is visible
+. Verify Vault is accessible at {vault_url}[{vault_url}^]:
 .. Retrieve the root token: `oc get secret vault-token -n vault -o jsonpath='\{.data.root_token}' | base64 -d`
-.. Log in with the root token and verify Parasol secrets are configured at {vault_secrets_url}
-. Open GitLab at {gitlab_url} and log in as `{dev_user}` / `{password}` — confirm repository access
+.. Log in with the root token and verify Parasol secrets are configured at {vault_secrets_url}[{vault_secrets_url}^]
+. Open GitLab at {gitlab_url}[{gitlab_url}^] and log in as `{dev_user}` / `{password}` — confirm repository access
 
 === Section 3 (in addition to Sections 1-2)
 
-. Verify the LLM endpoint is serving and accessible at {llm_endpoint_url}
+. Verify the LLM endpoint is serving and accessible at {llm_endpoint_url}[{llm_endpoint_url}^]
 . Confirm the Kafka topic with business data is available and producing messages
 . Verify the AI component template is available in RHDH
 

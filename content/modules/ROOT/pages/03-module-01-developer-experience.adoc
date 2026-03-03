@@ -325,7 +325,7 @@ DevSpaces gives platform engineers centralized control over developer environmen
 
 **What I do:**
 
-. Open the **Devfile Registry** at https://registry.devfile.io/viewer in a browser tab:
+. Open the **Devfile Registry** at https://registry.devfile.io/viewer[https://registry.devfile.io/viewer^] in a browser tab:
 * Show the catalog of community and Red Hat-maintained devfile stacks
 * Point out the available stacks: Java/Quarkus, Node.js, Python, .NET, Go, and more
 * "This is the public devfile registry. Platform engineers use it as a starting point when creating devfiles for their teams. They can pick a stack, customize it with their organization's tools and policies, and add it to their application repositories."
