@@ -10,6 +10,8 @@ This demo uses two SSO (Keycloak) personas. Both use the common password `{passw
 * **`{dev_user}`** — Developer persona. Use this when demonstrating the developer experience: DevSpaces, writing code, pushing commits, viewing pipeline results.
 * **`{pe_user}`** — Platform engineer persona. Use this when demonstrating platform configuration: DevSpaces operator, Service Mesh, production deployments.
 
+**Tip:** To avoid constant sign-out/sign-in noise during the demo, keep each persona logged in using a separate browser. For example, use Chrome for the developer persona and Firefox for the platform engineer persona (or use an incognito/private window for the second persona). This lets you switch between personas instantly by switching browser windows.
+
 Other services (SonarQube, Argo CD, Vault) require their own admin credentials — see the access details below.
 
 == Environment components
