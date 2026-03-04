@@ -196,7 +196,7 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 **What I do:**
 
 . In the DevSpaces workspace, start the application in development mode:
-* Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the command palette
+* Press kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) to open the command palette
 * Type and select **Tasks: Run Task**
 * Select the **devfile** task group
 * Select **Start Development Mode**
@@ -216,7 +216,7 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 
 . Create the new claims statistics endpoint. Add a new file `src/main/java/com/parasol/ClaimStatsResource.java`:
 +
-[source,java,role=copy]
+[source,java,role="copypaste"]
 ----
 package com.parasol;
 

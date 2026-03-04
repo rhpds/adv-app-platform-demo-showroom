@@ -69,7 +69,7 @@ Other services (SonarQube, Argo CD, Vault) require their own admin credentials â
 * Login as `admin`
 * Password: retrieve from the `sonarqube-admin` secret in the `sonarqube` namespace:
 +
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc get secret sonarqube-admin -n sonarqube -o jsonpath='{.data.password}' | base64 -d
 ----
@@ -85,7 +85,7 @@ There are two Argo CD instances in this environment:
 * Login as `admin`
 * Password: retrieve from the `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace:
 +
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
 ----
@@ -97,7 +97,7 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 * Login as `admin`
 * Password: retrieve from the `openshift-gitops-cluster` secret in the `openshift-gitops` namespace:
 +
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc get secret openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
 ----
@@ -128,7 +128,7 @@ oc get secret openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.a
 * Secrets browser: {vault_secrets_url}[{vault_secrets_url}^]
 * Login with the root token. Retrieve it from the `vault-token` secret in the `vault` namespace:
 +
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc get secret vault-token -n vault -o jsonpath='{.data.root_token}' | base64 -d
 ----

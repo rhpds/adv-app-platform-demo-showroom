@@ -127,6 +127,37 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 "Now let me show you the observability side. We have encryption and traffic management, but the platform engineer also needs to see what is happening. How is traffic flowing? Are there errors? Where are the bottlenecks? The Service Mesh console gives you all of that in real time."
 
+**Optional: generate traffic for the graph**
+
+[NOTE]
+====
+**Presenter tip:** The traffic graph looks best when there is active traffic flowing between services. Before showing the graph, start a traffic generator loop on your laptop to produce steady requests. Run this in a terminal and leave it running in the background during the demo.
+
+**macOS / Linux:**
+
+[source,bash,role="copypaste",subs="attributes+"]
+----
+while true; do
+  curl -s -o /dev/null -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/dashboard.html
+  curl -s -o /dev/null -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/api/claims
+  sleep 5
+done
+----
+
+**Windows (Command Prompt):**
+
+[source,bat,role="copypaste",subs="attributes+"]
+----
+:loop
+curl -s -o NUL -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/dashboard.html
+curl -s -o NUL -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/api/claims
+timeout /t 5 >nul
+goto loop
+----
+
+Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with the Service Mesh demo.
+====
+
 **What I do:**
 
 . From the **Overview** page, click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Graph**:

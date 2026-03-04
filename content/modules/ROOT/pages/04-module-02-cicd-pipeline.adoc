@@ -145,7 +145,7 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 
 . In the Continue chat, enter a prompt like:
 +
-[source,text]
+[source,text,role="copypaste"]
 ----
 This code in @ClaimStatsResource.java has code smells according to sonarqube. please fix them!
 ----
@@ -159,7 +159,7 @@ This code in @ClaimStatsResource.java has code smells according to sonarqube. pl
 . Verify the corrected code looks like this (for reference):
 
 +
-[source,java,role=copy]
+[source,java]
 ----
 package com.parasol;
 
@@ -300,7 +300,7 @@ GitOps with Argo CD makes Git the single source of truth for deployments. Every 
 * Log in as `admin`. Retrieve the password using one of these methods:
 ** **Option A (CLI):** Run this command in a terminal:
 +
-[source,bash]
+[source,bash,role="copypaste"]
 ----
 oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
 ----

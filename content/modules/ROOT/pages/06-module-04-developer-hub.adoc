@@ -53,7 +53,7 @@ Developer Hub provides a centralized, searchable catalog of all applications, co
 
 . Enter a natural language prompt in Lightspeed:
 +
-[source,text]
+[source,text,role="copypaste"]
 ----
 Tell me about the parasol-insurance-api API in the catalog, and write a sample snippet of Java code to access it
 ----

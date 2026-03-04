@@ -109,7 +109,7 @@ The platform engineer has already configured the LLM endpoint and Kafka credenti
 
 . Open a new **Terminal** in DevSpaces and cherry-pick the LLM classification code:
 +
-[source,bash,role=execute]
+[source,bash,role="copypaste"]
 ----
 git cherry-pick origin/llm-classification
 ----
@@ -145,12 +145,12 @@ git cherry-pick origin/llm-classification
 +
 [NOTE]
 ====
-**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use `Ctrl+Shift+P` -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab and navigate to the Inbox to see emails being classified by the LLM in real time.
+**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab and navigate to the Inbox to see emails being classified by the LLM in real time.
 ====
 
 . Push the code:
 +
-[source,bash,role=execute]
+[source,bash,role="copypaste"]
 ----
 git push
 ----
