@@ -48,6 +48,9 @@ Developer Hub provides a centralized, searchable catalog of all applications, co
 * Point out the left sidebar navigation: Catalog, Lightspeed, and other menu items
 * "This is the developer's home base. Everything they need is here: discover components and APIs in the Catalog, get AI assistance from Lightspeed, provision environments from templates, and monitor pipelines and deployments. One tool instead of a dozen."
 
+// TODO: Add screenshot of RHDH home screen showing the left sidebar navigation
+image::rhdh-home-interface.png[Red Hat Developer Hub home screen showing the left sidebar navigation with Catalog and Lightspeed and other menu items,link=self,window=blank,align="center",width=700,title="Developer Hub: the single pane of glass for developers"]
+
 . Navigate to the **Lightspeed** menu item in the left sidebar:
 * "This is Developer Lightspeed -- AI-assisted development built right into the developer platform. Unlike Continue, which is an AI assistant in the IDE for writing code, Lightspeed operates at the platform level. It combines product documentation, developer docs, and the software catalog to answer questions about the projects developers work on."
 

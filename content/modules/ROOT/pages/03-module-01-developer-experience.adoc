@@ -214,6 +214,9 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 * Walk through the running application briefly
 * "This is the Parasol Insurance platform. It is used by Parasol's agents to manage insurance claims and communicate with new and existing customers. Behind the scenes, it uses Apache Kafka for enterprise messaging -- incoming customer emails are processed through a keyword matching algorithm that routes them to the correct department: claims, retention, or acquisition. We will come back to that email routing in Section 3, where we enhance it with AI."
 
+// TODO: Add screenshot of the running Parasol app dashboard opened from DevSpaces
+image::parasol-app-home.png[Parasol Insurance application dashboard showing open claims and recent activity and the Inbox tab in the left navigation,link=self,window=blank,align="center",width=700,title="The running Parasol Insurance application"]
+
 . Create the new claims statistics endpoint. Add a new file `src/main/java/com/parasol/ClaimStatsResource.java`:
 +
 [source,java,role="copypaste"]
@@ -269,6 +272,9 @@ public class ClaimStatsResource {
 * The application reloads automatically (no restart required)
 * Open `/api/claims/stats` in the browser preview to show the new endpoint returning claim statistics
 * No manual build step, no repackaging, no redeployment
+
+// TODO: Add screenshot of the /api/claims/stats response in the browser
+image::parasol-claims-stats-devmode.png[Browser showing the /api/claims/stats endpoint returning JSON claim statistics data in Quarkus dev mode,link=self,window=blank,align="center",width=700,title="Claims statistics endpoint working in dev mode"]
 
 . Point out that the developer's code works but has code smells:
 * "Notice that our developer has added the claims statistics endpoint and verified it works in dev mode. But look at the code: they used `System.out.println` instead of a proper logger, and they wrapped the entire logic in a try-catch block with an empty catch — silently swallowing any exceptions. The code works, but these are exactly the kind of shortcuts that accumulate as technical debt. That is going to matter when we get to the CI/CD pipeline in Module 2."

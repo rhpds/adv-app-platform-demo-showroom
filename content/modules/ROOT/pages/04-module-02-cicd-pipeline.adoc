@@ -130,6 +130,9 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 * Point out the **Sonarqube report URL** at the end of the log
 * "The pipeline log includes a direct link to the full Sonarqube report. Let's open that."
 
+// TODO: Add screenshot of the pipeline log showing the Sonarqube report URL at the end
+image::ocp-pipeline-sonar-log.png[OpenShift pipeline log for the Sonarqube SAST stage showing the Sonarqube report URL at the bottom of the output,link=self,window=blank,align="center",width=700,title="Pipeline log with Sonarqube report URL"]
+
 . Open the **Sonarqube report URL** from the log to show the two code smells:
 ** **`System.out.println` usage** — Standard output should not be used for logging in production code. Use a proper logging framework instead.
 ** **Empty catch block** — Exceptions should not be silently swallowed. Either handle the exception, log it, or let it propagate.
@@ -139,6 +142,9 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 * "These might seem like minor issues, but they compound. At Parasol today, when a production incident occurs, the operations team spends hours searching through logs because developers used `System.out.println` instead of a proper logger with structured output. And those empty catch blocks? They silently hide failures that surface weeks later as data inconsistencies. The platform just prevented both of those problems."
 
 . Switch back to **DevSpaces** where the developer's workspace is still open
+
+// TODO: Add screenshot of the Continue AI assistant panel opened in the DevSpaces sidebar
+image::devspaces-continue-panel.png[DevSpaces IDE with the Continue AI assistant panel open in the left sidebar showing the chat interface,link=self,window=blank,align="center",width=700,title="Continue AI assistant pre-configured by the platform engineer"]
 
 . Open the **Continue** AI assistant panel on the left sidebar:
 * "This is where the platform's AI developer capabilities come in. The Continue extension has been pre-configured in the devfile by the platform engineer to use the IT-approved model -- in this case, a model hosted on the Red Hat demo platform through OpenShift AI. The developer does not need to configure API keys, choose a model, or worry about data governance. The platform engineer set it up as part of the golden path."
@@ -155,6 +161,9 @@ This code in @ClaimStatsResource.java has code smells according to sonarqube. pl
 * Review the diff that Continue presents -- it shows exactly what changed
 * Accept the changes
 * "The AI understood the Sonarqube findings and fixed both code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
+
+// TODO: Add screenshot of the Continue diff view showing the AI-generated fixes
+image::devspaces-continue-diff.png[Continue AI assistant showing a diff view with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
 
 . Verify the corrected code looks like this (for reference):
 
@@ -216,6 +225,9 @@ public class ClaimStatsResource {
 * The modified `ClaimStatsResource.java` appears under "Changes"
 * Stage the file, enter a commit message: `Fix code smells: use proper logging and remove empty catch block`
 * Click the dropdown arrow next to **Commit** and select **Commit & Push**
+
+// TODO: Add screenshot of Source Control view with commit message and Commit & Push dropdown
+image::devspaces-scm-commit-push.png[DevSpaces Source Control view showing staged changes with a commit message and the Commit and Push dropdown menu option,link=self,window=blank,align="center",width=700,title="Commit and Push from the Source Control view"]
 
 . Switch back to the **OpenShift web console** Pipelines view and show the new pipeline run:
 * A new pipeline run starts automatically

@@ -201,6 +201,12 @@ Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with t
 . Briefly mention **custom alerts** under **Observe**:
 * "The platform also supports custom alerts. Platform engineers can define thresholds -- for example, alert if CPU exceeds 80% for 5 minutes, or if memory usage trends upward consistently. These alerts catch misbehaving applications before they impact customers."
 
+// TODO: Add screenshot of Observe -> Metrics showing CPU and memory for Parasol workloads
+image::ocp-observe-metrics.png[OpenShift Observe Metrics view showing CPU and memory utilization metrics for Parasol Insurance workloads,link=self,window=blank,align="center",width=700,title="Workload metrics: CPU and memory utilization"]
+
+// TODO: Add screenshot of Observe -> Dashboards showing aggregate resource dashboard
+image::ocp-observe-dashboards.png[OpenShift Observe Dashboards view showing aggregate CPU and memory and network metrics with customizable dashboard panels,link=self,window=blank,align="center",width=700,title="Customizable dashboards for aggregate resource monitoring"]
+
 // TODO: Add screenshot of the Service Mesh console graph with animated traffic flow
 image::ossm-graph-traffic.png[OpenShift Service Mesh console showing the service graph with animated traffic flow between Parasol services and health indicators,link=self,window=blank,align="center",width=700,title="Service graph with real-time traffic flow and health indicators"]
 
