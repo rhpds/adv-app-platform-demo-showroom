@@ -43,22 +43,24 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 * This is integrated directly into the OpenShift console. No separate tool to access.
 * "The Service Mesh console is built into OpenShift. The platform engineer does not need a separate dashboard. Everything is accessible from the same console."
 
-. Select the Parasol application namespace to view the mesh for the application
+. On the **Overview** page, show the namespaces enrolled in the mesh:
+* Point out the health indicators (green for healthy)
+* Show the mTLS lock icons indicating encryption is active
+* "All services enrolled in the mesh get mutual TLS encryption automatically. The developers did not write a single line of TLS code. The mesh handles certificate generation, rotation, and validation automatically. This satisfies the compliance requirement for encryption in transit."
 
-. Show the **Overview** page:
-* Point out the services enrolled in the mesh (the 2 Parasol services)
-* Show the health indicators for each service (green for healthy)
-* "Both Parasol services are enrolled in the mesh. The platform manages their communication automatically."
+. Search for **parasol-insurance-prod** in the overview:
+* Point out the production namespace with its services
+* "Here is the Parasol application's production namespace. The platform manages communication between all services automatically."
 
-. Show **mTLS encryption** status:
-* Point out the lock icons or mTLS indicators on the service connections
-* "Every request between these services is encrypted with mutual TLS. The developers did not write a single line of TLS code. The mesh handles certificate generation, rotation, and validation automatically."
-* "This satisfies the compliance requirement for encryption in transit. The platform team enabled it once, and it applies to every service in the mesh."
-
-. Show the **Traffic** view to demonstrate traffic routing:
-* Point out the traffic flow between the 2 services
-* Show request rates, success/error percentages
-* "The platform engineer can see exactly how traffic flows between services, what the success rate is, and where errors occur. If they need to do a canary deployment or traffic split, they can configure it through the mesh without touching application code."
+. Click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Create traffic policy**:
+* Show the traffic policy creation form
+* "This is where the platform engineer can define traffic routing policies -- canary deployments, traffic splits, rate limiting, circuit breakers -- all without touching application code. The mesh applies these policies at the infrastructure level."
+* "For example, if Parasol wants to roll out a new version to 10% of traffic first, the platform engineer configures it here. No code changes, no redeployments, just a policy change."
++
+[NOTE]
+====
+**Presenter tip:** Do not actually create the policy. The goal is to show the capability and explain the business value. Cancel out of the form after showing it.
+====
 
 . Briefly discuss **access policies** (talk track):
 * "Service Mesh also supports authorization policies that control which services can communicate with each other. This is the principle of least privilege applied to service-to-service communication. Only authorized services can make requests. This is configured by the platform team, not the developers."
@@ -127,9 +129,9 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 **What I do:**
 
-. In the **Service Mesh** menu, navigate to **Traffic Graph** and select the Parasol namespace:
+. From the **Overview** page, click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Graph**:
 * Show the service graph with animated traffic flow between the Parasol services
-* "This is a live graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
+* "This is a live traffic graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
 * Point out the service nodes and the connections between them
 
 . Show the **health indicators** on the graph:
@@ -140,9 +142,9 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 . Click on a service node to show **detailed metrics**:
 * Show the side panel with service details
 * Point out key metrics:
-** **Requests per second** — current throughput
-** **Error rate** — percentage of failed requests (4xx and 5xx responses)
-** **Response time** — p50, p95, and p99 latency percentiles
+** **Requests per second** -- current throughput
+** **Error rate** -- percentage of failed requests (4xx and 5xx responses)
+** **Response time** -- p50, p95, and p99 latency percentiles
 * "The platform engineer can see exactly how each service is performing. If latency spikes or error rates increase, they know immediately which service is affected and can drill in further."
 
 . Show the **Workload** or **Service** detail view:
@@ -156,6 +158,18 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 * Show how the graph adapts to show different perspectives
 * "Platform engineers can view traffic by application, by workload, or by version. During a canary deployment, for example, you can see traffic split between the old and new versions in real time."
 
+. Show **workload observability** using the OpenShift built-in monitoring:
+* Navigate to **Observe** -> **Metrics** in the OpenShift web console
+* Show CPU and memory utilization metrics for the Parasol workloads
+* "Beyond service mesh observability, the platform provides workload-level monitoring out of the box. CPU usage, memory consumption, network throughput -- all available without any additional tooling."
+
+. Navigate to **Observe** -> **Dashboards**:
+* Show the aggregate dashboard with CPU, memory, and network metrics
+* "These dashboards can be customized for specific teams or applications. Platform engineers can build views that aggregate metrics across all Parasol services, or drill down into individual workloads."
+
+. Briefly mention **custom alerts** under **Observe**:
+* "The platform also supports custom alerts. Platform engineers can define thresholds -- for example, alert if CPU exceeds 80% for 5 minutes, or if memory usage trends upward consistently. These alerts catch misbehaving applications before they impact customers."
+
 // TODO: Add screenshot of the Service Mesh console graph with animated traffic flow
 image::ossm-graph-traffic.png[OpenShift Service Mesh console showing the service graph with animated traffic flow between Parasol services and health indicators,link=self,window=blank,align="center",width=700,title="Service graph with real-time traffic flow and health indicators"]
 
@@ -167,12 +181,14 @@ image::ossm-service-metrics.png[OpenShift Service Mesh console showing detailed 
 * The service graph provides immediate visual understanding of the application architecture and traffic patterns
 * Health is indicated through color coding. No need to check dashboards or parse logs to know if something is wrong.
 * Detailed metrics (throughput, errors, latency) are available for every service without any application code instrumentation
-* The mesh collects all observability data automatically through the sidecar proxies
+* The mesh collects all observability data automatically
 * Different graph views provide different perspectives on the same traffic data
+* Workload observability (CPU, memory, network) is built into the platform through the Observe menu
+* Dashboards are customizable and alerts can be configured to catch issues proactively
 
 **Business value callout:**
 
-"At Parasol, when a cross-service issue occurs, the operations team spends hours correlating logs across services to find the root cause. With the Service Mesh console, they can see the problem in seconds: which service is failing, what the error rate is, and how it affects downstream services. This reduces mean time to resolution from hours to minutes. And none of this required any changes to the application code. The platform provides it automatically."
+"At Parasol, when a cross-service issue occurs, the operations team spends hours correlating logs across services to find the root cause. With the Service Mesh console, they can see the problem in seconds: which service is failing, what the error rate is, and how it affects downstream services. Add in the platform's built-in workload monitoring with customizable dashboards and proactive alerts, and you have a complete observability picture -- from individual service metrics to aggregate resource consumption. This reduces mean time to resolution from hours to minutes. And none of this required any changes to the application code. The platform provides it automatically."
 
 **If asked:**
 
@@ -240,12 +256,12 @@ A: "Most organizations start with one team and one application, exactly the patt
 === What we demonstrated across Modules 1-3
 
 . **Module 1: Developer experience** — Application modernization with MTA, one-click DevSpaces access from the topology view, fast iteration with Quarkus dev mode, and platform engineer governance of DevSpaces through the operator and devfile registry
-. **Module 2: CI/CD pipeline** — Automated pipeline triggering, SAST/Sonarqube quality gate enforcement catching code smells, and GitOps-driven delivery with Argo CD
-. **Module 3: Platform operations** — mTLS encryption and traffic management with Service Mesh, real-time observability through the Service Mesh console, and broader platform capabilities
+. **Module 2: CI/CD pipeline** — Automated pipeline triggering, Sonarqube quality gate enforcement catching code smells, AI-assisted remediation with Continue, and GitOps-driven delivery with Argo CD
+. **Module 3: Platform operations** — mTLS encryption and traffic policy management with Service Mesh, real-time observability through traffic graphs and workload monitoring, customizable dashboards and alerts, and broader platform capabilities
 
 === The continuous story
 
-A new developer joined Parasol, clicked one button to open the app in DevSpaces, added a claims statistics endpoint in seconds with Quarkus dev mode, pushed code that triggered an automated pipeline, fixed code smells flagged by Sonarqube, and deployed through GitOps, all on a platform that handles encryption, traffic management, and observability automatically. This is what an application platform delivers.
+A new developer joined Parasol, clicked one button to open the app in DevSpaces, explored the running application with its Kafka-powered email processing, added a claims statistics endpoint in seconds with Quarkus dev mode, committed and pushed from the IDE, triggering an automated pipeline that caught code smells. The developer used the platform's AI assistant to fix the issues, pushed again, and the pipeline passed. Argo CD deployed the change through GitOps, all on a platform that handles encryption, traffic management, workload monitoring, and observability automatically. This is what an application platform delivers.
 
 === Key takeaways
 

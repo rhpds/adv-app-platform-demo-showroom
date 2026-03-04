@@ -37,14 +37,13 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 
 **What I do:**
 
-. In the **DevSpaces** terminal, commit and push the code change:
-+
-[source,bash,role=execute]
-----
-git add -A && git commit -m "Add claims statistics API endpoint" && git push
-----
-+
-* "That is all the developer does. A standard git push. The platform takes it from here."
+. In **DevSpaces**, use the **Source Control** view in the left sidebar:
+* Click the **Source Control** icon (branch icon) in the activity bar
+* The new `ClaimStatsResource.java` file appears under "Changes"
+* Stage the file by clicking the **+** icon next to it
+* Enter a commit message: `Add claims statistics API endpoint`
+* Click the dropdown arrow next to the **Commit** button and select **Commit & Push**
+* "That is all the developer does. A commit and push from the IDE. The platform takes it from here."
 
 . Switch to the **OpenShift web console** at {console_url}[{console_url}^] (logged in as `{dev_user}` / `{password}`)
 
@@ -54,15 +53,13 @@ git add -A && git commit -m "Add claims statistics API endpoint" && git push
 
 . Walk through the pipeline stages as they execute:
 * **Clone** — Source code pulled from the Git repository
-* **Build** — Quarkus application compiled and packaged
-* **Test** — Unit tests executed
-* **SAST/Sonarqube** — Static analysis and security scanning
-* **Image build** — Container image created
-* **Image push** — Image pushed to the registry
+* **Sonarqube SAST** — Static analysis and security scanning
+* **Build and Push** — Quarkus application compiled, container image built and pushed to the registry
+* **Re-rollout app** — The updated application is re-deployed in the dev environment
 * "Every code change goes through the exact same stages. No shortcuts, no skipping steps, no variation between teams."
 
 . Point out that the pipeline is still running:
-* "Let's watch this for a moment. Remember those code shortcuts our developer took? In Part 2, we will see what happens when the pipeline reaches the SAST/Sonarqube stage."
+* "Let's watch this for a moment. Remember those code shortcuts our developer took? In Part 2, we will see what happens when the pipeline reaches the Sonarqube SAST stage."
 
 // TODO: Add screenshot of OpenShift console showing the pipeline run in progress
 image::ocp-pipeline-running.png[OpenShift web console Pipelines view showing a Tekton pipeline run triggered by git push with stages in progress,link=self,window=blank,align="center",width=700,title="Pipeline run triggered automatically by git push"]
@@ -124,12 +121,16 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 
 **What I do:**
 
-. In the **OpenShift web console**, show the pipeline run reaching the **SAST/Sonarqube** stage:
+. In the **OpenShift web console**, show the pipeline run reaching the **Sonarqube SAST** stage:
 * The stage turns red (failed status)
-* "The pipeline caught it. The SAST/Sonarqube quality gate failed because of code smells in the new endpoint."
+* "The pipeline caught it. The Sonarqube quality gate failed because of code smells in the new endpoint."
 
-. Click into the failed stage to show the failure details:
-* Show the Sonarqube report highlighting the two code smells:
+. Click on the **log** for the failed Sonarqube SAST stage:
+* Scroll to the end of the log output
+* Point out the **Sonarqube report URL** at the end of the log
+* "The pipeline log includes a direct link to the full Sonarqube report. Let's open that."
+
+. Open the **Sonarqube report URL** from the log to show the two code smells:
 ** **`System.out.println` usage** — Standard output should not be used for logging in production code. Use a proper logging framework instead.
 ** **Empty catch block** — Exceptions should not be silently swallowed. Either handle the exception, log it, or let it propagate.
 * "These are not suggestions. They are hard gates. Code with these quality violations does not move forward. The platform enforces the same standard for every developer on every commit."
@@ -139,10 +140,23 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 
 . Switch back to **DevSpaces** where the developer's workspace is still open
 
-. Fix the code smells in the `ClaimStatsResource.java` file:
-* Replace `System.out.println` with the Quarkus `Log` API
-* Remove the empty try-catch block and let the business logic execute directly
-* Show the corrected code:
+. Open the **Continue** AI assistant panel on the left sidebar:
+* "This is where the platform's AI developer capabilities come in. The Continue extension has been pre-configured in the devfile by the platform engineer to use the IT-approved model -- in this case, a model hosted on the Red Hat demo platform through OpenShift AI. The developer does not need to configure API keys, choose a model, or worry about data governance. The platform engineer set it up as part of the golden path."
+
+. In the Continue chat, enter a prompt like:
++
+[source,text]
+----
+This code in @ClaimStatsResource.java has code smells according to sonarqube. please fix them!
+----
++
+* Watch as the LLM analyzes the code and generates fixes
+* The AI identifies both issues: `System.out.println` should use proper logging, and the empty catch block should be removed
+* Review the diff that Continue presents -- it shows exactly what changed
+* Accept the changes
+* "The AI understood the Sonarqube findings and fixed both code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
+
+. Verify the corrected code looks like this (for reference):
 
 +
 [source,java,role=copy]
@@ -177,13 +191,13 @@ public class ClaimStatsResource {
 
 		Map<String, Long> byCategory = new HashMap<>();
 		for (var claim : claims) {
-			byCategory.merge(claim.category, 1L, Long::sum);
+			byCategory.merge(claim.getCategory(), 1L, Long::sum);
 		}
 		stats.put("by_category", byCategory);
 
 		Map<String, Long> byStatus = new HashMap<>();
 		for (var claim : claims) {
-			byStatus.merge(claim.status, 1L, Long::sum);
+			byStatus.merge(claim.getStatus(), 1L, Long::sum);
 		}
 		stats.put("by_status", byStatus);
 
@@ -195,22 +209,20 @@ public class ClaimStatsResource {
 +
 [NOTE]
 ====
-**Presenter tip:** Walk through the two fixes briefly. First, point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API — this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. Second, show that the empty try-catch was removed entirely — if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it.
+**Presenter tip:** Walk through the diff briefly. Point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API -- this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. And the empty try-catch was removed entirely -- if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it. Emphasize that the AI understood the context and made the right fixes without the developer needing to look up the Quarkus logging API.
 ====
 
-. Commit and push the fix:
-+
-[source,bash,role=execute]
-----
-git add -A && git commit -m "Fix code smells: use proper logging and remove empty catch block" && git push
-----
+. Commit and push the fix using the **Source Control** view:
+* The modified `ClaimStatsResource.java` appears under "Changes"
+* Stage the file, enter a commit message: `Fix code smells: use proper logging and remove empty catch block`
+* Click the dropdown arrow next to **Commit** and select **Commit & Push**
 
 . Switch back to the **OpenShift web console** Pipelines view and show the new pipeline run:
 * A new pipeline run starts automatically
-* Watch the stages progress: clone, build, test, SAST/Sonarqube
-* The SAST/Sonarqube stage passes this time (green status)
+* Watch the stages progress: Clone, Sonarqube SAST, Build and Push, Re-rollout app
+* The Sonarqube SAST stage passes this time (green status)
 * All remaining stages complete successfully
-* "The developer fixed the code smells, pushed the update, and the pipeline passes. The quality gate is satisfied."
+* "The developer used AI to fix the code smells, pushed the update, and the pipeline passes. The quality gate is satisfied."
 
 // TODO: Add screenshot of OpenShift console showing the failed pipeline stage
 image::ocp-pipeline-failed.png[OpenShift web console showing a failed SAST/Sonarqube pipeline stage with quality gate violation due to code smells,link=self,window=blank,align="center",width=700,title="Pipeline fails: SAST/Sonarqube catches code smells"]
@@ -224,14 +236,16 @@ image::ocp-pipeline-passed.png[OpenShift web console showing all pipeline stages
 **What they should notice:**
 
 * The platform caught the code smells automatically. No human reviewer needed to flag them.
+* The Sonarqube report URL was available directly in the pipeline log
 * The failures were specific and actionable: Sonarqube told the developer exactly what to fix and why
-* The fix was straightforward: replace `System.out.println` with `Log.info` and remove the empty catch block
-* The fix followed the same workflow: code change, git push, automatic pipeline run
+* The developer used AI (Continue extension) to fix the issues instead of manually editing code
+* The AI was pre-configured by the platform engineer in the devfile -- the developer did not set it up
+* The fix followed the same workflow: AI-assisted code change, commit and push from the IDE, automatic pipeline run
 * The second pipeline run passed all stages, including the previously failed quality gate
 
 **Business value callout:**
 
-"This is the platform's guardrail in action. At Parasol, code smells like these accumulate across hundreds of developers and thousands of commits. Each one seems minor, but together they create a codebase that is difficult to debug, difficult to maintain, and prone to silent failures. The platform just prevented that by enforcing coding standards automatically on every commit. The developer got specific feedback, fixed the issues in minutes, and the code is now production-ready with proper logging and exception handling."
+"This is the platform's guardrail and AI assistance working together. At Parasol, code smells like these accumulate across hundreds of developers and thousands of commits. Each one seems minor, but together they create a codebase that is difficult to debug, difficult to maintain, and prone to silent failures. The platform caught the problems automatically, and the AI fixed them in seconds. The developer did not need to look up the Quarkus logging API or research exception handling best practices. The platform enforced the standard, the AI resolved it, and the code is now production-ready."
 
 **If asked:**
 
@@ -283,12 +297,15 @@ GitOps with Argo CD makes Git the single source of truth for deployments. Every 
 **What I do:**
 
 . Open the **Argo CD console** (rhdh-gitops instance) at {argocd_url}[{argocd_url}^]:
-* Log in as `admin`. Retrieve the password from the `rhdh-gitops-cluster` secret:
+* Log in as `admin`. Retrieve the password using one of these methods:
+** **Option A (CLI):** Run this command in a terminal:
 +
 [source,bash]
 ----
 oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
 ----
++
+** **Option B (Console):** In the OpenShift web console, navigate to **Workloads** -> **Secrets** in the `rhdh-gitops` namespace, find the `rhdh-gitops-cluster` secret, and copy the `admin.password` value
 
 . Show the Parasol application in the Argo CD dashboard:
 * Point out the sync status changing as Argo CD detects the new image
@@ -349,9 +366,9 @@ A: "Argo CD detects configuration drift and can automatically correct it. If som
 
 In this module, you saw how the platform's CI/CD pipeline enforces quality and automates delivery:
 
-. **Automated pipeline triggering** — A simple git push triggered a full Tekton pipeline with build, test, and SAST/Sonarqube stages, visible in the OpenShift web console
-. **Quality enforcement** — The Sonarqube quality gate caught code smells (improper logging and empty exception handling), preventing low-quality code from reaching production
-. **Fast remediation** — The developer fixed the code smells directly in DevSpaces, replacing `System.out.println` with proper logging and removing the empty catch block
+. **Automated pipeline triggering** — A commit and push from DevSpaces triggered a full Tekton pipeline with Clone, Sonarqube SAST, Build and Push, and Re-rollout stages, visible in the OpenShift web console
+. **Quality enforcement** — The Sonarqube quality gate caught code smells (improper logging and empty exception handling), with a direct link to the Sonarqube report in the pipeline log
+. **AI-assisted remediation** — The developer used the Continue AI assistant (pre-configured by the platform engineer) to fix the code smells, reviewing the diff before accepting the changes
 . **GitOps delivery** — Argo CD managed the deployment declaratively, with the sync process visible in the Argo CD console
 
 === Setting up Module 3

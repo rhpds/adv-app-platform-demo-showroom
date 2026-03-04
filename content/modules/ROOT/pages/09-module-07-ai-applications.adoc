@@ -2,340 +2,267 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This is Section 3 (Intelligent Applications). Fast forward from Section 2: the Parasol application is running smoothly on the platform with a trusted software supply chain in place. The CIO wants to leverage an existing LLM to enhance the claims processing workflow. A developer uses Developer Hub to scaffold a new AI-powered email routing service, integrates it with the main application, and deploys it through the same trusted pipeline. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch, cherry-pick the LLM classification code, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
 
 [NOTE]
 ====
-**Presenter note:** Section 3 builds on everything from Sections 1 and 2. The foundational platform is in place, the secure supply chain is operational, and now the organization is ready to integrate AI capabilities into their applications. This section shows that the same platform patterns, templates, pipelines, and GitOps, apply seamlessly to AI-enhanced workloads.
+**Presenter note:** Section 3 builds on everything from Sections 1 and 2. The foundational platform is in place, the secure supply chain is operational, and now the organization is ready to integrate AI capabilities into their applications. This section shows that the same platform patterns -- DevSpaces, pipelines, and GitOps -- apply seamlessly to AI-enhanced workloads.
 ====
 
 [#part-1]
-== Part 1 — Setting the scene: leveraging AI for business value
+== Part 1 — Setting the scene: the email triage problem
 
 === Know
 
-_Parasol Insurance receives thousands of customer emails daily. Currently, emails that cannot be automatically categorized by simple rule-based logic land in an "unknown" bucket, where claims administrators must manually triage them. The CIO has tasked the development team with building an AI-powered service that uses an existing LLM to evaluate these emails, route them to the correct processing queue, and provide an audit trail of the AI's decisions._
+_Parasol Insurance receives customer emails that are processed by the application's inbox system. On the Inbox screen (left-hand tab in the Parasol app), incoming emails flow in as they arrive. The current system uses a keyword matching algorithm to route emails to the appropriate department: CLAIMS, RETENTION, or ACQUISITION. However, ambiguous emails that do not match any keywords are routed to "REVIEW REQUIRED," where claims administrators must manually triage them. The CIO has tasked the development team with using an LLM to replace this keyword matching, eliminating the manual review bucket entirely._
 
 **Business challenge:**
 
-* Thousands of customer emails per day land in an "unknown" bucket due to naive routing logic
+* Ambiguous customer emails pile up in "Review Required" because the keyword matcher cannot understand context
 * Claims administrators spend hours manually triaging emails that could be automatically routed
-* Business leadership wants to leverage the LLM that the data science team has already deployed
+* Business leadership wants to leverage the LLM that is already available as a platform service
 * Ad hoc AI integrations risk bypassing established security and compliance controls
 
 **Current state at Parasol:**
 
-* An LLM is available as an API endpoint (in this demo, hosted on the Red Hat Demo Platform; in production, this could be Red Hat AI on-premises or any hosted model provider)
-* Customer emails flow through Kafka topics, but uncategorized emails pile up in an "unknown" topic
-* Claims administrators manually review and route these emails to the correct queues
-* The platform team wants AI integrations to follow the same golden path as any other component
+* An LLM is available as an API endpoint (in this demo, hosted on the Red Hat Demo Platform through OpenShift AI)
+* Customer emails flow through Kafka into the application's inbox, but ambiguous ones accumulate in "Review Required"
+* Claims administrators manually review and route these emails to the correct department
+* The platform team wants AI integrations to follow the same golden path as any other code change
 
 **Value proposition:**
 
-The application platform makes AI integration a standard development activity, not a special case. The developer will scaffold a new service using a Developer Hub template, add logic to consume emails from Kafka, pass them to the LLM for evaluation, and route them to one of three destination topics: `existing_customer_followup`, `new_customer_acquisition`, or `email_followup` (a default fallback). The same DevHub templates, DevSpaces environments, and CI/CD pipelines from Sections 1 and 2 apply. No new tools, no special processes, no ungoverned experimentation.
+The application platform makes AI integration a standard development activity, not a special case. The developer will enhance the existing email routing logic to call an LLM instead of relying on keyword matching. The LLM understands natural language context and always classifies emails into one of three departments -- CLAIMS, RETENTION, or ACQUISITION -- eliminating the "Review Required" bucket entirely. The same DevSpaces environment, CI/CD pipeline, and GitOps delivery from Sections 1 and 2 apply. No new tools, no special processes.
 
 === Show
 
 [NOTE]
 ====
-**Presenter note:** This section sets context with a brief talk track about the AI strategy. The key message is that the platform makes AI integration follow the same golden path as any other development activity. Emphasize the specific business problem: manual email triage is expensive and slow.
+**Presenter note:** This section sets context with a brief talk track and a look at the current application state. The key message is that the platform makes AI integration follow the same golden path as any other development activity.
 ====
 
 **What I say:**
 
-"Parasol's applications are running smoothly. The CI/CD pipeline is automated, the supply chain is trusted, and the platform handles operations. Now the CIO has a new mandate: use the AI models the data science team has already built to solve a real business problem.
+"Parasol's applications are running smoothly. The CI/CD pipeline is automated, the supply chain is trusted, and the platform handles operations. Now the CIO has a new mandate: use AI to solve a real business problem.
 
-Right now, Parasol receives thousands of customer emails every day. Their current system uses simple rule-based logic to categorize them, but a significant number of emails end up in an 'unknown' bucket because the rules cannot handle the complexity of natural language. Claims administrators spend hours every day manually triaging these emails, figuring out whether each one is from an existing customer needing follow-up, a potential new customer, or just a general inquiry.
+Right now, the Parasol application has an Inbox screen where incoming customer emails are processed. The current system uses keyword matching to route them -- if the email mentions 'accident' or 'damage,' it goes to Claims. If the sender is a known customer, it goes to Retention. But many emails are ambiguous -- they describe situations without using the right keywords. Those end up in a 'Review Required' bucket, and claims administrators have to manually triage every one of them.
 
-An LLM is already available as an API endpoint, ready to be consumed. It does not matter whether the model runs on-premises with Red Hat AI or through a hosted provider — the application platform treats it the same way. The question is: how does a developer build this integration without creating shadow AI outside of IT's guardrails?
+An LLM is already available as an API endpoint, managed as a platform service. The developer does not need to deploy a model or manage infrastructure. The question is: how do they integrate it into the existing application using the same platform patterns?"
 
-The answer is that they use the exact same platform patterns we have been showing. Developer Hub templates, DevSpaces, CI/CD pipelines, GitOps. AI is not a special case. It is just another component in the system. Let me show you how."
+**What I do:**
+
+. Open the running **Parasol application** (from the existing deployment):
+* Navigate to the **Inbox** tab on the left side of the application
+* Show incoming emails flowing in
+* Point out the emails routed to different departments: CLAIMS, RETENTION, ACQUISITION
+* Point out the emails marked **"REVIEW REQUIRED"** -- these are the ambiguous ones the keyword matcher could not handle
+* "These 'Review Required' emails are the problem. Each one requires a claims administrator to read it, understand the context, and manually route it. That is the manual triage cost we are going to eliminate with AI."
 
 **Business value callout:**
 
-"Manual email triage costs Parasol an estimated 2,000 staff hours per month across their claims organization. An AI-powered routing service can evaluate and route emails in seconds, freeing claims administrators to focus on high-value work like complex claims resolution."
+"Manual email triage costs Parasol significant staff hours across their claims organization. An AI-powered routing service can evaluate and route emails in seconds with full context understanding, freeing claims administrators to focus on high-value work like complex claims resolution."
 
 **If asked:**
 
 Q: "Where is the LLM running?"::
-A: "The model is available as an API endpoint. In this demo, it is hosted on the Red Hat Demo Platform, which uses OpenShift AI for model serving. In production, organizations can run models on-premises with Red Hat AI (which includes RHEL AI and OpenShift AI) or consume models from hosted providers. The application platform does not care where the model lives — the developer just needs an endpoint URL and an API key."
+A: "The model is available as an API endpoint. In this demo, it is hosted on the Red Hat Demo Platform, which uses OpenShift AI for model serving. In production, organizations can run models on-premises with Red Hat AI or consume models from hosted providers. The application platform does not care where the model lives -- the developer just needs an endpoint URL and an API key, both managed through Vault."
 
 Q: "What about model governance and responsible AI?"::
-A: "Model governance is handled by the data science and platform teams through whatever model serving infrastructure they use. The application developer consumes a governed, approved endpoint. The same trusted software supply chain from Section 2 ensures the AI-enhanced component is scanned, signed, and attested before reaching production."
-
-Q: "What if the LLM makes a wrong routing decision?"::
-A: "That is exactly why we include an audit log. The claims administrator can review every decision the LLM made, see the reasoning, and override if needed. The 'email_followup' topic acts as a safety net for cases where the LLM is not confident enough to route definitively."
+A: "Model governance is handled by the data science and platform teams. The application developer consumes a governed, approved endpoint. The same trusted software supply chain from Section 2 ensures the AI-enhanced code is scanned, signed, and attested before reaching production."
 
 '''
 
 [#part-2]
-== Part 2 — Building the AI-powered email routing service
+== Part 2 — Implementing LLM-powered email routing
 
 === Know
 
-_The developer uses a Developer Hub software template to scaffold a new Quarkus service that will consume emails from the "unknown" Kafka topic, pass them to the LLM for evaluation, and route them to the appropriate destination topic. The template provides the project structure, Kafka consumer and producer configuration, LLM client boilerplate, and CI/CD pipeline setup. The developer then adds the business logic using provided code snippets._
+_The same developer from Section 2 is tasked with improving the email routing. They re-open their DevSpaces workspace from the feature branch created in Section 2. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer cherry-picks the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
 
 **Business challenge:**
 
 * Developers waste time figuring out how to integrate with AI model endpoints
 * No standardized patterns for consuming AI services in production applications
-* Connecting to existing Kafka topics and LLM endpoints requires manual infrastructure setup
+* Connecting to existing Kafka and LLM endpoints requires manual configuration
 * AI integrations built outside the golden path bypass security and compliance controls
-
-**Current state at Parasol:**
-
-* The LLM endpoint is available but no standardized way exists for developers to consume it
-* The "unknown" Kafka topic contains unrouted customer emails ready for processing
-* Developers need a template that handles the boilerplate of LLM and Kafka integration
-* The platform team has prepared a golden path template for AI-enhanced components
 
 **Value proposition:**
 
-The DevHub software template for AI components includes everything the developer needs: Quarkus project scaffolding, Kafka consumer and producer configuration, LLM client setup with the endpoint URL and API key, and CI/CD pipeline configuration. The developer selects the template, fills in a few parameters, and gets a fully functional starting point. Development happens in DevSpaces with the same tools and workflow from Sections 1 and 2.
+The platform engineer has already configured the LLM endpoint and Kafka credentials as environment variables through external secrets (visible in `application.properties`). The developer does not need to manage API keys or infrastructure. They simply implement the feature using the pre-configured connections, following the same development workflow from Sections 1 and 2.
 
 === Show
 
 **What I say:**
 
-"Let me show you how quickly a developer can build an AI-powered service using the same platform patterns we have been demonstrating. We are going to scaffold a new service, add the email routing logic, and push it through the pipeline, all using the golden path."
+"The same developer from Section 2 has been tasked with replacing the keyword matching with LLM-powered classification. Let me show you how they do this using the same platform patterns we have been demonstrating."
 
 **What I do:**
 
-. Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}`
+. Re-open the **DevSpaces** workspace from the feature branch created in Section 2:
+* Use the DevSpaces link from the Developer Hub catalog component created in Module 4
+* Show the workspace loading on the correct feature branch
 
-. Navigate to the **Create** section in the left sidebar
+. Show the pre-configured environment variables in `src/main/resources/application.properties`:
+* Point out the Kafka configuration with `DEV_KAFKA_PASSWORD` provided as an environment variable
+* Point out the LangChain4j LLM configuration with `LLM_BASE_URL` and `LLM_API_KEY`
+* "The platform engineer has already configured the Kafka broker credentials and the LLM endpoint through external secrets, as we saw in Module 5. The developer does not need to manage API keys or model endpoints. They are pre-approved and pre-configured as part of the golden path."
 
-. Show the available software templates:
-* Point out that these are pre-approved golden path templates maintained by the platform team
-* "Each template includes everything a developer needs to get started: project structure, build configuration, CI/CD pipeline, and catalog registration."
+. Open a new **Terminal** in DevSpaces and cherry-pick the LLM classification code:
++
+[source,bash,role=execute]
+----
+git cherry-pick origin/llm-classification
+----
++
+* "The LLM classification implementation is ready on a separate branch. The developer cherry-picks it into their feature branch. This brings in the new code without switching branches."
 
-. Select the **AI Service** template (or equivalent template for AI-powered components)
-
-. Walk through the template form:
-* **Component name**: `email-router-ai`
-* **Description**: `AI-powered email routing service using LLM evaluation`
-* **System**: Select "Parasol Insurance" from the system entitypicker (this automatically links the new component to the existing Parasol system in the catalog)
-* **LLM Endpoint URL**: The provided LLM serving endpoint
-* **Kafka bootstrap servers**: Pre-configured Kafka cluster connection
-* Point out: "The developer does not need to provision any infrastructure. The template handles namespace creation, Kafka topic configuration, and pipeline setup automatically."
-
-. Click **Create** and show the provisioning progress:
-* Git repository created in GitLab
-* Namespace provisioned on OpenShift
-* CI/CD pipeline configured
-* Component registered in the RHDH catalog
-* "In a few seconds, the developer has a fully scaffolded service with all the infrastructure they need."
-
-. Click the link to open the new component in **DevSpaces**:
-* Show the workspace starting up with the correct Quarkus tooling
-* Point out the devfile-driven configuration, same pattern from Section 1
+. Review the changes that were cherry-picked:
+* Show the new file `src/main/java/com/parasol/EmailClassifier.java`:
+** A `@RegisterAiService` interface using Quarkus LangChain4j
+** `@SystemMessage` describing the three departments (CLAIMS, RETENTION, ACQUISITION) with classification criteria
+** Lists the known existing customers so the LLM can distinguish between retention and acquisition
+** Instructs the LLM to respond with JSON: `{"department":"...","reason":"..."}`
+* Show the modified `src/main/java/com/parasol/EmailRouter.java`:
+** Now injects the `EmailClassifier` and uses the LLM as the primary classification path
+** Keyword matching is kept as a fallback in case the LLM is unavailable
+** Response parser handles the LLM's JSON output, including edge cases
+* Show the updated `pom.xml` with the `quarkus-langchain4j-openai` dependency
+* "The implementation uses Quarkus LangChain4j to call the LLM through a clean interface. The system prompt tells the LLM about the three departments and lists known customers. The LLM understands context -- it does not just match keywords. And if the LLM is unavailable, the keyword matching still works as a fallback."
 
 . Show the project structure in the DevSpaces IDE:
-* `src/main/java/.../EmailRouterService.java` — the main service class
-* `src/main/java/.../LlmClient.java` — LLM client with endpoint configuration
-* `src/main/java/.../KafkaEmailConsumer.java` — Kafka consumer for the "unknown" topic
-* `src/main/java/.../KafkaRouteProducer.java` — Kafka producer for routing decisions
-* `src/main/resources/application.properties` — Kafka and LLM endpoint configuration
-* "The template generated all of this. The developer just needs to add the business logic."
-
-. Add the email routing business logic:
-* Open the `EmailRouterService.java` file
-* Paste the provided code that:
-** Reads email content from the "unknown" Kafka topic
-** Sends the email text to the LLM endpoint for evaluation
-** Parses the LLM response to determine the routing decision
-** Routes to one of three topics: `existing_customer_followup`, `new_customer_acquisition`, or `email_followup`
-** Logs the routing decision with the LLM's reasoning for audit purposes
+* `src/main/java/com/parasol/EmailClassifier.java` -- the new AI service interface
+* `src/main/java/com/parasol/EmailRouter.java` -- modified to use LLM with keyword fallback
+* `src/main/java/com/parasol/EmailGenerator.java` -- simulates incoming emails
+* `src/main/java/com/parasol/EmailStore.java` -- in-memory store for processed emails
+* `src/main/java/com/parasol/InboxResource.java` -- REST endpoint for the inbox UI
+* `src/main/java/com/parasol/ClaimsResource.java` -- claims API
+* `src/main/java/com/parasol/model/Claim.java` -- claim entity
+* `src/main/java/com/parasol/model/Email.java` -- email model
+* `src/main/resources/application.properties` -- Kafka, LLM, and database configuration
+* `src/main/resources/META-INF/resources/inbox.html` -- the inbox UI
+* "This is the complete Parasol application. The LLM integration adds one new file and modifies one existing file. Everything else stays the same."
 
 +
 [NOTE]
 ====
-**Presenter tip:** The code is provided to the demoer. You do not need to write it from scratch. Paste it in and walk through the key sections, explaining what each part does. Emphasize that the LLM client, Kafka consumer, and producer were all scaffolded by the template. The developer only added the routing logic.
+**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use `Ctrl+Shift+P` -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab and navigate to the Inbox to see emails being classified by the LLM in real time.
 ====
 
-. Briefly show the application running locally using Quarkus dev mode:
+. Push the code:
 +
 [source,bash,role=execute]
 ----
-./mvnw quarkus:dev
+git push
 ----
 +
-* Show a test email being consumed and routed
-* "The developer can test the AI routing logic locally before committing. Same inner loop pattern from Section 1."
+* "The developer pushes the LLM integration to their feature branch. The secure pipeline starts automatically, just like in Module 5."
 
-. Commit and push the code:
-+
-[source,bash,role=execute]
-----
-git add -A && git commit -m "Add AI-powered email routing logic" && git push origin main
-----
-
-// TODO: Add screenshot of RHDH template form with AI service fields
-image::rhdh-ai-template-form.png[Developer Hub software template form for the AI email routing service,link=self,window=blank,align="center",width=700,title="Scaffolding the AI email routing service with Developer Hub"]
-
-// TODO: Add screenshot of DevSpaces with the email router project structure
-image::devspaces-email-router.png[DevSpaces IDE showing the scaffolded email router project with LLM client and Kafka configuration,link=self,window=blank,align="center",width=700,title="AI service project structure in DevSpaces"]
+// TODO: Add screenshot of DevSpaces showing the EmailClassifier.java AI service interface
+image::devspaces-email-classifier.png[DevSpaces IDE showing the EmailClassifier.java AI service interface with the LLM system prompt and department classification criteria,link=self,window=blank,align="center",width=700,title="LLM-powered email classification with Quarkus LangChain4j"]
 
 **What they should notice:**
 
-* The developer did not provision any infrastructure manually. No tickets, no waiting.
-* The software template created everything: Git repository, namespace, pipeline, catalog registration
-* The LLM client and Kafka configuration were pre-wired by the template
-* The developer only added the business logic (the routing rules)
-* Testing happened locally in DevSpaces with Quarkus dev mode, same pattern as Section 1
+* The developer re-opened their existing DevSpaces workspace from the Section 2 feature branch
+* The LLM endpoint and Kafka credentials were pre-configured by the platform engineer as environment variables
+* The cherry-pick brought in the LLM code cleanly -- one new file and one modified file
+* The implementation uses a clean AI service interface with a system prompt that describes the business rules
+* Keyword matching is kept as a fallback for resilience
+* The same push-and-pipeline workflow applies -- AI integration is not a special case
 
 **Business value callout:**
 
-"What you just saw would traditionally take days or weeks of coordination between the developer, platform team, and data science team. The developer would need to request a namespace, set up Kafka connections, figure out how to call the LLM, configure a pipeline, and register the service. With the golden path template, all of that happened in minutes. The developer focused entirely on the business logic: how to route emails based on the LLM's evaluation."
+"What you just saw is AI integration following the exact same development workflow. The developer did not provision any new infrastructure, configure API keys, or use any special tools. The platform engineer pre-configured the LLM endpoint through external secrets (which we saw in Module 5), and the developer implemented the feature using a standard Quarkus extension. One new file, one modified file, and a git push. That is how the platform makes AI a standard part of development."
 
 **If asked:**
 
 Q: "Can the developer customize the LLM prompt?"::
-A: "Yes. The template provides a sensible default prompt for email classification, but the developer can customize the prompt engineering in the service code. The LLM client is just a REST call. The developer has full control over the prompt, the response parsing, and the routing logic."
+A: "Yes. The system prompt in `EmailClassifier.java` is fully customizable. The developer defines the classification criteria, the department descriptions, and the response format. The LLM client is just a Quarkus extension. The developer has full control."
 
 Q: "What happens if the LLM is unavailable?"::
-A: "The service includes error handling for LLM timeout or unavailability. Emails that cannot be evaluated are routed to the 'email_followup' topic as the default fallback, ensuring nothing gets lost. The audit log records the failure for review."
+A: "The code includes a fallback to the original keyword matching logic. If the LLM call fails for any reason, emails are still classified using the keyword approach. The fallback is logged for visibility."
 
 Q: "How do you handle the LLM API key securely?"::
-A: "The API key is managed through the same external secrets pattern from Section 2. It is stored in Vault and injected at runtime through the External Secrets Operator. The developer never sees or commits the actual key."
+A: "The API key is managed through the same external secrets pattern from Module 5. It is stored in Vault as `litellm-credentials` and injected at runtime. The developer never sees or commits the actual key."
 
 '''
 
 [#part-3]
-== Part 3 — Integrating with the main app and showcasing the feature
+== Part 3 — Deploying and showcasing the AI-enhanced feature
 
 === Know
 
-_The new email routing service is built and pushed. Now the developer needs to integrate it with the main Parasol application so that claims administrators can see the routing results and review the AI's decisions. The developer uses Developer Hub to find the main application, opens it in DevSpaces, makes the integration changes, and creates a merge request. After the platform engineer approves the MR, the updated application is deployed and the new AI-powered feature is showcased._
+_The secure pipeline builds, scans, signs, and deploys the AI-enhanced application. Once deployed, the Inbox screen shows a dramatic improvement: emails that previously landed in "Review Required" are now intelligently classified into CLAIMS, RETENTION, or ACQUISITION, with rich descriptions of why the LLM made each decision._
 
 **Business challenge:**
 
 * AI features deployed without integration into existing applications provide limited business value
-* No way to verify that AI-enhanced components meet the same security standards as the rest of the application
 * Showcasing AI value to business stakeholders requires a working, integrated feature
 * Disconnected AI prototypes do not translate to production-ready capabilities
 
-**Current state at Parasol:**
-
-* The email routing service is built and its pipeline is running
-* The main Parasol application needs to be updated to display routing results and the audit log
-* Claims administrators need a UI to review and oversee the AI's routing decisions
-* The integration must follow the same merge request and review process as any other change
-
 **Value proposition:**
 
-The integration follows the same workflow the developer already knows: find the app in the Developer Hub catalog, open it in DevSpaces, make changes on a branch, and submit a merge request. The platform engineer reviews and approves. Argo CD deploys the updated application. The result is a production-ready, fully attested AI feature that claims administrators can use immediately. The same trusted supply chain from Section 2 applies to every step.
+The AI-enhanced email routing is deployed through the same trusted pipeline as every other change. The result is immediately visible in the application: the "Review Required" bucket disappears, and every email gets an intelligent classification with a detailed reason. Claims administrators can see why each email was routed to a specific department, providing transparency and trust in the AI's decisions.
 
 === Show
 
 **What I say:**
 
-"The email routing service is ready. Now the developer needs to wire it into the main Parasol application so the claims team can actually see and use the results. Watch how they do this using the same Developer Hub and DevSpaces workflow."
+"The pipeline is running on the AI-enhanced code. Let's watch it complete and then see the results in the application."
 
 **What I do:**
 
-. Switch back to **Red Hat Developer Hub** at {rhdh_url}[{rhdh_url}^]
+. Show the pipeline completing in **Developer Hub** or the **OpenShift console**:
+* The same secure pipeline stages: Clone, Sonarqube SAST, ACS scan, Build and Push, Tekton Chains signing and attestation
+* "The AI-enhanced code goes through the exact same secure pipeline. Scanned, signed, attested. No shortcuts because it uses AI."
 
-. Navigate to the **Catalog** and search for the main Parasol application:
-* Show the Parasol system with all its components listed
-* Point out that the new `email-router-ai` component is already registered in the catalog and linked to the Parasol system
-* "The developer can see the entire system landscape. The new AI service is already part of the family."
+. Once the pipeline completes and Argo CD syncs, open the **Parasol application** from the **Topology** view:
+* Navigate to the Topology view in the development namespace
+* Click the route link on the Parasol application to open it in a new tab
 
-. Click on the main Parasol application component
+. Navigate to the **Inbox** tab and demonstrate the improved email routing:
+* Show incoming emails being classified in real time
+* Point out that **there are no more "REVIEW REQUIRED" emails** -- every email is now classified into CLAIMS, RETENTION, or ACQUISITION
+* Show the **rich classification reasons** provided by the LLM for each email:
+** "Existing customer Sarah Mitchell reporting roof damage from a storm -- classified as CLAIMS"
+** "Unknown sender inquiring about homeowner's insurance options -- classified as ACQUISITION"
+** "Existing customer Robert Chen asking about policy renewal -- classified as RETENTION"
+* "Look at the difference. Before, ambiguous emails like 'a tree fell on my porch and I do not know what to do' would end up in 'Review Required.' Now the LLM understands the context -- it recognizes this as property damage that needs a claim, even without explicit keywords like 'accident' or 'damage.'"
 
-. Click the **OpenShift Dev Spaces** icon (or link) to open the application in DevSpaces:
-* "Notice that the developer did not need to clone a repository or set up anything. They clicked one button in the catalog and landed in a fully configured workspace."
-* Show the workspace loading with the main application code
+. Compare with the previous state:
+* "Before the LLM integration, the keyword matcher would only catch emails that used specific words. Anything ambiguous or conversational went to manual review. Now every email gets intelligent classification with a detailed reason. The 'Review Required' bucket is gone."
 
-. Create a new Git branch for the integration changes:
-+
-[source,bash,role=execute]
-----
-git checkout -b feature/ai-email-routing
-----
+// TODO: Add screenshot of Parasol Inbox showing LLM-classified emails with rich reasons
+image::parasol-ai-email-routing.png[Parasol Insurance Inbox showing AI-classified emails with CLAIMS and RETENTION and ACQUISITION departments and detailed LLM reasoning,link=self,window=blank,align="center",width=700,title="AI-powered email routing: no more manual review"]
 
-. Make the integration changes to the main application:
-* Add a new view for claims administrators to see the AI routing results
-* Add a consumer that reads from the three destination topics to display routing outcomes
-* Add the audit log view showing the LLM's reasoning for each routing decision
-
-+
-[NOTE]
-====
-**Presenter tip:** The code changes are provided. Paste the integration code and briefly walk through what it does: a new page in the claims admin UI that shows recently routed emails, which topic they were sent to, and the LLM's reasoning. Emphasize that this is a standard application change, no AI-specific tooling required.
-====
-
-. Commit the changes and push the branch:
-+
-[source,bash,role=execute]
-----
-git add -A && git commit -m "Add AI email routing results view for claims administrators" && git push origin feature/ai-email-routing
-----
-
-. Create a merge request:
-+
-[source,bash,role=execute]
-----
-git push -o merge_request.create -o merge_request.target=main origin feature/ai-email-routing
-----
-+
-* "The developer has submitted a merge request. In a real workflow, the platform engineer would review this before it reaches production."
-
-. Switch to **GitLab** at {gitlab_url}[{gitlab_url}^] (log in as `{dev_user}` / `{password}`) to show the merge request:
-* Show the MR with the code diff
-* Show the CI/CD pipeline running automatically on the MR
-* "The same secure pipeline from Section 2 runs here: build, test, ACS scan, image signing, SBOM generation."
-* Approve and merge the MR (simulating the platform engineer review)
-
-. Show the deployment in the **OpenShift console** at {console_url}[{console_url}^]:
-* Navigate to the Parasol application namespace
-* Show the running pods, including the new `email-router-ai` pod
-* Show the updated main application pod with the new version
-* "Both the new AI service and the updated main app are running. Everything was deployed through Argo CD, same GitOps pattern as always."
-
-. Open the running **Parasol application** and demonstrate the new feature:
-* Navigate to the claims administrator dashboard
-* Show the new **Email routing** section:
-** Emails that were previously in the "unknown" bucket are now categorized
-** Each email shows which topic it was routed to: `existing_customer_followup`, `new_customer_acquisition`, or `email_followup`
-** The LLM's reasoning is displayed alongside each decision
-* Show the **Audit log**:
-** Timestamp, email subject, LLM decision, confidence indicator, destination topic
-** Claims administrators can review and override if needed
-* "The claims team now has AI-powered email routing with full transparency. They can see exactly what the AI decided and why, and override if they disagree."
-
-// TODO: Add screenshot of the Parasol app showing AI email routing results
-image::parasol-ai-email-routing.png[Parasol Insurance application showing AI-powered email routing results with LLM decisions and audit log,link=self,window=blank,align="center",width=700,title="AI-powered email routing in the Parasol application"]
-
-// TODO: Add screenshot of the audit log view
-image::parasol-ai-audit-log.png[Claims administrator audit log showing LLM routing decisions with reasoning and confidence indicators,link=self,window=blank,align="center",width=700,title="AI routing audit log for claims administrators"]
+// TODO: Add screenshot comparing before (with Review Required) and after (all classified)
+image::parasol-inbox-before-after.png[Comparison showing the Parasol Inbox before with Review Required emails and after with all emails classified by the LLM,link=self,window=blank,align="center",width=700,title="Before and after: keyword matching vs LLM classification"]
 
 **What they should notice:**
 
-* The developer found the main app through the Developer Hub catalog and opened it in DevSpaces with one click
-* The integration followed the standard merge request workflow with platform engineer review
-* The same secure pipeline (ACS, signing, SBOM) ran on the merge request automatically
-* The AI feature is fully integrated into the existing application, not a separate prototype
-* Claims administrators have full visibility into the AI's decisions through the audit log
-* The entire flow, from scaffolding a new service to showcasing a production feature, used the same golden path
+* The AI-enhanced code went through the same secure pipeline as every other change
+* The "Review Required" bucket is completely eliminated -- every email is classified
+* The LLM provides rich, contextual reasons for each classification, not just a keyword match
+* Ambiguous emails that previously required manual triage are now handled automatically
+* The same platform patterns (DevSpaces, pipelines, GitOps) applied to the AI feature
+* The developer cherry-picked prepared code, reviewed it, and pushed -- no special AI tooling required
 
 **Business value callout:**
 
-"Let me recap what just happened. A developer received a task to add AI-powered email routing. Using the platform's golden path, they scaffolded a new service from a template, added the business logic, integrated it with the main application, and deployed it through the trusted pipeline, all in a single demo session. The claims team now has an AI-powered feature that saves thousands of manual triage hours, with full audit trail and human oversight. And it went through the exact same security and compliance controls as every other component. That is what it means to make AI a standard part of your development workflow."
+"Let me recap what just happened. A developer received a task to add AI-powered email routing. They re-opened their existing DevSpaces workspace, cherry-picked the LLM integration code, reviewed it, and pushed it through the secure pipeline. The platform handled everything else: the LLM credentials came from Vault, the pipeline scanned and signed the image, and Argo CD deployed it. The result? The 'Review Required' bucket is gone. Every email gets an intelligent classification with a clear explanation. Manual triage costs just dropped to near zero. And it went through the exact same security and compliance controls as every other component."
 
 **If asked:**
 
-Q: "How does the claims administrator override an AI decision?"::
-A: "The audit log includes an override action for each routing decision. The administrator can reassign an email to a different topic and flag the decision for the data science team to review. Over time, these overrides become feedback for improving the model."
-
 Q: "What about data privacy for the email content?"::
-A: "That depends on the deployment model. If the organization runs the LLM on-premises with Red Hat AI, no data leaves their infrastructure and they maintain full data sovereignty. If they use a hosted provider, they need to evaluate the provider's data handling policies. The application platform supports both models — the endpoint URL is just configuration."
+A: "That depends on the deployment model. If the organization runs the LLM on-premises with Red Hat AI, no data leaves their infrastructure. If they use a hosted provider, they need to evaluate the provider's data handling policies. The application platform supports both models."
 
 Q: "Can this pattern be applied to other AI use cases?"::
-A: "The template is reusable. Any team can scaffold a new AI-powered service that consumes Kafka data and calls the LLM endpoint. The platform team can create additional templates for different patterns: batch processing, real-time inference, agent-based workflows. The golden path scales across use cases."
+A: "Absolutely. The LangChain4j integration is a standard Quarkus extension. Any team can add LLM capabilities to their application the same way: add the dependency, create an AI service interface, and configure the endpoint through external secrets. The golden path scales across use cases."
 
 Q: "What if we want to use a different model?"::
-A: "The LLM endpoint is configurable. The service calls a REST API. Switching to a different model just means updating the endpoint URL and API key in Vault. The application code does not change."
+A: "The LLM endpoint is configurable through Vault. Switching to a different model means updating the endpoint URL and API key in Vault. The application code does not change."
+
+Q: "How does the claims administrator verify the AI's decisions?"::
+A: "Every classification includes the LLM's reasoning. The administrator can see why each email was routed to a specific department. If they disagree, they can manually reassign it. Over time, these corrections can inform prompt improvements."
 
 == Section 3 summary
 
@@ -343,18 +270,18 @@ A: "The LLM endpoint is configurable. The service calls a REST API. Switching to
 
 In this module, you saw how the application platform extends naturally to AI-enhanced workloads:
 
-. **AI as a standard component** — The developer used the same Developer Hub templates, DevSpaces environments, and CI/CD pipelines to build an AI-powered service. No special tools or processes required.
-. **Golden path for AI** — The platform team provides a template that handles LLM and Kafka integration boilerplate. The developer focused entirely on the business logic: evaluating emails and routing them.
-. **Full integration** — The AI service was integrated into the existing Parasol application through the standard merge request workflow, with platform engineer review and the trusted secure pipeline.
-. **Transparent AI** — Claims administrators have full visibility into the AI's decisions through an audit log, with the ability to review and override.
+. **AI as a standard feature** -- The developer used the same DevSpaces environment, pipeline, and GitOps delivery to add LLM-powered email classification. No special tools or processes required.
+. **Pre-configured AI services** -- The platform engineer pre-configured the LLM endpoint and credentials through external secrets. The developer consumed them as environment variables, just like any other service dependency.
+. **Immediate business value** -- The "Review Required" email bucket was eliminated entirely. Every email now gets intelligent classification with rich contextual reasoning.
+. **Trusted delivery** -- The AI-enhanced code went through the same secure pipeline with scanning, signing, and attestation. AI is not a special case.
 
 === The complete story
 
 Across all three sections, you saw a complete application platform transformation:
 
-* **Section 1 (Foundational)** — Application modernization, standardized development environments, live reload development, automated CI/CD with quality enforcement, GitOps delivery, and platform operations with Service Mesh and observability
-* **Section 2 (Advanced Developer Services)** — Developer Hub for discovery and self-service, secure build pipeline with supply chain trust, admission control, and SBOM management for compliance
-* **Section 3 (Intelligent Applications)** — AI-enhanced email routing built and deployed using the same golden path patterns, demonstrating that the platform scales from traditional to AI workloads seamlessly
+* **Section 1 (Foundational Application Platform)** -- Application modernization, standardized development environments, live reload development, automated CI/CD with quality enforcement and AI-assisted remediation, GitOps delivery, and platform operations with Service Mesh and observability
+* **Section 2 (Advanced Application Platform)** -- Developer Hub for discovery and self-service with AI-powered Lightspeed, secure build pipeline with supply chain trust, and SBOM management for compliance
+* **Section 3 (Intelligent Applications)** -- AI-enhanced email routing built and deployed using the same golden path patterns, demonstrating that the platform scales from traditional to AI workloads seamlessly
 
 === Key takeaway
 

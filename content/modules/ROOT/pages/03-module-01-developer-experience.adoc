@@ -167,7 +167,7 @@ A: "Dev Spaces supports connecting from VS Code desktop as well. Developers can 
 
 === Know
 
-_Our new developer is now in their cloud workspace and ready to contribute. They have been assigned their first task: add a new claims statistics API endpoint to the Parasol application. Using Quarkus dev mode, they can write code and see changes reflected immediately without manual builds or restarts. However, in their eagerness to ship, the developer takes some shortcuts — using `System.out.println` instead of proper logging and wrapping code in an empty catch block — code smells that will have consequences in Module 2._
+_Our new developer is now in their cloud workspace and ready to contribute. But first, let them explore the application. Parasol Insurance is a claims and customer management platform used by Parasol's agents to process insurance claims and communicate with customers. It uses enterprise messaging with Apache Kafka to process incoming emails through a keyword matching algorithm that routes them to the appropriate department. (This routing will be enhanced with AI in Section 3.) The developer has been assigned their first task: add a new claims statistics API endpoint. Using Quarkus dev mode, they can write code and see changes reflected immediately without manual builds or restarts. However, in their eagerness to ship, the developer takes some shortcuts — using `System.out.println` instead of proper logging and wrapping code in an empty catch block — code smells that will have consequences in Module 2._
 
 **Business challenge:**
 
@@ -191,22 +191,28 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 
 **What I say:**
 
-"Our new developer has their workspace ready and has been assigned their first task: add a claims statistics API endpoint. This endpoint will aggregate claim data by category and status for the operations dashboard. Let me show you how fast this inner loop is with Quarkus dev mode. The developer writes code, saves, and the application updates immediately, no manual builds, no restarts, no waiting."
+"Our new developer has their workspace ready. Before diving into code, let me first start the application so we can see what we are working with. Then the developer will add a claims statistics API endpoint, and you will see how fast the inner loop is with Quarkus dev mode."
 
 **What I do:**
 
-. In the Dev Spaces workspace, start the application in development mode using the terminal:
+. In the DevSpaces workspace, start the application in development mode:
+* Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the command palette
+* Type and select **Tasks: Run Task**
+* Select the **devfile** task group
+* Select **Start Development Mode**
 +
-[source,bash,role=execute]
-----
-./mvnw quarkus:dev
-----
+[NOTE]
+====
+**Presenter tip:** The devfile defines this task so every developer gets the same startup experience. The platform engineer configured it, and the developer just selects it from the menu. No need to remember Maven commands or flags.
+====
 
 . Show the application starting and the development mode output:
 * Live coding is active
 * The application is running and accessible
 
-. Open the running application in a browser preview to show the current claims API response
+. When DevSpaces prompts with a popup to open the application, click to **open it in a new tab**:
+* Walk through the running application briefly
+* "This is the Parasol Insurance platform. It is used by Parasol's agents to manage insurance claims and communicate with new and existing customers. Behind the scenes, it uses Apache Kafka for enterprise messaging -- incoming customer emails are processed through a keyword matching algorithm that routes them to the correct department: claims, retention, or acquisition. We will come back to that email routing in Section 3, where we enhance it with AI."
 
 . Create the new claims statistics endpoint. Add a new file `src/main/java/com/parasol/ClaimStatsResource.java`:
 +
@@ -242,13 +248,13 @@ public class ClaimStatsResource {
 
 			Map<String, Long> byCategory = new HashMap<>();
 			for (var claim : claims) {
-				byCategory.merge(claim.category, 1L, Long::sum);
+				byCategory.merge(claim.getCategory(), 1L, Long::sum);
 			}
 			stats.put("by_category", byCategory);
 
 			Map<String, Long> byStatus = new HashMap<>();
 			for (var claim : claims) {
-				byStatus.merge(claim.status, 1L, Long::sum);
+				byStatus.merge(claim.getStatus(), 1L, Long::sum);
 			}
 			stats.put("by_status", byStatus);
 		} catch (Exception e) {
