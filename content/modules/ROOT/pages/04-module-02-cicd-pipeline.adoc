@@ -39,7 +39,7 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 
 . In **DevSpaces**, use the **Source Control** view in the left sidebar:
 * Click the **Source Control** icon (branch icon) in the activity bar
-* The new `ClaimStatsResource.java` file appears under "Changes"
+* The new `ClaimsStatsResource.java` file appears under "Changes"
 * Stage the file by clicking the **+** icon next to it
 * Enter a commit message: `Add claims statistics API endpoint`
 * Click the dropdown arrow next to the **Commit** button and select **Commit & Push**
@@ -158,16 +158,15 @@ image::devspaces-continue-panel.png[DevSpaces IDE with the Continue AI assistant
 +
 [source,text,role="copypaste"]
 ----
-This code in @ClaimStatsResource.java has code smells according to sonarqube. please fix them!
+This code in @ClaimsStatsResource.java has code smells according to sonarqube - something about system.out.println, field injection vs. constructor, and empty try/catch. please fix all of them!
 ----
 +
 * Watch as the LLM analyzes the code and generates fixes
 * The AI identifies both issues: `System.out.println` should use proper logging, and the empty catch block should be removed
 * Review the diff that Continue presents -- it shows exactly what changed
-* Accept the changes
-* "The AI understood the Sonarqube findings and fixed both code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
+* Accept the changes in the chat by clicking the green checkmark to _Accept All_
+* "The AI understood the Sonarqube findings and fixed the code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
 
-// TODO: Add screenshot of the Continue diff view showing the AI-generated fixes
 image::devspaces-continue-diff.png[Continue AI assistant showing a diff view with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
 
 . Verify the corrected code looks like this (for reference, or in case the LLM responds differently):
@@ -188,11 +187,11 @@ import jakarta.ws.rs.core.MediaType;
 
 @Path("/api/claims/stats")
 @Produces(MediaType.APPLICATION_JSON)
-public class ClaimStatsResource {
+public class ClaimsStatsResource {
 
 	private final ClaimsResource claimsResource;
 
-	public ClaimStatsResource(ClaimsResource claimsResource) {
+	public ClaimsStatsResource(ClaimsResource claimsResource) {
 			this.claimsResource = claimsResource;
 	}
 
@@ -228,14 +227,14 @@ public class ClaimStatsResource {
 ====
 
 . Commit and push the fix using the **Source Control** view as before.
-* The modified `ClaimStatsResource.java` appears under "Changes"
+* The modified `ClaimsStatsResource.java` appears under "Changes"
 * Stage the file (click the + next to it), enter a commit message: `Fix code smells: use proper logging and remove empty catch block`
 * Click the dropdown arrow next to **Commit** and select **Commit & Push**
 +
 image::devspaces-scm-commit-push.png[DevSpaces Source Control view showing staged changes with a commit message and the Commit and Push dropdown menu option,link=self,window=blank,align="center",width=700,title="Commit and Push from the Source Control view"]
 
 . Switch back to the **OpenShift web console** Pipelines view and show the new pipeline run:
-* A new pipeline run starts automatically
+* A new pipeline run starts automatically (in the `parasol-insurance-build` namespace)
 * Watch the stages progress: Clone, Sonarqube SAST, Build and Push, Re-rollout app
 * The Sonarqube SAST stage passes this time (green status)
 * All remaining stages complete successfully

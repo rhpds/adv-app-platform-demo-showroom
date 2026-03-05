@@ -47,13 +47,16 @@ The Dependency Analytics plugin in DevSpaces scans project dependencies in real-
 * "The Dependency Analytics plugin scans this file automatically. It checks every dependency against known vulnerability databases and compatibility rules in real time."
 
 . Show the **Dependency Analytics report**:
-* Point out the report identifying the `quarkus-rest` dependency as unnecessary
+* Either click the Open Report in the pop-up, or right-click on the vulnerability and choose "Red Hat Dependency Analytics Report"
+* Point out the report identifying the `quarkus-rest` dependency as unnecessary (this is the only _direct_ issue we can fix in our code, the others are indirect and could be addressed with more invasive changes)
 * Show the report message: _"A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it."_
 * "The report has identified an unnecessary dependency. The `quarkus-rest` extension is incompatible with other extensions in the project. This kind of dependency bloat increases the attack surface and can cause subtle runtime issues."
 
 // TODO: Add screenshot of DevSpaces showing Dependency Analytics report with quarkus-rest flagged
-image::devspaces-dependency-analytics.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics identifies an unnecessary dependency"]
+image::devspaces-dependency-analytics-popup.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics Red Squigglies indicating an issue"]
 
+// TODO: Add screenshot of DevSpaces showing Dependency Analytics report with quarkus-rest flagged
+image::devspaces-dependency-analytics-report.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics identifies an unnecessary dependency"]
 
 . **Remove the unnecessary dependency** by deleting the `quarkus-rest` entry from `pom.xml`:
 * Show the dependency being removed

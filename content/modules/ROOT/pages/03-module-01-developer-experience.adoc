@@ -113,6 +113,7 @@ Cloud-based development environments eliminate local setup entirely. Every devel
 image::ocp-topology-devspaces-icon.png[OpenShift Topology view showing the Parasol application with the DevSpaces icon on the blue donut,link=self,window=blank,align="center",width=700,title="One-click access to DevSpaces from the OpenShift Topology view"]
 
 . Show the DevSpaces workspace starting up automatically, pointing out:
+* DevSpaces will establish a connection (OAuth) to GitLab to pull and eventually push code, you'll need to again supply your username (`dev1`) and password (`{password}`) to authenticate the connection.
 * The devfile in the repository defines the entire workspace configuration
 * The correct Java SDK, Quarkus CLI, and extensions are installed automatically
 * Database connections and service endpoints are pre-configured
@@ -217,7 +218,7 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 // TODO: Add screenshot of the running Parasol app dashboard opened from DevSpaces
 image::parasol-app-home.png[Parasol Insurance application dashboard showing open claims and recent activity and the Inbox tab in the left navigation,link=self,window=blank,align="center",width=700,title="The running Parasol Insurance application"]
 
-. Create the new claims statistics endpoint. In the Explorer on the left, right-click on the `java / com / Parasol` directory and select **New File**. Name the file `ClaimStatsResource.java`. Then copy and paste the following code into the new file:
+. Create the new claims statistics endpoint. In the Explorer on the left, right-click on the `java / com / Parasol` directory and select **New File**. Name the file `ClaimsStatsResource.java`. Then copy and paste the following code into the new file:
 +
 [source,java,role="copypaste"]
 ----
@@ -234,7 +235,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @Path("/api/claims/stats")
 @Produces(MediaType.APPLICATION_JSON)
-public class ClaimStatsResource {
+public class ClaimsStatsResource {
 
 	@Inject
 	ClaimsResource claimsResource;

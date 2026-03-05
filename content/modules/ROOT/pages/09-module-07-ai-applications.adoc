@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch, cherry-pick the LLM classification code, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch (or create a new one if starting from here), cherry-pick the LLM classification code, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
 
 [NOTE]
 ====
@@ -55,7 +55,7 @@ An LLM is already available as an API endpoint, managed as a platform service. T
 * Navigate to the **Inbox** tab on the left side of the application
 * Show incoming emails flowing in
 * Point out the emails routed to different departments: CLAIMS, RETENTION, ACQUISITION
-* Point out the emails marked **"REVIEW REQUIRED"** -- these are the ambiguous ones the keyword matcher could not handle
+* Point out the emails marked **"REVIEW REQUIRED"** (there will be many) -- these are the ambiguous ones the keyword matcher could not handle
 * "These 'Review Required' emails are the problem. Each one requires a claims administrator to read it, understand the context, and manually route it. That is the manual triage cost we are going to eliminate with AI."
 
 // TODO: Add screenshot of the Parasol Inbox showing emails with REVIEW REQUIRED badges
@@ -71,7 +71,7 @@ Q: "Where is the LLM running?"::
 A: "The model is available as an API endpoint. In this demo, it is hosted on the Red Hat Demo Platform, which uses OpenShift AI for model serving. In production, organizations can run models on-premises with Red Hat AI or consume models from hosted providers. The application platform does not care where the model lives -- the developer just needs an endpoint URL and an API key, both managed through Vault."
 
 Q: "What about model governance and responsible AI?"::
-A: "Model governance is handled by the data science and platform teams. The application developer consumes a governed, approved endpoint. The same trusted software supply chain from Section 2 ensures the AI-enhanced code is scanned, signed, and attested before reaching production."
+A: "Model governance is handled by the data science and platform teams. The application developer consumes a governed, approved endpoint that is pre-configured via software templates. The same trusted software supply chain from Section 2 ensures the AI-enhanced code is scanned, signed, and attested before reaching production."
 
 '''
 
@@ -81,6 +81,13 @@ A: "Model governance is handled by the data science and platform teams. The appl
 === Know
 
 _The same developer from Section 2 is tasked with improving the email routing. They re-open their DevSpaces workspace from the feature branch created in Section 2. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer cherry-picks the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
+
+[NOTE]
+====
+This demo focuses on the _value of the platform_, including runtimes like Quarkus, but is not intended to be a deep dive on
+coding exercises. Therefore, you as a demoer will not write the new code to implement the AI-based triage, but instead
+use `git cherry-pick` to automatically update the existing code with the changes to implement the AI functionality (This could also be done by a more powerful LLM using a code assistant).
+====
 
 **Business challenge:**
 
@@ -106,7 +113,6 @@ The platform engineer has already configured the LLM endpoint and Kafka credenti
 * Show the workspace loading on the correct feature branch
 
 . Show the pre-configured environment variables in `src/main/resources/application.properties`:
-* Point out the Kafka configuration with `DEV_KAFKA_PASSWORD` provided as an environment variable
 * Point out the LangChain4j LLM configuration with `LLM_BASE_URL` and `LLM_API_KEY`
 * "The platform engineer has already configured the Kafka broker credentials and the LLM endpoint through external secrets, as we saw in Module 5. The developer does not need to manage API keys or model endpoints. They are pre-approved and pre-configured as part of the golden path."
 
@@ -122,7 +128,7 @@ git cherry-pick origin/llm-classification
 +
 * "The LLM classification implementation is ready on a separate branch. The developer cherry-picks it into their feature branch. This brings in the new code without switching branches."
 
-. Review the changes that were cherry-picked:
+. Depending on the audience (whether they want a code walkthrough or not), review the changes that were cherry-picked:
 * Show the new file `src/main/java/com/parasol/EmailClassifier.java`:
 ** A `@RegisterAiService` interface using Quarkus LangChain4j
 ** `@SystemMessage` describing the three departments (CLAIMS, RETENTION, ACQUISITION) with classification criteria
@@ -147,7 +153,6 @@ git cherry-pick origin/llm-classification
 * `src/main/resources/application.properties` -- Kafka, LLM, and database configuration
 * `src/main/resources/META-INF/resources/inbox.html` -- the inbox UI
 * "This is the complete Parasol application. The LLM integration adds one new file and modifies one existing file. Everything else stays the same."
-
 +
 [NOTE]
 ====
@@ -162,9 +167,6 @@ git push
 ----
 +
 * "The developer pushes the LLM integration to their feature branch. The secure pipeline starts automatically, just like in Module 5."
-
-// TODO: Add screenshot of DevSpaces showing the EmailClassifier.java AI service interface
-image::devspaces-email-classifier.png[DevSpaces IDE showing the EmailClassifier.java AI service interface with the LLM system prompt and department classification criteria,link=self,window=blank,align="center",width=700,title="LLM-powered email classification with Quarkus LangChain4j"]
 
 **What they should notice:**
 
@@ -228,10 +230,6 @@ The AI-enhanced email routing is deployed through the same trusted pipeline as e
 . Navigate to the **Inbox** tab and demonstrate the improved email routing:
 * Show incoming emails being classified in real time
 * Point out that **there are no more "REVIEW REQUIRED" emails** -- every email is now classified into CLAIMS, RETENTION, or ACQUISITION
-* Show the **rich classification reasons** provided by the LLM for each email:
-** "Existing customer Sarah Mitchell reporting roof damage from a storm -- classified as CLAIMS"
-** "Unknown sender inquiring about homeowner's insurance options -- classified as ACQUISITION"
-** "Existing customer Robert Chen asking about policy renewal -- classified as RETENTION"
 * "Look at the difference. Before, ambiguous emails like 'a tree fell on my porch and I do not know what to do' would end up in 'Review Required.' Now the LLM understands the context -- it recognizes this as property damage that needs a claim, even without explicit keywords like 'accident' or 'damage.'"
 
 . Compare with the previous state:
@@ -240,8 +238,27 @@ The AI-enhanced email routing is deployed through the same trusted pipeline as e
 // TODO: Add screenshot of Parasol Inbox showing LLM-classified emails with rich reasons
 image::parasol-ai-email-routing.png[Parasol Insurance Inbox showing AI-classified emails with CLAIMS and RETENTION and ACQUISITION departments and detailed LLM reasoning,link=self,window=blank,align="center",width=700,title="AI-powered email routing: no more manual review"]
 
+Compare this with the original, showing many emails in "Review Required" and no LLM reasoning:
+
 // TODO: Add screenshot comparing before (with Review Required) and after (all classified)
-image::parasol-inbox-before-after.png[Comparison showing the Parasol Inbox before with Review Required emails and after with all emails classified by the LLM,link=self,window=blank,align="center",width=700,title="Before and after: keyword matching vs LLM classification"]
+image::parasol-inbox.png[Comparison showing the Parasol Inbox before with Review Required emails and after with all emails classified by the LLM,link=self,window=blank,align="center",width=700,title="keyword matching vs LLM classification"]
+
+**(Optional, not recommended unless you have extra time)** From here, you can follow the same steps to promote the code to production:
+
+. Developer creates a merge request on the `parasol-insurance` repo in GitLab from their feature branch to main
+. Platform engineer reviews and merges the MR
+. PE creates a tag (e.g., 1.1) on the `parasol-insurance`repo in GitLab
+. The tag push triggers the parasol-insurance-secured-listener EventListener in the parasol-insurance-secured-build namespace (the main build namespace, not the developer's sandbox)
+. That triggers the parasol-insurance-secured-tag-promote pipeline which:
+.. Clones the repo at the tagged commit
+.. Builds and pushes an image tagged 1.1
+.. Creates a merge request on the parasol-insurance-secured-manifests GitOps repo to update app/values/values-prod.yaml with the new image tag
+. PE merges that GitOps MR
+. Argo CD syncs parasol-insurance-secured-prod with the new image
+
+So there are two manual gates: the code MR approval + tag creation, and the GitOps MR approval for production. This is the same flow from Section 1 with the unsecured app, just applied to the secured variant.
+
+The developer's sandbox pipeline (in their namespace) is separate — it only builds and deploys to the developer's own namespace. It doesn't touch the prod promotion path at all. The promotion path only activates when code lands on main and gets tagged.
 
 **What they should notice:**
 
@@ -265,7 +282,7 @@ Q: "Can this pattern be applied to other AI use cases?"::
 A: "Absolutely. The LangChain4j integration is a standard Quarkus extension. Any team can add LLM capabilities to their application the same way: add the dependency, create an AI service interface, and configure the endpoint through external secrets. The golden path scales across use cases."
 
 Q: "What if we want to use a different model?"::
-A: "The LLM endpoint is configurable through Vault. Switching to a different model means updating the endpoint URL and API key in Vault. The application code does not change."
+A: "The LLM endpoint is configurable through Vault. Switching to a different model means updating the endpoint URL and API key in Vault. The application code does not change. Platform engineers can also configure the template with multiple approved models, allowing developers to choose a best fit for their use case."
 
 Q: "How does the claims administrator verify the AI's decisions?"::
 A: "Every classification includes the LLM's reasoning. The administrator can see why each email was routed to a specific department. If they disagree, they can manually reassign it. Over time, these corrections can inform prompt improvements."
