@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch (or create a new one if starting from here), cherry-pick the LLM classification code, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch (or create a new one if starting from here), pull in the LLM classification code from a prepared branch, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
 
 [NOTE]
 ====
@@ -80,13 +80,13 @@ A: "Model governance is handled by the data science and platform teams. The appl
 
 === Know
 
-_The same developer from Section 2 is tasked with improving the email routing. They re-open their DevSpaces workspace from the feature branch created in Section 2. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer cherry-picks the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
+_The same developer from Section 2 is tasked with improving the email routing. They re-open their DevSpaces workspace from the feature branch created in Section 2. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer pulls in the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
 
 [NOTE]
 ====
 This demo focuses on the _value of the platform_, including runtimes like Quarkus, but is not intended to be a deep dive on
 coding exercises. Therefore, you as a demoer will not write the new code to implement the AI-based triage, but instead
-use `git cherry-pick` to automatically update the existing code with the changes to implement the AI functionality (This could also be done by a more powerful LLM using a code assistant).
+use a few git commands to pull in the pre-built AI code from a prepared branch, overlaying it onto the current feature branch (this could also be done by a more powerful LLM using a code assistant).
 ====
 
 **Business challenge:**
@@ -119,16 +119,16 @@ The platform engineer has already configured the LLM endpoint and Kafka credenti
 // TODO: Add screenshot of application.properties showing LLM and Kafka env var configuration
 image::devspaces-application-properties.png[DevSpaces IDE showing application.properties with LLM_BASE_URL and LLM_API_KEY and DEV_KAFKA_PASSWORD environment variable references,link=self,window=blank,align="center",width=700,title="Pre-configured LLM and Kafka environment variables in application.properties"]
 
-. Open a new **Terminal** in DevSpaces and cherry-pick the LLM classification code:
+. Open a new **Terminal** in DevSpaces and pull in the LLM classification code from the prepared branch:
 +
 [source,bash,role="copypaste"]
 ----
-git cherry-pick origin/llm-classification
+cd $PROJECT_SOURCE && git rm -rf . && git clean -df && git checkout origin/llm-classification -- .
 ----
 +
-* "The LLM classification implementation is ready on a separate branch. The developer cherry-picks it into their feature branch. This brings in the new code without switching branches."
+* "The LLM classification implementation has been prepared on a separate branch. We pull the code into our feature branch with a single command. This overlays the AI-enhanced version of the application onto our working branch without changing branches."
 
-. Depending on the audience (whether they want a code walkthrough or not), review the changes that were cherry-picked:
+. Depending on the audience (whether they want a code walkthrough or not), review the changes:
 * Show the new file `src/main/java/com/parasol/EmailClassifier.java`:
 ** A `@RegisterAiService` interface using Quarkus LangChain4j
 ** `@SystemMessage` describing the three departments (CLAIMS, RETENTION, ACQUISITION) with classification criteria
@@ -172,7 +172,7 @@ git push
 
 * The developer re-opened their existing DevSpaces workspace from the Section 2 feature branch
 * The LLM endpoint and Kafka credentials were pre-configured by the platform engineer as environment variables
-* The cherry-pick brought in the LLM code cleanly -- one new file and one modified file
+* The prepared LLM code was pulled in cleanly -- one new file and one modified file
 * The implementation uses a clean AI service interface with a system prompt that describes the business rules
 * Keyword matching is kept as a fallback for resilience
 * The same push-and-pipeline workflow applies -- AI integration is not a special case
@@ -267,11 +267,11 @@ The developer's sandbox pipeline (in their namespace) is separate — it only bu
 * The LLM provides rich, contextual reasons for each classification, not just a keyword match
 * Ambiguous emails that previously required manual triage are now handled automatically
 * The same platform patterns (DevSpaces, pipelines, GitOps) applied to the AI feature
-* The developer cherry-picked prepared code, reviewed it, and pushed -- no special AI tooling required
+* The developer pulled in prepared code, reviewed it, and pushed -- no special AI tooling required
 
 **Business value callout:**
 
-"Let me recap what just happened. A developer received a task to add AI-powered email routing. They re-opened their existing DevSpaces workspace, cherry-picked the LLM integration code, reviewed it, and pushed it through the secure pipeline. The platform handled everything else: the LLM credentials came from Vault, the pipeline scanned and signed the image, and Argo CD deployed it. The result? The 'Review Required' bucket is gone. Every email gets an intelligent classification with a clear explanation. Manual triage costs just dropped to near zero. And it went through the exact same security and compliance controls as every other component."
+"Let me recap what just happened. A developer received a task to add AI-powered email routing. They re-opened their existing DevSpaces workspace, pulled in the LLM integration code from a prepared branch, reviewed it, and pushed it through the secure pipeline. The platform handled everything else: the LLM credentials came from Vault, the pipeline scanned and signed the image, and Argo CD deployed it. The result? The 'Review Required' bucket is gone. Every email gets an intelligent classification with a clear explanation. Manual triage costs just dropped to near zero. And it went through the exact same security and compliance controls as every other component."
 
 **If asked:**
 
