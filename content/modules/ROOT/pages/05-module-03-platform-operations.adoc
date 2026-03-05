@@ -2,14 +2,14 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module shows how the platform handles cross-cutting operational concerns after the application is deployed. It covers Service Mesh for traffic management and security, the OpenShift Service Mesh console (Kiali) for observability, and wraps up with a talk track on additional platform capabilities. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This module shows how the platform handles cross-cutting operational concerns after the application is deployed in production. It covers Service Mesh for traffic management and security, the OpenShift Observability for observability, and wraps up with a talk track on additional platform capabilities. Target duration: 15 minutes across 3 parts.
 
 [#part-1]
 == Part 1 — Traffic management and security with Service Mesh
 
 === Know
 
-_With the Parasol application deployed and running, the platform handles cross-cutting concerns that would otherwise require significant development effort in each service. OpenShift Service Mesh provides traffic management, mutual TLS encryption, and least-privilege access controls without any application code changes._
+_With the Parasol application deployed and running, the platform handles cross-cutting concerns that would otherwise require significant development effort in each service. OpenShift Service Mesh provides traffic management, mutual TLS encryption (supported, but not part of demo), and least-privilege access controls without any application code changes._
 
 **Business challenge:**
 
@@ -20,7 +20,7 @@ _With the Parasol application deployed and running, the platform handles cross-c
 
 **Current state at Parasol:**
 
-* Service-to-service communication across the Parasol application's 2 services is unencrypted
+* Service-to-service communication across the Parasol application's services is unencrypted
 * Each development team implements their own retry and timeout logic inconsistently
 * No centralized traffic management or routing policies
 * Compliance audits flag the lack of encryption in transit as a critical finding
@@ -44,8 +44,7 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 * "The Service Mesh console is built into OpenShift. The platform engineer does not need a separate dashboard. Everything is accessible from the same console."
 
 . On the **Overview** page, show the namespaces enrolled in the mesh:
-* Point out the health indicators (green for healthy)
-* Show the mTLS lock icons indicating encryption is active
+* Point out the health indicators (green for healthy). Some namespaces are _enrolled_ in the mesh, some are not (indicated by the presence of "istio config" field).
 * "All services enrolled in the mesh get mutual TLS encryption automatically. The developers did not write a single line of TLS code. The mesh handles certificate generation, rotation, and validation automatically. This satisfies the compliance requirement for encryption in transit."
 
 . Search for **parasol-insurance-prod** in the overview:
@@ -65,16 +64,12 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 . Briefly discuss **access policies** (talk track):
 * "Service Mesh also supports authorization policies that control which services can communicate with each other. This is the principle of least privilege applied to service-to-service communication. Only authorized services can make requests. This is configured by the platform team, not the developers."
 
-// TODO: Add screenshot of the OpenShift Service Mesh console showing the namespace overview
-image::ossm-console-overview.png[OpenShift Service Mesh console showing the Parasol application namespace with service health indicators and mTLS status,link=self,window=blank,align="center",width=700,title="Service Mesh console: namespace overview with mTLS encryption"]
-
-// TODO: Add screenshot showing traffic flow between services
-image::ossm-traffic-flow.png[OpenShift Service Mesh console showing traffic flow between the Parasol application services with request rates and success percentages,link=self,window=blank,align="center",width=700,title="Service-to-service traffic flow with encryption"]
+image::ossm-console-overview.png[OpenShift Service Mesh console showing the Parasol application namespace with service health indicators and mTLS status,link=self,window=blank,align="center",width=700,title="Service Mesh console: namespace overview"]
 
 **What they should notice:**
 
 * Service Mesh is integrated into the OpenShift console. No separate tool required.
-* mTLS encryption is automatic. The developers did not write any TLS code.
+* mTLS encryption is can be configured to be automatic. The developers did not write any TLS code.
 * Traffic visibility is built in. The platform engineer can see how services communicate in real time.
 * Access policies enforce least privilege at the service level without application code changes.
 * All of these capabilities are configured by the platform team and apply consistently.
@@ -86,7 +81,7 @@ image::ossm-traffic-flow.png[OpenShift Service Mesh console showing traffic flow
 **If asked:**
 
 Q: "Does this add latency to requests?"::
-A: "The sidecar proxy adds minimal latency, typically less than 1 millisecond per hop. For the vast majority of applications, this is negligible compared to the security and observability benefits."
+A: "The sidecar proxy adds minimal latency, typically less than 1 millisecond per hop. For the vast majority of applications, this is negligible compared to the security and observability benefits. Ambient mode reduces this even more by eliminating the sidecar for certain workloads."
 
 Q: "What about services that are not in the mesh?"::
 A: "Services can be enrolled in the mesh incrementally. The platform team can start with critical services and expand over time. Services outside the mesh can still communicate, but they do not get mTLS or traffic management benefits."
@@ -127,11 +122,9 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 "Now let me show you the observability side. We have encryption and traffic management, but the platform engineer also needs to see what is happening. How is traffic flowing? Are there errors? Where are the bottlenecks? The Service Mesh console gives you all of that in real time."
 
-**Optional: generate traffic for the graph**
-
-[NOTE]
+[TIP]
 ====
-**Presenter tip:** The traffic graph looks best when there is active traffic flowing between services. Before showing the graph, start a traffic generator loop on your laptop to produce steady requests. Run this in a terminal and leave it running in the background during the demo.
+**Optional: generate traffic for the graph.** The traffic graph looks best when there is active traffic flowing between services. Before showing the graph, start a traffic generator loop on your laptop to produce steady requests. Run this in a terminal and leave it running in the background during the demo (you can also run it in the OpenShift Web Terminal but that means the traffic will originate from with the cluster, making a slightly less interesting traffic view).
 
 **macOS / Linux:**
 
@@ -161,9 +154,12 @@ Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with t
 **What I do:**
 
 . From the **Overview** page, click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Graph**:
+* On the Display menu, enable Traffic Animation, and set the refresh rate to 10 seconds at the upper right.
 * Show the service graph with animated traffic flow between the Parasol services
 * "This is a live traffic graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
 * Point out the service nodes and the connections between them
++
+image::ossm-console-traffic.png[OpenShift Service Mesh traffic,link=self,window=blank,align="center",width=700,title="Service Mesh Traffic Graph with animated traffic flow between services"]
 
 . Show the **health indicators** on the graph:
 * Green nodes indicate healthy services
@@ -172,7 +168,7 @@ Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with t
 
 . Click on a service node to show **detailed metrics**:
 * Show the side panel with service details
-* Point out key metrics:
+* Point out key metrics (not all are shown all the time)
 ** **Requests per second** -- current throughput
 ** **Error rate** -- percentage of failed requests (4xx and 5xx responses)
 ** **Response time** -- p50, p95, and p99 latency percentiles
@@ -181,7 +177,7 @@ Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with t
 . Show the **Workload** or **Service** detail view:
 * Navigate to the detail view for one of the Parasol services
 * Show the inbound and outbound traffic metrics
-* Show the traffic breakdown by response code (200, 400, 500, etc.)
+* Show the traffic breakdown by response code (200, 400, 500, etc.) (note: these aren't shown in ambient mode)
 * "This is the level of detail you get without adding a single line of instrumentation to the application. The mesh collects all of this automatically."
 
 . Demonstrate the traffic **animation and graph layout options**:
@@ -201,17 +197,8 @@ Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with t
 . Briefly mention **custom alerts** under **Observe**:
 * "The platform also supports custom alerts. Platform engineers can define thresholds -- for example, alert if CPU exceeds 80% for 5 minutes, or if memory usage trends upward consistently. These alerts catch misbehaving applications before they impact customers."
 
-// TODO: Add screenshot of Observe -> Metrics showing CPU and memory for Parasol workloads
-image::ocp-observe-metrics.png[OpenShift Observe Metrics view showing CPU and memory utilization metrics for Parasol Insurance workloads,link=self,window=blank,align="center",width=700,title="Workload metrics: CPU and memory utilization"]
-
 // TODO: Add screenshot of Observe -> Dashboards showing aggregate resource dashboard
-image::ocp-observe-dashboards.png[OpenShift Observe Dashboards view showing aggregate CPU and memory and network metrics with customizable dashboard panels,link=self,window=blank,align="center",width=700,title="Customizable dashboards for aggregate resource monitoring"]
-
-// TODO: Add screenshot of the Service Mesh console graph with animated traffic flow
-image::ossm-graph-traffic.png[OpenShift Service Mesh console showing the service graph with animated traffic flow between Parasol services and health indicators,link=self,window=blank,align="center",width=700,title="Service graph with real-time traffic flow and health indicators"]
-
-// TODO: Add screenshot of service detail metrics panel
-image::ossm-service-metrics.png[OpenShift Service Mesh console showing detailed service metrics including requests per second and error rate and latency percentiles,link=self,window=blank,align="center",width=700,title="Service detail metrics: throughput and error rate and latency"]
+image::ocp-observe-dashboard.png[OpenShift Observe Dashboards view showing aggregate CPU and memory and network metrics with customizable dashboard panels,link=self,window=blank,align="center",width=700,title="Customizable dashboards for aggregate resource monitoring"]
 
 **What they should notice:**
 

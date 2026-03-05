@@ -4,6 +4,11 @@ include::partial$_attributes.adoc[]
 
 *Presenter note*: This module continues the Section 2 story. The developer works on their feature branch in DevSpaces, uses the Dependency Analytics plugin to identify an unnecessary dependency (quarkus-rest), pushes code that triggers the secure build pipeline against their feature branch, then creates a merge request in GitLab for PE approval. The PE approves and creates a release tag. External secrets are managed through Vault using litellm-credentials as the example. Target duration: 15 minutes across 3 parts.
 
+[NOTE]
+====
+One big difference here is that you should not have to visit the OpenShift Console at all - reinforcing the message that Developer Hub is the single pane of glass for developers. The deployment topology, pipeline and Argo CD sync are both viewed from Developer Hub. The only time you leave Developer Hub is to log in to GitLab as the platform engineer to approve the merge request and create a release tag, and to show Vault details.
+====
+
 [#part-1]
 == Part 1 — Development with DevSpaces and Dependency Analytics
 
@@ -46,6 +51,10 @@ The Dependency Analytics plugin in DevSpaces scans project dependencies in real-
 * Show the report message: _"A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it."_
 * "The report has identified an unnecessary dependency. The `quarkus-rest` extension is incompatible with other extensions in the project. This kind of dependency bloat increases the attack surface and can cause subtle runtime issues."
 
+// TODO: Add screenshot of DevSpaces showing Dependency Analytics report with quarkus-rest flagged
+image::devspaces-dependency-analytics.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics identifies an unnecessary dependency"]
+
+
 . **Remove the unnecessary dependency** by deleting the `quarkus-rest` entry from `pom.xml`:
 * Show the dependency being removed
 * "One line removed. The dependency tree is cleaner, the attack surface is smaller, and the potential for runtime incompatibilities is eliminated. In the old workflow, this would have surfaced as a confusing build failure or runtime error much later."
@@ -54,8 +63,6 @@ The Dependency Analytics plugin in DevSpaces scans project dependencies in real-
 * Point out dependencies with no issues flagged
 * "The rest of the dependencies are clean. The developer has confidence that their project's dependency tree is healthy before they even commit."
 
-// TODO: Add screenshot of DevSpaces showing Dependency Analytics report with quarkus-rest flagged
-image::devspaces-dependency-analytics.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics identifies an unnecessary dependency"]
 
 **What they should notice:**
 
@@ -122,7 +129,10 @@ The secure build pipeline integrates multiple trust and compliance controls into
 * Show the pipeline run triggered by the push to the feature branch
 * "The developer sees the pipeline status right here in Developer Hub. No need to switch to the OpenShift console. Developer Hub is the single pane of glass."
 
-. Walk through each stage as it appears in the Developer Hub pipeline view:
+// TODO: Add screenshot of Developer Hub showing the secure pipeline running
+image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure build pipeline with ACS scan and Tekton Chains stages,link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
+
+. Expand the pipeline and Walk through each stage as it appears in the Developer Hub pipeline view:
 * **Clone** -- Source code pulled from the feature branch
 * **Sonarqube SAST** -- Static analysis and security scanning
 * **ACS vulnerability scan and policy check** -- Red Hat Advanced Cluster Security scans the built image
@@ -139,6 +149,8 @@ The secure build pipeline integrates multiple trust and compliance controls into
 * "The developer can also watch the Argo CD sync right here in Developer Hub. The secure pipeline built and deployed the image to their development namespace, and Argo CD is reconciling the deployment."
 * "This is the secure software supply chain in action. Every artifact is scanned, signed, and attested, and the developer witnesses the entire process from a single pane of glass."
 
+(Optional if you have time, to promote to production, using the same process from section 1):
+
 . After verifying the deployment is healthy, switch to **GitLab** at {gitlab_url}[{gitlab_url}^] (log in as `{dev_user}` / `{password}`):
 * Navigate to the repository
 * Click **Create merge request** for the feature branch
@@ -148,11 +160,8 @@ The secure build pipeline integrates multiple trust and compliance controls into
 . Switch to the **platform engineer persona** (log in as `{pe_user}` / `{password}` in GitLab):
 * Review and **approve the merge request**
 * Merge the MR
-* Navigate to **Repository** -> **Tags** and create a **new release** with tag `1.1`
-* "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release."
-
-// TODO: Add screenshot of Developer Hub showing the secure pipeline running
-image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure build pipeline with ACS scan and Tekton Chains stages,link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
+* Navigate to **Repository** -> **Tags** and create a **new tag** with tag `1.1`
+* "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release, and issue a new MR to the GitOps repo to update production. The platform engineer controls when code is promoted to production by merging and tagging."
 
 // TODO: Add screenshot of Developer Hub showing Argo CD sync status
 image::devhub-argocd-sync.png[Developer Hub showing Argo CD sync status for the development namespace,link=self,window=blank,align="center",width=700,title="Argo CD sync status viewed in Developer Hub"]
@@ -216,13 +225,16 @@ The External Secrets Operator integrates with HashiCorp Vault to provide central
 **What I do:**
 
 . Open **Vault** at {vault_url}[{vault_url}^] and log in with the root token (retrieve it with `oc get secret vault-token -n vault -o jsonpath='\{.data.root_token}' | base64 -d`):
-* Navigate to the secrets engine and show the `secrets/litellm/credentials` path
+* Select **Secrets* at the top and then navigate to the kv (key/value) folder then to the `secrets/litellm/credentials` path
 * Show the stored values: `base_url` and `api_key`
 * "All secrets are stored centrally in Vault, organized by application and purpose. The developer never sees these values in their code or manifests."
++
+image::vault-litellm-credentials.png[HashiCorp Vault showing the litellm credentials secret with base_url and api_key,link=self,window=blank,align="center",width=700,title="LLM credentials managed centrally in Vault"]
 
 . Show the **ExternalSecret** resource in the application manifests:
-* Switch to DevSpaces or the Git repository and open the Kubernetes manifests
-* Show the `ExternalSecret` resource that references the Vault path:
+* In the OpenShift Console, navigate to **Workloads** > **Secrets**, select the application namespace (e.g. `parasol-insurance-prod`) and, and click on the `litellm-credentials` secret, and _Reveal Values_ showing they are the same values.
+* This Secrete was created by the External Secrets Operator based on the `ExternalSecret` created as part of the Argo CD deployment.
+* Click on the "Owner" link to show the ExternalSecret. 
 +
 [source,yaml]
 ----
@@ -249,18 +261,14 @@ spec:
         property: api_key
 ----
 +
-* "The manifest references a path in Vault, not the actual secret value. The External Secrets Operator syncs the value at runtime."
+* "The External Secret references a path in Vault, not the actual secret value. The External Secrets Operator syncs the value at runtime."
 
-. Show the **synced Kubernetes secret** in the OpenShift console:
-* Navigate to the application namespace and show the `litellm-credentials` Kubernetes secret created by the operator
 * Point out that the secret exists in the cluster but was never committed to Git
 * "The operator automatically created this Kubernetes secret from the Vault data. The application consumes it like any normal secret. But the actual values never appear in source control."
 
 . **Talk track** about rotation and audit:
 * "When the platform team rotates a secret in Vault, the External Secrets Operator syncs the new value automatically based on the refresh interval. No application restart required, no manual update. And every access to every secret is audited in Vault's audit log."
 
-// TODO: Add screenshot of Vault showing litellm-credentials secret
-image::vault-litellm-credentials.png[HashiCorp Vault showing the litellm credentials secret with base_url and api_key,link=self,window=blank,align="center",width=700,title="LLM credentials managed centrally in Vault"]
 
 **What they should notice:**
 

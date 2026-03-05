@@ -44,12 +44,16 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 * Enter a commit message: `Add claims statistics API endpoint`
 * Click the dropdown arrow next to the **Commit** button and select **Commit & Push**
 * "That is all the developer does. A commit and push from the IDE. The platform takes it from here."
++
+image::scm-commit.png[SCM Commit pricess,link=self,window=blank,align="center",width=700,title="Developer commits and pushes code from the IDE, triggering the CI pipeline"]
 
 . Switch to the **OpenShift web console** at {console_url}[{console_url}^] (logged in as `{dev_user}` / `{password}`)
 
 . Navigate to the **Pipelines** section in the `{parasol_build_ns}` namespace:
 * Show the pipeline run that was triggered automatically by the git push
 * "The developer did not click a 'Build' button. The git push triggered a webhook that started the Tekton pipeline automatically."
++
+image::ocp-pipeline-running.png[OpenShift web console Pipelines view showing a Tekton pipeline run triggered by git push with stages in progress,link=self,window=blank,align="center",width=700,title="Pipeline run triggered automatically by git push"]
 
 . Walk through the pipeline stages as they execute:
 * **Clone** — Source code pulled from the Git repository
@@ -60,9 +64,6 @@ Tekton pipelines automate the entire CI process, triggered by a simple git push.
 
 . Point out that the pipeline is still running:
 * "Let's watch this for a moment. Remember those code shortcuts our developer took? In Part 2, we will see what happens when the pipeline reaches the Sonarqube SAST stage."
-
-// TODO: Add screenshot of OpenShift console showing the pipeline run in progress
-image::ocp-pipeline-running.png[OpenShift web console Pipelines view showing a Tekton pipeline run triggered by git push with stages in progress,link=self,window=blank,align="center",width=700,title="Pipeline run triggered automatically by git push"]
 
 **What they should notice:**
 
@@ -81,7 +82,7 @@ Q: "Can we use our existing Jenkins pipelines?"::
 A: "Yes. OpenShift supports both Tekton (the built-in pipeline engine) and external CI systems like Jenkins, GitLab CI, or GitHub Actions. Many organizations run both during a transition period. The key point is that the pipeline is automated and standardized, regardless of which engine runs it."
 
 Q: "Who defines the pipeline stages?"::
-A: "The platform team defines the pipeline templates as Tekton resources in the cluster. Developers do not need to write pipeline configurations. When the application repository is set up, the pipeline is already wired to trigger on push."
+A: "The platform engineering team defines the pipeline templates as Tekton resources in the cluster. Developers do not need to write pipeline configurations. When the application repository is set up, the pipeline is already wired to trigger on push."
 
 Q: "How long does a typical pipeline run take?"::
 A: "A full pipeline run with build, test, and scanning typically completes in 3-5 minutes for a Quarkus application. The exact time depends on the application size, test suite, and scan depth."
@@ -97,7 +98,7 @@ _The pipeline's SAST/Sonarqube stage fails because the developer's new claims st
 
 **Business challenge:**
 
-* Code smells accumulate as technical debt, making the codebase harder to maintain over time
+* Code smells and lack of test automation accumulate as technical debt, making the codebase harder to maintain over time
 * Improper logging makes production debugging expensive and time-consuming
 * Swallowed exceptions hide failures, causing silent data corruption or incorrect behavior
 * Manual code review alone cannot catch all quality issues consistently across teams
@@ -125,18 +126,22 @@ Automated quality gates in the pipeline catch code smells that manual processes 
 * The stage turns red (failed status)
 * "The pipeline caught it. The Sonarqube quality gate failed because of code smells in the new endpoint."
 
-. Click on the **log** for the failed Sonarqube SAST stage:
+. Click on the failed step for the failed Sonarqube SAST stage:
 * Scroll to the end of the log output
-* Point out the **Sonarqube report URL** at the end of the log
+* Point out the **Sonarqube report URL** at the end of the log (it is also present on the details tab)
 * "The pipeline log includes a direct link to the full Sonarqube report. Let's open that."
-
++
 // TODO: Add screenshot of the pipeline log showing the Sonarqube report URL at the end
 image::ocp-pipeline-sonar-log.png[OpenShift pipeline log for the Sonarqube SAST stage showing the Sonarqube report URL at the bottom of the output,link=self,window=blank,align="center",width=700,title="Pipeline log with Sonarqube report URL"]
 
 . Open the **Sonarqube report URL** from the log to show the two code smells:
 ** **`System.out.println` usage** — Standard output should not be used for logging in production code. Use a proper logging framework instead.
 ** **Empty catch block** — Exceptions should not be silently swallowed. Either handle the exception, log it, or let it propagate.
+** **Field Injection issues** - Sonarqube flags the use of field injection (e.g. `@Inject ClaimsResource claimsResource;`) as a code smell because it can lead to issues with testability and hidden dependencies. Constructor injection is generally recommended instead.
 * "These are not suggestions. They are hard gates. Code with these quality violations does not move forward. The platform enforces the same standard for every developer on every commit."
++
+// TODO: Add screenshot of the pipeline log showing the Sonarqube report URL at the end
+image::ocp-pipeline-sonar-report.png[Sonaqube report,link=self,window=blank,align="center",width=700,title="Sonarqube report showing code smell violations"]
 
 . Pause for the business value connection:
 * "These might seem like minor issues, but they compound. At Parasol today, when a production incident occurs, the operations team spends hours searching through logs because developers used `System.out.println` instead of a proper logger with structured output. And those empty catch blocks? They silently hide failures that surface weeks later as data inconsistencies. The platform just prevented both of those problems."
@@ -165,7 +170,7 @@ This code in @ClaimStatsResource.java has code smells according to sonarqube. pl
 // TODO: Add screenshot of the Continue diff view showing the AI-generated fixes
 image::devspaces-continue-diff.png[Continue AI assistant showing a diff view with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
 
-. Verify the corrected code looks like this (for reference):
+. Verify the corrected code looks like this (for reference, or in case the LLM responds differently):
 
 +
 [source,java]
@@ -176,7 +181,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.quarkus.logging.Log;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -186,47 +190,48 @@ import jakarta.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClaimStatsResource {
 
-	@Inject
-	ClaimsResource claimsResource;
+	private final ClaimsResource claimsResource;
+
+	public ClaimStatsResource(ClaimsResource claimsResource) {
+			this.claimsResource = claimsResource;
+	}
 
 	@GET
 	public Map<String, Object> getStats() {
-		Map<String, Object> stats = new HashMap<>();
+			Map<String, Object> stats = new HashMap<>();
 
-		Log.info("Fetching claim statistics");
+			Log.info("Fetching claim statistics");
 
-		var claims = claimsResource.getAllClaims();
-		stats.put("total", claims.size());
+			var claims = claimsResource.getAllClaims();
+			stats.put("total", claims.size());
 
-		Map<String, Long> byCategory = new HashMap<>();
-		for (var claim : claims) {
-			byCategory.merge(claim.getCategory(), 1L, Long::sum);
-		}
-		stats.put("by_category", byCategory);
+			Map<String, Long> byCategory = new HashMap<>();
+			for (var claim : claims) {
+					byCategory.merge(claim.getCategory(), 1L, Long::sum);
+			}
+			stats.put("by_category", byCategory);
 
-		Map<String, Long> byStatus = new HashMap<>();
-		for (var claim : claims) {
-			byStatus.merge(claim.getStatus(), 1L, Long::sum);
-		}
-		stats.put("by_status", byStatus);
+			Map<String, Long> byStatus = new HashMap<>();
+			for (var claim : claims) {
+					byStatus.merge(claim.getStatus(), 1L, Long::sum);
+			}
+			stats.put("by_status", byStatus);
 
-		return stats;
+			return stats;
 	}
 }
 ----
-
 +
 [NOTE]
 ====
-**Presenter tip:** Walk through the diff briefly. Point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API -- this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. And the empty try-catch was removed entirely -- if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it. Emphasize that the AI understood the context and made the right fixes without the developer needing to look up the Quarkus logging API.
+**Presenter tip:** Depending on the audience, you fan walk through the diff briefly. Point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API -- this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. And the empty try-catch was removed entirely -- if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it. Emphasize that the AI understood the context and made the right fixes without the developer needing to look up the Quarkus logging API. The field-level injection was also moved to constructor injection, which is a best practice for testability and clearer dependencies. The platform's guardrails (Sonarqube) and AI assistance (Continue) worked together to enforce and achieve code quality.
 ====
 
-. Commit and push the fix using the **Source Control** view:
+. Commit and push the fix using the **Source Control** view as before.
 * The modified `ClaimStatsResource.java` appears under "Changes"
-* Stage the file, enter a commit message: `Fix code smells: use proper logging and remove empty catch block`
+* Stage the file (click the + next to it), enter a commit message: `Fix code smells: use proper logging and remove empty catch block`
 * Click the dropdown arrow next to **Commit** and select **Commit & Push**
-
-// TODO: Add screenshot of Source Control view with commit message and Commit & Push dropdown
++
 image::devspaces-scm-commit-push.png[DevSpaces Source Control view showing staged changes with a commit message and the Commit and Push dropdown menu option,link=self,window=blank,align="center",width=700,title="Commit and Push from the Source Control view"]
 
 . Switch back to the **OpenShift web console** Pipelines view and show the new pipeline run:
@@ -236,13 +241,6 @@ image::devspaces-scm-commit-push.png[DevSpaces Source Control view showing stage
 * All remaining stages complete successfully
 * "The developer used AI to fix the code smells, pushed the update, and the pipeline passes. The quality gate is satisfied."
 
-// TODO: Add screenshot of OpenShift console showing the failed pipeline stage
-image::ocp-pipeline-failed.png[OpenShift web console showing a failed SAST/Sonarqube pipeline stage with quality gate violation due to code smells,link=self,window=blank,align="center",width=700,title="Pipeline fails: SAST/Sonarqube catches code smells"]
-
-// TODO: Add screenshot of the Sonarqube report showing code smell details
-image::sonarqube-code-smells.png[Sonarqube report showing code smell violations: System.out.println usage and empty catch block,link=self,window=blank,align="center",width=700,title="Sonarqube identifies improper logging and empty exception handling"]
-
-// TODO: Add screenshot of OpenShift console showing the passing pipeline
 image::ocp-pipeline-passed.png[OpenShift web console showing all pipeline stages passing after the developer fixed the code smells,link=self,window=blank,align="center",width=700,title="Pipeline passes after fixing code smells"]
 
 **What they should notice:**
@@ -265,13 +263,13 @@ Q: "What if the developer disagrees with the quality gate?"::
 A: "Quality gates are defined by the platform team based on organizational standards. They are not optional for individual developers. However, the platform team can adjust thresholds and rules as the organization matures. The goal is to establish a baseline that everyone follows."
 
 Q: "What other code smells does Sonarqube catch?"::
-A: "Sonarqube enforces hundreds of coding rules across multiple dimensions: code smells (complexity, duplication, naming conventions), bugs (null pointer risks, resource leaks, logic errors), vulnerabilities (SQL injection, XSS, hardcoded credentials), and security hotspots. The platform team configures which rules are active and which are quality gate blockers."
+A: "Sonarqube enforces hundreds of coding rules across multiple dimensions: code smells (complexity, duplication, naming conventions), bugs (null pointer risks, resource leaks, logic errors), vulnerabilities (SQL injection, XSS, hardcoded credentials), and security hotspots. The platform team configures which rules are active and which are quality gate blockers. The platform team can integrate with other scanning tools as well if they want to cover additional languages or specific security checks."
 
 Q: "Why not catch these in the IDE before pushing?"::
 A: "IDE plugins like SonarLint can surface some issues during development, and organizations can enable that as well. But the pipeline quality gate is the authoritative enforcement point — it ensures standards are met regardless of what tools the developer has configured locally. Defense in depth: catch what you can early, enforce what you must in the pipeline."
 
 Q: "What about more complex issues like security vulnerabilities?"::
-A: "Sonarqube handles SAST (Static Application Security Testing) in addition to code smell detection. In Section 2 of this demo, we add additional security layers: ACS for container image scanning, Tekton Chains for image signing, and admission control for deployment verification. The pipeline is extensible."
+A: "Sonarqube handles SAST (Static Application Security Testing) in addition to code smell detection. In Section 2 of this demo, we add additional security layers: Trusted Artifact Signer for code signing and provenence, ACS for container image scanning, Tekton Chains for image signing, and admission control for deployment verification. The pipeline is extensible."
 
 '''
 
@@ -320,7 +318,8 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 ** **Option B (Console):** In the OpenShift web console, navigate to **Workloads** -> **Secrets** in the `rhdh-gitops` namespace, find the `rhdh-gitops-cluster` secret, and copy the `admin.password` value
 
 . Show the Parasol application in the Argo CD dashboard:
-* Point out the sync status changing as Argo CD detects the new image
+* You will see several parasol applications representing different environments (dev, prod, and a couple used in section 2). You want to look at the **parasol-insurance-dev** application, which represents the dev environment where the pipeline deploys to.
+* Since this is a developer's local environment, the `latest` tag is used, ensuring that the latest successful build from the pipeline is deployed automatically. You can note this in the timestamps of the pod shown in Argo.
 * "Argo CD continuously compares what is declared in Git with what is running in the cluster. It has detected that the pipeline produced a new image, and the desired state has changed."
 
 . Walk through the Argo CD sync process:
@@ -335,23 +334,29 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 * "All of these are managed declaratively through GitOps. The developer does not deploy individual components. Argo CD manages the entire application stack."
 
 . Open the running **Parasol application** to verify the new feature is live:
-* Navigate to the claims statistics endpoint at `/api/claims/stats`
+* Navigate to the claims statistics endpoint at `/api/claims/stats` using the route URL provided in the OpenShift console in the `parasol-insurance-dev` namespace
 * Show the claims statistics data that the developer's new endpoint returns
 * Verify the endpoint is working in the deployed application
-* "The claims statistics API that our developer added is now live. It has been built, scanned for quality, and deployed, all automatically. The developer pushed code and the platform handled everything else."
+* "The claims statistics API that our developer added is now live _in the dev environment_. It has been built, scanned for quality, and deployed, all automatically. The developer pushed code and the platform handled everything else."
++
+image::parasol-claims-stats-live.png[Parasol Insurance application showing the claims app live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims app deployed and live in the Parasol dev environment"]
 
-// TODO: Add screenshot of Argo CD console showing sync status
-image::argocd-sync-status.png[Argo CD console showing the Parasol application transitioning from OutOfSync to Synced with the resource tree visible,link=self,window=blank,align="center",width=700,title="Argo CD syncing the Parasol application after pipeline completion"]
+. Promote to Production (optional, if time allows):
+* As a platform engineer, you can trigger a promotion to production by creating a new tag in the source repository, and then approving the merge reqquest (MR) to update the production GitOps repository to use the new tag. This separates responsiblities between developers and platform operators, while still keeping the process automated and auditable.
+* Log into GitLab as the `pe1` user, navigate to the `parasol-insurance` repository, noting the latest commit from the developer.
+* Click on **Tags** on the left, and select **New Tag** to create a new tag, with a name (e.g. `1.1`, or `prod-20240601`) and linking it to the latest commit on the `main` branch. You can leave the rest of the fields blank, scroll to the bottom and click **Create tag**.
+* With the new tag created, a new pipeline begins to build the production image (at the specified tag), and issue a new MR to the GitOps repo to update the production image.
+* Once the pipeline completes, navigate to the https://gitlab-gitlab.{subdomain}/parasol/parasol-insurance-manifests[GitOps repository in GitLab], and you will see a new MR to update the production image tag. Review the MR and approve/merge it to merge the change.
+* With the change merged, Argo CD detects the new desired state and deploys the new version to production automatically.
 
-// TODO: Add screenshot of the running Parasol app showing the claims stats endpoint live
-image::parasol-claims-stats-live.png[Parasol Insurance application showing the claims statistics API endpoint live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims statistics API deployed and live in the Parasol application"]
+image::argocd-promote.png[Argo promotion,link=self,window=blank,align="center",width=700,title="New production app being rolled out in the Parasol production environment"]
 
 **What they should notice:**
 
 * The deployment happened automatically after the pipeline passed. No tickets, no manual steps.
 * Argo CD provides a visual resource tree showing the entire application stack and its health
 * The developer can see the deployment status without needing specialized knowledge
-* The claims statistics endpoint that was added in Module 1, caught by the pipeline for code smells in Part 2, and fixed by the developer is now live in production
+* The claims statistics endpoint that was added in Module 1, caught by the pipeline for code smells in Part 2, and fixed by the developer is now live in the production environment, demonstrating the full inner loop to outer loop journey.
 * The entire journey from code change to production deployment happened in a single demo session
 
 **Business value callout:**
@@ -385,7 +390,7 @@ In this module, you saw how the platform's CI/CD pipeline enforces quality and a
 
 === Setting up Module 3
 
-The application is now deployed with the new feature, having passed all quality gates. In Module 3, we will see how the platform handles the operational concerns: traffic management, security, and observability across the deployed services.
+The application is now deployed in production with the new feature, having passed all quality gates. In Module 3, we will see how the platform handles the operational concerns: traffic management, security, and observability across the deployed services.
 
 === Presenter transition
 

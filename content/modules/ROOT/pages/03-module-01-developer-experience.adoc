@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module sets the scene with application modernization context, then follows a new developer joining Parasol who opens the app in DevSpaces and adds a new API endpoint using Quarkus dev mode. The code works but contains code smells (improper logging and empty exception handling), which sets up the pipeline failure in Module 2. The module closes with a platform engineer perspective on managing DevSpaces environments. Target duration: 15 minutes across 4 parts.
+*Presenter note*: This module sets the scene with application modernization context, then follows a new developer joining Parasol who opens the app in DevSpaces and adds a new API endpoint using Quarkus dev mode. The code works but contains code smells (improper logging and empty exception handling), which sets up the pipeline failure in Module 2. The module closes with a platform engineer perspective on managing DevSpaces environments. Target duration: 30 minutes across 4 parts.
 
 [#part-1]
 == Part 1 — Setting the scene: Application modernization
@@ -104,11 +104,13 @@ Cloud-based development environments eliminate local setup entirely. Every devel
 . Open the **OpenShift web console** at {console_url}[{console_url}^] and log in as `{dev_user}` / `{password}`
 
 . Navigate to **Workloads → Topology** and select the `{parasol_dev_ns}` namespace:
-* Point out the "blue donut" icons representing the running application components
+* Point out the "blue donut" icons representing the running application components in the 'dev' environment represented by the namespace.
 * "This is the Parasol application running on OpenShift. The developer can see all the components and their status at a glance."
 
 . Click the **DevSpaces icon** on the Parasol application's blue donut:
 * "Notice this icon on the application. One click, and it opens the application's source code directly in a cloud development environment. The developer does not need to clone a repository, install tools, or configure anything."
++
+image::ocp-topology-devspaces-icon.png[OpenShift Topology view showing the Parasol application with the DevSpaces icon on the blue donut,link=self,window=blank,align="center",width=700,title="One-click access to DevSpaces from the OpenShift Topology view"]
 
 . Show the DevSpaces workspace starting up automatically, pointing out:
 * The devfile in the repository defines the entire workspace configuration
@@ -118,20 +120,18 @@ Cloud-based development environments eliminate local setup entirely. Every devel
 
 . Once the workspace loads, show the fully configured browser-based IDE:
 * File explorer with the complete project structure
-* Terminal with all CLI tools available (`oc`, `mvn`, `quarkus`)
-* Extensions pre-installed (Java, Quarkus, YAML, OpenShift toolkit)
+* Terminal with all CLI tools available (`oc`, `mvn`, etc)
+* Extensions pre-installed (Java, Quarkus, YAML, Continue AI code assistant, etc)
 * Git integration connected to the repository
++
+image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded and configured,link=self,window=blank,align="center",width=700,title="Fully configured cloud development workspace"]
 
-. Open the `devfile.yaml` in the repository root and briefly show its contents:
+. Open the `devfile.yaml` in the repository root and then open the _parent_ devfile briefly show its contents:
+* Point out that the parent/child relationship allows for a common base configuration across multiple projects, with the ability to customize per project as needed
 * Point out the container image definition with pre-installed tools
 * Show the endpoint definitions for the application
 * Highlight that this file lives in the repository, so it is versioned and reviewed like any other code
 
-// TODO: Add screenshot of OpenShift Topology view with DevSpaces icon on the blue donut
-image::ocp-topology-devspaces-icon.png[OpenShift Topology view showing the Parasol application with the DevSpaces icon on the blue donut,link=self,window=blank,align="center",width=700,title="One-click access to DevSpaces from the OpenShift Topology view"]
-
-// TODO: Add screenshot of Dev Spaces workspace loaded with Parasol project
-image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded and configured,link=self,window=blank,align="center",width=700,title="Fully configured cloud development workspace"]
 
 **What they should notice:**
 
@@ -199,7 +199,7 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 * Press kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) to open the command palette
 * Type and select **Tasks: Run Task**
 * Select the **devfile** task group
-* Select **Start Development Mode**
+* Select **Start Development Mode (Hot Reload + debug)**
 +
 [NOTE]
 ====
@@ -213,11 +213,11 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 . When DevSpaces prompts with a popup to open the application, click to **open it in a new tab**:
 * Walk through the running application briefly
 * "This is the Parasol Insurance platform. It is used by Parasol's agents to manage insurance claims and communicate with new and existing customers. Behind the scenes, it uses Apache Kafka for enterprise messaging -- incoming customer emails are processed through a keyword matching algorithm that routes them to the correct department: claims, retention, or acquisition. We will come back to that email routing in Section 3, where we enhance it with AI."
-
++
 // TODO: Add screenshot of the running Parasol app dashboard opened from DevSpaces
 image::parasol-app-home.png[Parasol Insurance application dashboard showing open claims and recent activity and the Inbox tab in the left navigation,link=self,window=blank,align="center",width=700,title="The running Parasol Insurance application"]
 
-. Create the new claims statistics endpoint. Add a new file `src/main/java/com/parasol/ClaimStatsResource.java`:
+. Create the new claims statistics endpoint. In the Explorer on the left, right-click on the `java / com / Parasol` directory and select **New File**. Name the file `ClaimStatsResource.java`. Then copy and paste the following code into the new file:
 +
 [source,java,role="copypaste"]
 ----
@@ -268,18 +268,17 @@ public class ClaimStatsResource {
 }
 ----
 
-. Save the file and immediately show:
-* The application reloads automatically (no restart required)
+. The file will immediately save.
+* Upon accessing the app again, the application reloads automatically (no restart required)
+* In the browser address bar, replace the `dashboard.html` with `api/claims/stats` and hit enter to access the new endpoint
 * Open `/api/claims/stats` in the browser preview to show the new endpoint returning claim statistics
 * No manual build step, no repackaging, no redeployment
 
-// TODO: Add screenshot of the /api/claims/stats response in the browser
 image::parasol-claims-stats-devmode.png[Browser showing the /api/claims/stats endpoint returning JSON claim statistics data in Quarkus dev mode,link=self,window=blank,align="center",width=700,title="Claims statistics endpoint working in dev mode"]
 
 . Point out that the developer's code works but has code smells:
 * "Notice that our developer has added the claims statistics endpoint and verified it works in dev mode. But look at the code: they used `System.out.println` instead of a proper logger, and they wrapped the entire logic in a try-catch block with an empty catch — silently swallowing any exceptions. The code works, but these are exactly the kind of shortcuts that accumulate as technical debt. That is going to matter when we get to the CI/CD pipeline in Module 2."
 
-// TODO: Add screenshot of Quarkus dev mode showing live reload
 image::quarkus-dev-mode-live-reload.png[Development mode terminal showing live reload with instant feedback on code changes,link=self,window=blank,align="center",width=700,title="Quarkus dev mode with live reload"]
 
 **What they should notice:**
@@ -299,10 +298,10 @@ Q: "Does this work with other languages besides Java?"::
 A: "Red Hat supports multiple runtimes including Node.js, Python, .NET, and Go through OpenShift application runtimes. The live reload experience varies by framework, but the principle of fast feedback is consistent."
 
 Q: "Why not catch the code smells in dev mode?"::
-A: "Quarkus dev mode focuses on fast feedback for functional changes: does the code compile, does it run, does it produce the right output. Code quality enforcement happens in the CI/CD pipeline, where SonarQube applies organizational coding standards. This separation keeps the inner loop fast while the outer loop enforces quality."
+A: "Quarkus dev mode focuses on fast feedback for functional changes: does the code compile, does it run, does it produce the right output. Code quality enforcement happens in the developer's CI/CD pipeline, where SonarQube applies organizational coding standards. This separation keeps the inner loop fast while the outer loop enforces quality."
 
 Q: "What about debugging?"::
-A: "Development mode includes full debugging support. Developers can set breakpoints, inspect variables, and step through code directly in the cloud IDE. The experience is identical to a local IDE."
+A: "Development mode includes full debugging support. Developers can set breakpoints, inspect variables, and step through code directly in the cloud IDE. The experience is identical to a local IDE. Quarkus also features continuous testing, re-running tests automatically as code changes."
 
 [#part-4]
 == Part 4 — Managing DevSpaces environments (platform engineer persona)
@@ -341,32 +340,36 @@ DevSpaces gives platform engineers centralized control over developer environmen
 * Show the catalog of community and Red Hat-maintained devfile stacks
 * Point out the available stacks: Java/Quarkus, Node.js, Python, .NET, Go, and more
 * "This is the public devfile registry. Platform engineers use it as a starting point when creating devfiles for their teams. They can pick a stack, customize it with their organization's tools and policies, and add it to their application repositories."
-* Browse a Quarkus stack entry to show what it includes: base container image, tools, extensions, endpoints
++
+image::devfile-registry-viewer.png[Devfile registry viewer showing available community and Red Hat devfile stacks for various languages and frameworks,link=self,window=blank,align="center",width=700,title="Devfile registry: starting point for platform engineers"]
+
+* Search for or browse a Quarkus stack entry to show what it includes: base container image, tools, extensions, endpoints
 * "The platform engineer does not start from scratch. They take a community-maintained stack and customize it for their organization's requirements."
 
 . Switch to the **OpenShift web console** at {console_url}[{console_url}^] and log in as `{pe_user}` / `{password}` (platform engineer persona)
 
-. Navigate to **Operators** → **Installed Operators** → **Red Hat OpenShift Dev Spaces**
+. Navigate to **Ecosystem** → **Installed Operators** → **Red Hat OpenShift Dev Spaces** → **Red Hat OpenShift Dev Spaces instance Specification** tab
 
-. Click on the **CheCluster** custom resource (CR) to show the DevSpaces configuration:
-* Show the key configuration sections:
+. Click on the **devspaces** custom resource (CR) to show the DevSpaces configuration:
+* Show the key configuration sections on the **YAML** tab:
 ** **devEnvironments** — default IDE, container build configuration, default resources (CPU, memory) for workspaces
 ** **maxNumberOfRunningWorkspacesPerUser** — limits how many workspaces a developer can run simultaneously
 ** **secondsOfInactivityBeforeIdling** — idle timeout to reclaim resources from unused workspaces
 ** **storage** — persistent volume configuration for workspace data
 * "This is where the platform engineer fine-tunes DevSpaces for the organization. Resource limits, idle timeouts, storage policies, default IDE configuration. These settings apply to every workspace across the cluster."
-
++
+image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster custom resource with DevSpaces configuration parameters,link=self,window=blank,align="center",width=700,title="DevSpaces operator configuration via custom resource"]
 +
 [NOTE]
 ====
 **Presenter tip:** Do not spend too much time on individual CR fields. The goal is to show that the platform engineer has centralized control, not to walk through every configuration option. Highlight 2-3 settings that resonate with the audience (resource limits, idle timeout, and max workspaces are usually the most interesting).
 ====
 
-// TODO: Add screenshot of the devfile registry viewer showing available stacks
-image::devfile-registry-viewer.png[Devfile registry viewer showing available community and Red Hat devfile stacks for various languages and frameworks,link=self,window=blank,align="center",width=700,title="Devfile registry: starting point for platform engineers"]
+. Navigate to **Ecosystem** → **Software Catalog**
+* Show the available, customizable categoiies of pre-vetted services that developers and platform engineers can use when working directly in OpenShift. Platform engineers can customize this for their environment. For example, the platform engineer can set up a shared database service that developers can connect to from their applications without needing to configure credentials or network access, or remove access to certin services that are not approved for use in development environments.
++
+image::ecosystem.png[OpenShift console showing the Software Catalog,link=self,window=blank,align="center",width=700,title="Ecosystem Catalog for platform engineers to curate available services and tools"]
 
-// TODO: Add screenshot of the CheCluster CR in the OpenShift console
-image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster custom resource with DevSpaces configuration parameters,link=self,window=blank,align="center",width=700,title="DevSpaces operator configuration via custom resource"]
 
 **What they should notice:**
 
