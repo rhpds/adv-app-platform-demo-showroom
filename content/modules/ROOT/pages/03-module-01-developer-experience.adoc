@@ -367,7 +367,7 @@ image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster cust
 ====
 
 . Navigate to **Ecosystem** → **Software Catalog**
-* Show the available, customizable categoiies of pre-vetted services that developers and platform engineers can use when working directly in OpenShift. Platform engineers can customize this for their environment. For example, the platform engineer can set up a shared database service that developers can connect to from their applications without needing to configure credentials or network access, or remove access to certin services that are not approved for use in development environments.
+* Show the available, customizable categories of pre-vetted services that developers and platform engineers can use when working directly in OpenShift. Platform engineers can customize this for their environment. For example, the platform engineer can set up a shared database service that developers can connect to from their applications without needing to configure credentials or network access, or remove access to certain services that are not approved for use in development environments.
 +
 image::ecosystem.png[OpenShift console showing the Software Catalog,link=self,window=blank,align="center",width=700,title="Ecosystem Catalog for platform engineers to curate available services and tools"]
 

@@ -206,7 +206,7 @@ RHDH templates provide golden path self-service for developers. The "Parasol Ins
 . Select the **Parasol Insurance Secured Development** template
 
 . Walk through the template form:
-* The developer only needs to specify a **branch name** (e.g., `feat1`) (keep the names short, as they will be used for fully qualified network names which have length restictions))
+* The developer only needs to specify a **branch name** (e.g., `feat1`) (keep the names short, as they will be used for fully qualified network names which have length restrictions))
 * "That is it. One field. The template handles everything else: creating the branch on the source repository, provisioning the development namespace, configuring the pipeline for the branch, and registering a new component in the catalog."
 
 . Click **Create** and show the provisioning progress:

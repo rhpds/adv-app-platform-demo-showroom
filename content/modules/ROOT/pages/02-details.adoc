@@ -101,7 +101,7 @@ There are two Argo CD instances in this environment:
 oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.password}' | base64 -d
 ----
 
-**openshift-gitops (bootstrap — for debugging the demo environmentonly)**
+**openshift-gitops (bootstrap — for debugging the demo environment only)**
 
 * URL: {argocd_bootstrap_url}[{argocd_bootstrap_url}^]
 * This instance manages the environment itself (app-of-apps pattern). Useful for troubleshooting if demo components are not deploying correctly. Not shown during the demo.

@@ -268,7 +268,7 @@ Q: "Why not catch these in the IDE before pushing?"::
 A: "IDE plugins like SonarLint can surface some issues during development, and organizations can enable that as well. But the pipeline quality gate is the authoritative enforcement point — it ensures standards are met regardless of what tools the developer has configured locally. Defense in depth: catch what you can early, enforce what you must in the pipeline."
 
 Q: "What about more complex issues like security vulnerabilities?"::
-A: "Sonarqube handles SAST (Static Application Security Testing) in addition to code smell detection. In Section 2 of this demo, we add additional security layers: Trusted Artifact Signer for code signing and provenence, ACS for container image scanning, Tekton Chains for image signing, and admission control for deployment verification. The pipeline is extensible."
+A: "Sonarqube handles SAST (Static Application Security Testing) in addition to code smell detection. In Section 2 of this demo, we add additional security layers: Trusted Artifact Signer for code signing and provenance, ACS for container image scanning, Tekton Chains for image signing, and admission control for deployment verification. The pipeline is extensible."
 
 '''
 
@@ -341,7 +341,7 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 image::parasol-claims-stats-live.png[Parasol Insurance application showing the claims app live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims app deployed and live in the Parasol dev environment"]
 
 . Promote to Production (optional, if time allows):
-* As a platform engineer, you can trigger a promotion to production by creating a new tag in the source repository, and then approving the merge reqquest (MR) to update the production GitOps repository to use the new tag. This separates responsiblities between developers and platform operators, while still keeping the process automated and auditable.
+* As a platform engineer, you can trigger a promotion to production by creating a new tag in the source repository, and then approving the merge request (MR) to update the production GitOps repository to use the new tag. This separates responsibilities between developers and platform operators, while still keeping the process automated and auditable.
 * Log into GitLab as the `pe1` user, navigate to the `parasol-insurance` repository, noting the latest commit from the developer.
 * Click on **Tags** on the left, and select **New Tag** to create a new tag, with a name (e.g. `1.1`, or `prod-20240601`) and linking it to the latest commit on the `main` branch. You can leave the rest of the fields blank, scroll to the bottom and click **Create tag**.
 * With the new tag created, a new pipeline begins to build the production image (at the specified tag), and issue a new MR to the GitOps repo to update the production image.
