@@ -284,7 +284,9 @@ image::ocp-hpa-config.png[OpenShift console showing the HorizontalPodAutoscaler 
 +
 [source,bash,role="copypaste",subs="attributes+"]
 ----
-oc run load-generator --image=quay.io/curl/curl:latest -n {parasol_prod_ns} --restart=Never -- /bin/sh -c "while true; do curl -s -o /dev/null http://parasol-insurance.{parasol_prod_ns}.svc:8080/api/claims; done"
+oc run load-generator --image=quay.io/curl/curl:latest \
+  -n {parasol_prod_ns} --restart=Never -- /bin/sh -c \
+  "while true; do curl -s -o /dev/null http://parasol-insurance.{parasol_prod_ns}.svc:8080/api/claims; done"
 ----
 +
 * "This generates continuous traffic to the Parasol application, driving up CPU utilization."
