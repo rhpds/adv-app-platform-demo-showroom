@@ -6,7 +6,7 @@ include::partial$_attributes.adoc[]
 
 [NOTE]
 ====
-**Presenter note:** Section 3 builds on everything from Sections 1 and 2. The foundational platform is in place, the secure supply chain is operational, and now the organization is ready to integrate AI capabilities into their applications. This section shows that the same platform patterns -- DevSpaces, pipelines, and GitOps -- apply seamlessly to AI-enhanced workloads.
+Section 3 builds on everything from Sections 1 and 2. The foundational platform is in place, the secure supply chain is operational, and now the organization is ready to integrate AI capabilities into their applications. This section shows that the same platform patterns -- DevSpaces, pipelines, and GitOps -- apply seamlessly to AI-enhanced workloads.
 ====
 
 [#part-1]
@@ -15,6 +15,8 @@ include::partial$_attributes.adoc[]
 === Know
 
 _Parasol Insurance receives customer emails that are processed by the application's inbox system. On the Inbox screen (left-hand tab in the Parasol app), incoming emails flow in as they arrive. The current system uses a keyword matching algorithm to route emails to the appropriate department: CLAIMS, RETENTION, or ACQUISITION. However, ambiguous emails that do not match any keywords are routed to "REVIEW REQUIRED," where claims administrators must manually triage them. The CIO has tasked the development team with using an LLM to replace this keyword matching, eliminating the manual review bucket entirely._
+
+image::parasol-inbox-review-required.png[Parasol Insurance Inbox screen showing incoming emails with several marked as REVIEW REQUIRED alongside CLAIMS and RETENTION classifications,link=self,window=blank,align="center",width=700,title="Inbox with Review Required emails that need manual triage"]
 
 **Business challenge:**
 
@@ -123,7 +125,10 @@ image::devspaces-application-properties.png[DevSpaces IDE showing application.pr
 +
 [source,bash,role="copypaste"]
 ----
-cd $PROJECT_SOURCE && git rm -rf . && git clean -df && git checkout origin/llm-classification -- .
+cd $PROJECT_SOURCE && \
+git rm -rf . && \
+git clean -df && \
+git checkout origin/llm-classification -- .
 ----
 +
 * "The LLM classification implementation has been prepared on a separate branch. We pull the code into our feature branch with a single command. This overlays the AI-enhanced version of the application onto our working branch without changing branches."
@@ -159,12 +164,16 @@ cd $PROJECT_SOURCE && git rm -rf . && git clean -df && git checkout origin/llm-c
 **Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab and navigate to the Inbox to see emails being classified by the LLM in real time.
 ====
 
-. Push the code:
+. Push the code (same as previous sections):
+* In **DevSpaces**, use the **Source Control** view in the left sidebar
+* Click the **Source Control** icon (branch icon) in the activity bar
+* The new files appears under "Changes"
+* Enter a commit message: `Add claims statistics API endpoint`
+* Click the dropdown arrow next to the **Commit** button and select **Commit & Push**
+* Click **Yes** when prompted about unstaged changes. This will add all changed files to your commit.
+* "That is all the developer does. A commit and push from the IDE. The platform takes it from here."
 +
-[source,bash,role="copypaste"]
-----
-git push
-----
+image::scm-commit.png[SCM Commit pricess,link=self,window=blank,align="center",width=700,title="Developer commits and pushes code from the IDE, triggering the CI pipeline"]
 +
 * "The developer pushes the LLM integration to their feature branch. The secure pipeline starts automatically, just like in Module 5."
 
