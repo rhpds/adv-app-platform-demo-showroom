@@ -124,32 +124,14 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 [TIP]
 ====
-**Optional: generate traffic for the graph.** The traffic graph looks best when there is active traffic flowing between services. Before showing the graph, start a traffic generator loop on your laptop to produce steady requests. Run this in a terminal and leave it running in the background during the demo (you can also run it in the OpenShift Web Terminal but that means the traffic will originate from with the cluster, making a slightly less interesting traffic view).
-
-**macOS / Linux:**
+**Generate traffic for the graph.** The traffic graph needs active traffic flowing between services to show useful data. Use the Web Terminal (click the `>_` icon at the top of the OpenShift Console) to run a load generator pod inside the cluster. Internal traffic flows through the waypoint proxy, which provides the HTTP-level metrics that Kiali displays. External traffic can be configured to also flow through the waypoint proxy if that is of interest.
 
 [source,bash,role="copypaste",subs="attributes+"]
 ----
-while true; do
-  curl -s -o /dev/null -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/dashboard.html
-  curl -s -o /dev/null -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/api/claims
-  sleep 5
-done
+oc run load-generator --image=quay.io/curl/curl:latest \
+  -n {parasol_prod_ns} --restart=Never -- /bin/sh -c \
+  "while true; do curl -s -o /dev/null http://parasol-insurance.{parasol_prod_ns}.svc:8080/api/claims; done"
 ----
-
-**Windows (Command Prompt):**
-
-[source,bat,role="copypaste",subs="attributes+"]
-----
-:loop
-curl -s -o NUL -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/dashboard.html
-curl -s -o NUL -L https://parasol-insurance-{parasol_prod_ns}.{subdomain}/api/claims
-timeout /t 5 >nul
-goto loop
-----
-
-Stop the loop with kbd:[CTRL+C] (or kbd:[CMD+C] on Mac) when you are done with the Service Mesh demo.
-====
 
 **What I do:**
 
@@ -199,6 +181,14 @@ image::ossm-console-traffic.png[OpenShift Service Mesh traffic,link=self,window=
 
 // TODO: Add screenshot of Observe -> Dashboards showing aggregate resource dashboard
 image::ocp-observe-dashboard.png[OpenShift Observe Dashboards view showing aggregate CPU and memory and network metrics with customizable dashboard panels,link=self,window=blank,align="center",width=700,title="Customizable dashboards for aggregate resource monitoring"]
+
+Stop and remove the generator when done:
+
+[source,bash,role="copypaste",subs="attributes+"]
+----
+oc delete pod load-generator -n {parasol_prod_ns}
+----
+====
 
 **What they should notice:**
 
