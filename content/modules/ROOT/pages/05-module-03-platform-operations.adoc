@@ -294,8 +294,9 @@ oc run load-generator --image=quay.io/curl/curl:latest -n {parasol_prod_ns} --re
 * Show the HPA status: **Workloads** -> **HorizontalPodAutoscalers** to see current vs. target CPU and replica count
 * "The platform detected the increased CPU utilization and automatically added replicas. No human intervention required. The application continues to serve traffic while scaling."
 
-// TODO: Add screenshot of topology showing scaled pods
-image::ocp-hpa-scaled.png[OpenShift Topology view showing the Parasol application scaled up to multiple pods with the HPA active,link=self,window=blank,align="center",width=700,title="Autoscaler responding to load: pods scaling up automatically"]
+image::ocp-hpa-scaled1.png[OpenShift Topology view showing the Parasol application scaled up to multiple pods with the HPA active,link=self,window=blank,align="center",width=700,title="Autoscaler responding to load: pods scaling up automatically"]
+
+image::ocp-hpa-scaled2.png[HPA detail showing the activity of the HPA,link=self,window=blank,align="center",width=700,title="HPA Details showing current vs. desired and scaling events"]
 
 . Stop the load generator:
 +
@@ -314,7 +315,6 @@ oc delete pod load-generator -n {parasol_prod_ns}
 
 **What they should notice:**
 
-* The HPA was configured through the console UI in seconds -- no YAML, no code changes
 * The platform automatically scaled the deployment in response to CPU load
 * Scaling down happens automatically when load decreases -- no manual intervention
 * Multiple autoscaling strategies exist for different use cases (horizontal, vertical, cluster, event-driven)
