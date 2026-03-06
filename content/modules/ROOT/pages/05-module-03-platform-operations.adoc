@@ -272,13 +272,15 @@ OpenShift provides multiple autoscaling strategies out of the box:
 
 . Show the existing HPA configuration:
 * Navigate to **Workloads** -> **HorizontalPodAutoscalers** in the `{parasol_prod_ns}` namespace
-* Click on `parasol-insurance-hpa` to show the configuration: min 2, max 5, CPU target 20%
+* Click on `parasol-insurance-hpa` to show the configuration: min 2, max 5, CPU target 10%
 * "The platform engineer configured this HPA in the GitOps manifests. It is managed as code alongside the deployment, reviewed through merge requests, and deployed through Argo CD. The platform automatically adjusts the number of replicas based on CPU utilization."
 
 // TODO: Add screenshot of the HPA details page
-image::ocp-hpa-config.png[OpenShift console showing the HorizontalPodAutoscaler details with min 2 and max 5 pods and 20 percent CPU target,link=self,window=blank,align="center",width=700,title="HorizontalPodAutoscaler configured through GitOps"]
+image::ocp-hpa-config.png[OpenShift console showing the HorizontalPodAutoscaler details with min 2 and max 5 pods and 10 percent CPU target,link=self,window=blank,align="center",width=700,title="HorizontalPodAutoscaler configured through GitOps"]
 
 . Generate load to trigger autoscaling by running a load generator pod:
+* Open the Web Terminal using the `>_` icon at the top of the OpenShift Console (if this is the first time you've run it, just accept defaults and click **Start Terminal**)
+* Run the following command in the terminal to create a load generator pod that continuously sends requests to the Parasol application, driving up CPU utilization:
 +
 [source,bash,role="copypaste",subs="attributes+"]
 ----
@@ -288,7 +290,7 @@ oc run load-generator --image=quay.io/curl/curl:latest -n {parasol_prod_ns} --re
 * "This generates continuous traffic to the Parasol application, driving up CPU utilization."
 
 . Watch the **Topology** view as pods scale up:
-* The blue donut grows as new replicas are added
+* The blue donut show scaling activity as new replicas are added
 * Show the HPA status: **Workloads** -> **HorizontalPodAutoscalers** to see current vs. target CPU and replica count
 * "The platform detected the increased CPU utilization and automatically added replicas. No human intervention required. The application continues to serve traffic while scaling."
 
