@@ -69,7 +69,7 @@ image::ossm-console-overview.png[OpenShift Service Mesh console showing the Para
 **What they should notice:**
 
 * Service Mesh is integrated into the OpenShift console. No separate tool required.
-* mTLS encryption is can be configured to be automatic. The developers did not write any TLS code.
+* mTLS encryption is automatic. The developers did not write any TLS code.
 * Traffic visibility is built in. The platform engineer can see how services communicate in real time.
 * Access policies enforce least privilege at the service level without application code changes.
 * All of these capabilities are configured by the platform team and apply consistently.
