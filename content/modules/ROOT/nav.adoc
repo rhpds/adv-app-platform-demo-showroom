@@ -19,7 +19,7 @@
 * xref:05-module-03-platform-operations.adoc[Module 3: Platform operations]
 ** xref:05-module-03-platform-operations.adoc#part-1[Part 1: Traffic management and security]
 ** xref:05-module-03-platform-operations.adoc#part-2[Part 2: Observability with Kiali]
-** xref:05-module-03-platform-operations.adoc#part-3[Part 3: Platform capabilities]
+** xref:05-module-03-platform-operations.adoc#part-3[Part 3: Autoscaling]
 
 .Section 2: Advanced application platform
 * xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and catalog]

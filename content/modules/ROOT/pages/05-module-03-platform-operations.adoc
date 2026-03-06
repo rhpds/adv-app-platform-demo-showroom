@@ -231,49 +231,109 @@ A: "The graph automatically adapts to the number of services. In larger environm
 '''
 
 [#part-3]
-== Part 3 — Platform capabilities talk track
+== Part 3 — Autoscaling
 
 === Know
 
-_Beyond the specific capabilities demonstrated in this demo, the OpenShift application platform provides additional features that scale across the organization. This section provides a talk track for discussing these broader capabilities without a live demonstration._
+_Production workloads need to handle variable demand. The Parasol application sees traffic spikes during business hours and seasonal peaks. OpenShift provides multiple layers of autoscaling: horizontal pod autoscaling (adding more replicas), vertical pod autoscaling (adjusting CPU and memory), cluster autoscaling (adding more nodes), and event-driven autoscaling with KEDA for scaling based on external metrics like Kafka queue depth._
 
-**Additional platform capabilities:**
+**Business challenge:**
 
-* **Integration with existing CI systems** — Organizations using Jenkins, GitHub Actions, or GitLab CI can integrate with OpenShift Pipelines or use their existing CI alongside the platform capabilities shown here
-* **Serverless and event-driven architectures** — OpenShift Serverless (Knative) enables scale-to-zero workloads and event-driven patterns for use cases like document processing or AI inference
-* **Advanced deployment strategies** — Blue-green, canary, and A/B deployments through Service Mesh and Argo CD rollouts
-* **Multi-cluster management** — Red Hat Advanced Cluster Management for Kubernetes for managing policies and workloads across multiple OpenShift clusters
-* **AI/ML workloads** — Applications consume LLM endpoints as API calls; models can run on-premises with Red Hat AI (RHEL AI or OpenShift AI) or through hosted providers, and integrate seamlessly with the application platform
+* Applications are either over-provisioned (wasting resources) or under-provisioned (degrading performance during traffic spikes)
+* Manual scaling requires operations team intervention, often after users are already impacted
+* No automated response to changing demand patterns
+* Different workloads need different scaling strategies (CPU-bound vs. event-driven)
+
+**Current state at Parasol:**
+
+* Application replicas are statically configured. During peak hours, response times degrade.
+* Operations team manually scales deployments when alerted, adding 10-15 minutes of response time
+* Resources are over-provisioned during off-peak hours to avoid incidents, increasing infrastructure costs
+* Event-driven workloads like email processing have no way to scale based on queue depth
+
+**Value proposition:**
+
+OpenShift provides multiple autoscaling strategies out of the box:
+
+* **HorizontalPodAutoscaler (HPA)** -- Automatically adds or removes pod replicas based on CPU, memory, or custom metrics. The platform engineer sets thresholds and min/max bounds, and the platform handles scaling automatically.
+* **VerticalPodAutoscaler (VPA)** -- Adjusts CPU and memory requests/limits for individual pods based on observed usage patterns. Right-sizes workloads without manual tuning.
+* **ClusterAutoscaler and MachineAutoscaler** -- Scales the cluster itself by adding or removing worker nodes when pods cannot be scheduled due to insufficient capacity. The platform grows and shrinks the infrastructure automatically.
+* **KEDA (Event-Driven Autoscaler)** -- Scales workloads based on external event sources like Kafka topic lag, HTTP request queues, or custom metrics. Ideal for event-driven architectures where scaling should respond to queue depth, not just CPU.
 
 === Show
 
-[NOTE]
-====
-**Presenter note:** This section is a talk track only. Use these talking points to address broader platform capabilities based on audience interest and remaining time.
-====
-
 **What I say:**
 
-"Before we wrap up, I want to highlight that what we showed today is just the starting point. The OpenShift application platform extends well beyond what we demonstrated:
+"The last thing I want to show you is how the platform handles scaling automatically. In production, traffic is not constant. The platform engineer has already configured a HorizontalPodAutoscaler for the Parasol production deployment through the GitOps manifests. It scales between 2 and 5 replicas based on CPU utilization. Let me show you what happens when load increases."
 
-For teams that already use Jenkins or GitHub Actions, the platform integrates with your existing CI. You do not have to rip and replace. Tekton is there as an option, and many teams use both during a transition.
+**What I do:**
 
-For workloads that do not need to run all the time, OpenShift Serverless provides scale-to-zero capabilities. Think about batch processing, event-driven workflows, or AI inference endpoints that only spin up when requests come in.
+. In the **OpenShift web console**, navigate to the **Topology** view in the `{parasol_prod_ns}` namespace
 
-And for organizations looking to adopt AI, this platform is the foundation. The same automated pipelines, GitOps practices, and observability tools apply to AI workloads. Whether the LLM runs on-premises with Red Hat AI or through a hosted provider, the application platform treats it as an API endpoint that any component can consume.
+. Show the existing HPA configuration:
+* Navigate to **Workloads** -> **HorizontalPodAutoscalers** in the `{parasol_prod_ns}` namespace
+* Click on `parasol-insurance-hpa` to show the configuration: min 2, max 5, CPU target 20%
+* "The platform engineer configured this HPA in the GitOps manifests. It is managed as code alongside the deployment, reviewed through merge requests, and deployed through Argo CD. The platform automatically adjusts the number of replicas based on CPU utilization."
 
-The key takeaway is that OpenShift is not just a container runtime. It is an application platform that grows with your organization's needs."
+// TODO: Add screenshot of the HPA details page
+image::ocp-hpa-config.png[OpenShift console showing the HorizontalPodAutoscaler details with min 2 and max 5 pods and 20 percent CPU target,link=self,window=blank,align="center",width=700,title="HorizontalPodAutoscaler configured through GitOps"]
+
+. Generate load to trigger autoscaling by running a load generator pod:
++
+[source,bash,role="copypaste",subs="attributes+"]
+----
+oc run load-generator --image=quay.io/curl/curl:latest -n {parasol_prod_ns} --restart=Never -- /bin/sh -c "while true; do curl -s -o /dev/null http://parasol-insurance.{parasol_prod_ns}.svc:8080/api/claims; done"
+----
++
+* "This generates continuous traffic to the Parasol application, driving up CPU utilization."
+
+. Watch the **Topology** view as pods scale up:
+* The blue donut grows as new replicas are added
+* Show the HPA status: **Workloads** -> **HorizontalPodAutoscalers** to see current vs. target CPU and replica count
+* "The platform detected the increased CPU utilization and automatically added replicas. No human intervention required. The application continues to serve traffic while scaling."
+
+// TODO: Add screenshot of topology showing scaled pods
+image::ocp-hpa-scaled.png[OpenShift Topology view showing the Parasol application scaled up to multiple pods with the HPA active,link=self,window=blank,align="center",width=700,title="Autoscaler responding to load: pods scaling up automatically"]
+
+. Stop the load generator:
++
+[source,bash,role="copypaste",subs="attributes+"]
+----
+oc delete pod load-generator -n {parasol_prod_ns}
+----
++
+* "After removing the load, the HPA will gradually scale back down to the minimum. The platform optimizes resource usage automatically."
+
+. **Talk track** about additional scaling capabilities:
+* "What we just showed is horizontal pod autoscaling -- adding more replicas. But OpenShift provides several other autoscaling strategies:"
+* "**Vertical Pod Autoscaler** adjusts CPU and memory for individual pods based on observed usage. Instead of adding more replicas, it right-sizes each pod. This is ideal for workloads that need more resources per instance rather than more instances."
+* "**Cluster Autoscaler and Machine Autoscaler** scale the cluster itself. If pods cannot be scheduled because the cluster is full, the platform automatically provisions new worker nodes. When demand drops, it removes them. The infrastructure grows and shrinks with demand."
+* "**KEDA, the event-driven autoscaler**, scales based on external event sources. For example, Parasol's email processing could scale based on the Kafka topic queue depth. If thousands of emails arrive at once, KEDA spins up more consumers to process them faster, then scales back to zero when the queue is empty."
+
+**What they should notice:**
+
+* The HPA was configured through the console UI in seconds -- no YAML, no code changes
+* The platform automatically scaled the deployment in response to CPU load
+* Scaling down happens automatically when load decreases -- no manual intervention
+* Multiple autoscaling strategies exist for different use cases (horizontal, vertical, cluster, event-driven)
+
+**Business value callout:**
+
+"At Parasol, the operations team manually scales deployments when performance degrades -- a reactive process that adds 10-15 minutes of response time and impacts customer experience. With the HPA, the platform responds to demand changes in seconds, automatically. During peak hours, the application scales up. During off-peak hours, it scales back down, saving infrastructure costs. And with KEDA, event-driven workloads like email processing can scale based on queue depth, not just CPU. The platform handles it all automatically."
 
 **If asked:**
 
-Q: "How does this work in a multi-cloud environment?"::
-A: "OpenShift runs consistently across public clouds (AWS, Azure, GCP), private data centers, and edge locations. The developer and platform engineer experience is identical regardless of where the cluster runs. Red Hat Advanced Cluster Management for Kubernetes adds centralized policy and workload management across all clusters."
+Q: "How fast does the HPA react?"::
+A: "The HPA checks metrics every 15 seconds by default. Scale-up typically happens within 30-60 seconds of the threshold being exceeded. Scale-down is more conservative -- the HPA waits 5 minutes by default to avoid flapping."
 
-Q: "What about cost management?"::
-A: "The platform consolidates multiple tools into a single, integrated experience. Instead of separately procuring, integrating, and supporting a CI system, a GitOps tool, a service mesh, and an observability stack, these are all included with OpenShift. This reduces total cost of ownership."
+Q: "Can we scale based on custom metrics?"::
+A: "Yes. The HPA supports custom metrics through the Prometheus adapter. You can scale based on any metric that Prometheus collects -- request rate, queue depth, response latency, or business-specific metrics."
 
-Q: "How do we get started?"::
-A: "Most organizations start with one team and one application, exactly the pattern we showed today. Adopt DevSpaces for the developer experience, add a pipeline for CI, and layer on GitOps and Service Mesh as the team matures. The platform grows with you."
+Q: "What about scaling the cluster itself?"::
+A: "The Cluster Autoscaler monitors pending pods that cannot be scheduled due to insufficient resources. When it detects unschedulable pods, it provisions new worker nodes through Machine Autoscaler. When nodes are underutilized, it drains and removes them. This is fully automated."
+
+Q: "How does KEDA differ from the HPA?"::
+A: "The HPA scales based on pod-level metrics like CPU and memory. KEDA scales based on external event sources: Kafka topic lag, HTTP queue length, database query count, or any custom scaler. KEDA can also scale to zero, which the HPA cannot. This makes KEDA ideal for event-driven and batch workloads."
 
 == Section 1 summary
 
@@ -281,7 +341,7 @@ A: "Most organizations start with one team and one application, exactly the patt
 
 . **Module 1: Developer experience** — Application modernization with MTA, one-click DevSpaces access from the topology view, fast iteration with Quarkus dev mode, and platform engineer governance of DevSpaces through the operator and devfile registry
 . **Module 2: CI/CD pipeline** — Automated pipeline triggering, Sonarqube quality gate enforcement catching code smells, AI-assisted remediation with Continue, and GitOps-driven delivery with Argo CD
-. **Module 3: Platform operations** — mTLS encryption and traffic policy management with Service Mesh, real-time observability through traffic graphs and workload monitoring, customizable dashboards and alerts, and broader platform capabilities
+. **Module 3: Platform operations** — mTLS encryption and traffic policy management with Service Mesh, real-time observability through traffic graphs and workload monitoring, customizable dashboards and alerts, and Auto Scaling (HPA)
 
 === The continuous story
 

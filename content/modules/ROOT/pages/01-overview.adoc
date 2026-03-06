@@ -40,9 +40,9 @@ A new developer joins Parasol Insurance and experiences the full application lif
 
 . **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the code smells. The developer fixes the issues by using an AI code assistant, replacing `System.out.println` with the Quarkus `Log` API and removing the empty catch block, pushes again, and the pipeline passes. Argo CD handles the deployment.
 
-. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, and additional platform capabilities.
+. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, and Auto Scaling (HPA).
 
-**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, Sonarqube, Argo CD, Service Mesh, Observability (Kiali/OpenShift console), DevSpaces code assistance (AI)
+**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, SonarQube, Argo CD, Service Mesh, Observability (Kiali/OpenShift console), DevSpaces code assistance (AI), Auto Scaling (HPA)
 
 === Section 2: Advanced developer platform (Modules 4-6)
 

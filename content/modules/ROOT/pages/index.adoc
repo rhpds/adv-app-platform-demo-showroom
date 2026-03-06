@@ -16,7 +16,7 @@ Establish the core value of OpenShift as an application platform. Application mo
 
 * xref:03-module-01-developer-experience.adoc[Module 1: Developer experience] — MTA migration context, one-click DevSpaces from the topology view, Quarkus dev mode, and platform engineer governance
 * xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline] — Tekton pipeline triggering, SAST/Sonarqube quality gates that catch code smells, and GitOps delivery with Argo CD
-* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, and broader platform capabilities
+* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, and Auto Scaling (HPA)
 
 **Section 2: Advanced developer services**
 
