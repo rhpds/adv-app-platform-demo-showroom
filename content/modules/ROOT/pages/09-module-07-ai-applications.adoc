@@ -159,7 +159,7 @@ image::devspaces-application-properties.png[DevSpaces IDE showing application.pr
 +
 [NOTE]
 ====
-**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab and navigate to the Inbox to see emails being classified by the LLM in real time.
+**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab when prompted and navigate to the Inbox to see emails being classified by the LLM in real time.
 ====
 
 . Push the code (same as previous sections):
