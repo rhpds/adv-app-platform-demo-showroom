@@ -1,7 +1,7 @@
 ---
 site:
   title: OpenShift Advanced App Platform Demo
-  url: https://github.com/rhpds/showroom_template_nookbag
+  url: https://github.com/rhpds/adv-app-platform-demo-showroom
   start_page: modules::index.adoc
 
 content:
