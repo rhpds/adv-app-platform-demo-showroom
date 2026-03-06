@@ -122,18 +122,16 @@ The Service Mesh console provides an intuitive, real-time view of the entire ser
 
 "Now let me show you the observability side. We have encryption and traffic management, but the platform engineer also needs to see what is happening. How is traffic flowing? Are there errors? Where are the bottlenecks? The Service Mesh console gives you all of that in real time."
 
-[TIP]
-====
-**Generate traffic for the graph.** The traffic graph needs active traffic flowing between services to show useful data. Use the Web Terminal (click the `>_` icon at the top of the OpenShift Console) to run a load generator pod inside the cluster. Internal traffic flows through the waypoint proxy, which provides the HTTP-level metrics that Kiali displays. External traffic can be configured to also flow through the waypoint proxy if that is of interest.
+**What I do:**
 
+. **Generate traffic for the graph.** The traffic graph needs active traffic flowing between services to show useful data. Use the Web Terminal (click the `>_` icon at the top of the OpenShift Console) to run a load generator pod inside the cluster. Internal traffic flows through the waypoint proxy, which provides the HTTP-level metrics that Kiali displays. External traffic can be configured to also flow through the waypoint proxy if that is of interest.
++
 [source,bash,role="copypaste",subs="attributes+"]
 ----
 oc run load-generator --image=quay.io/curl/curl:latest \
   -n {parasol_prod_ns} --restart=Never -- /bin/sh -c \
   "while true; do curl -s -o /dev/null http://parasol-insurance.{parasol_prod_ns}.svc:8080/api/claims; done"
 ----
-
-**What I do:**
 
 . From the **Overview** page, click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Graph**:
 * On the Display menu, enable Traffic Animation, and set the refresh rate to 10 seconds at the upper right.
