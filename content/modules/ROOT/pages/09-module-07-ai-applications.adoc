@@ -60,7 +60,6 @@ An LLM is already available as an API endpoint, managed as a platform service. T
 * Point out the emails marked **"REVIEW REQUIRED"** (there will be many) -- these are the ambiguous ones the keyword matcher could not handle
 * "These 'Review Required' emails are the problem. Each one requires a claims administrator to read it, understand the context, and manually route it. That is the manual triage cost we are going to eliminate with AI."
 
-// TODO: Add screenshot of the Parasol Inbox showing emails with REVIEW REQUIRED badges
 image::parasol-inbox-review-required.png[Parasol Insurance Inbox screen showing incoming emails with several marked as REVIEW REQUIRED alongside CLAIMS and RETENTION classifications,link=self,window=blank,align="center",width=700,title="Inbox with Review Required emails that need manual triage"]
 
 **Business value callout:**
@@ -114,13 +113,6 @@ The platform engineer has already configured the LLM endpoint and Kafka credenti
 * Use the DevSpaces link from the Developer Hub catalog component created in Module 4
 * Show the workspace loading on the correct feature branch
 
-. Show the pre-configured environment variables in `src/main/resources/application.properties`:
-* Point out the LangChain4j LLM configuration with `LLM_BASE_URL` and `LLM_API_KEY`
-* "The platform engineer has already configured the Kafka broker credentials and the LLM endpoint through external secrets, as we saw in Module 5. The developer does not need to manage API keys or model endpoints. They are pre-approved and pre-configured as part of the golden path."
-
-// TODO: Add screenshot of application.properties showing LLM and Kafka env var configuration
-image::devspaces-application-properties.png[DevSpaces IDE showing application.properties with LLM_BASE_URL and LLM_API_KEY and DEV_KAFKA_PASSWORD environment variable references,link=self,window=blank,align="center",width=700,title="Pre-configured LLM and Kafka environment variables in application.properties"]
-
 . Open a new **Terminal** in DevSpaces and pull in the LLM classification code from the prepared branch:
 +
 [source,bash,role="copypaste"]
@@ -132,6 +124,12 @@ git checkout origin/llm-classification -- .
 ----
 +
 * "The LLM classification implementation has been prepared on a separate branch. We pull the code into our feature branch with a single command. This overlays the AI-enhanced version of the application onto our working branch without changing branches."
+
+. Show the pre-configured environment variables in `src/main/resources/application.properties`:
+* Point out the LangChain4j LLM configuration with `LLM_BASE_URL` and `LLM_API_KEY`
+* "The platform engineer has already configured the Kafka broker credentials and the LLM endpoint through external secrets, as we saw in Module 5. The developer does not need to manage API keys or model endpoints. They are pre-approved and pre-configured as part of the golden path."
+
+image::devspaces-application-properties.png[DevSpaces IDE showing application.properties with LLM_BASE_URL and LLM_API_KEY and DEV_KAFKA_PASSWORD environment variable references,link=self,window=blank,align="center",width=700,title="Pre-configured LLM and Kafka environment variables in application.properties"]
 
 . Depending on the audience (whether they want a code walkthrough or not), review the changes:
 * Show the new file `src/main/java/com/parasol/EmailClassifier.java`:
