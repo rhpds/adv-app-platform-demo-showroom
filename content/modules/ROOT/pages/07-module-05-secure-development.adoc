@@ -163,7 +163,7 @@ TIP: Optional, but if you have time, promote to production using the same proces
 . Switch to the **platform engineer persona** (log in as `{pe_user}` / `{password}` in GitLab):
 * Review and **approve the merge request**
 * Merge the MR
-* Select **Code** -> **Tags** in the respository's side menu and click **New tag**
+* Select **Code** -> **Tags** in the repository's side menu and click **New tag**
 * Create a tag named `1.1`
 * "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release, and issue a new MR to the GitOps repo to update production. The platform engineer controls when code is promoted to production by merging and tagging."
 
@@ -228,7 +228,7 @@ The External Secrets Operator integrates with HashiCorp Vault to provide central
 
 **What I do:**
 
-. Visit the {vault_url}[**Vault** UI^] served by a Vault instance running in your cluster. Log in with the Vaukt token.
+. Visit the {vault_url}[**Vault** UI^] served by a Vault instance running in your cluster. Log in with the Vault token.
 +
 [TIP]
 ====
