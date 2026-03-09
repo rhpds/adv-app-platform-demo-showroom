@@ -3,11 +3,6 @@ include::partial$_attributes.adoc[]
 
 *Presenter note*: Read this section before the demo. It provides the full business context and narrative you need to deliver a compelling presentation. This content is not shown to the audience.
 
-[TIP]
-====
-A tip goes here.
-====
-
 == The core message
 
 Every Kubernetes distribution can orchestrate containers. That is table stakes. What differentiates Red Hat OpenShift is everything above the Kubernetes API: integrated development environments, application runtimes, automated CI/CD, a developer portal with self-service, a trusted software supply chain, and AI-ready application delivery. This demo shows that complete application platform story, progressing from foundational capabilities through advanced developer platform capabilities to intelligent applications.
@@ -28,19 +23,19 @@ This demo tells a continuous story across three sections. Each section builds on
 
 === Section 1: Foundational application platform (Modules 1-3)
 
-_Establish the core value of OpenShift as an application platform, not just container management._
+_Establish the core value of OpenShift as an application platform, not just a container management tool._
 
 A new developer joins Parasol Insurance and experiences the full application lifecycle on the platform:
 
 . **Application modernization (context setting)** — Parasol has already migrated their legacy Java EE application to OpenShift using the Migration Toolkit for Applications (MTA). This migration is discussed but not shown live. It sets the stage for everything that follows.
 
-. **Developer inner loop** — The new developer clicks a single button in the OpenShift topology view to open the Parasol app in OPenShift DevSpaces. They add a new claims statistics API endpoint using Quarkus dev mode. The code works but contains code smells: `System.out.println` instead of proper logging and an empty catch block that silently swallows exceptions (these are simple examples of typical code smells, there are many more of course).
+. **Developer inner loop** — The new developer clicks a single button in the OpenShift topology view to open the Parasol app in OpenShift DevSpaces. They add a new claims statistics API endpoint, seeing their changes live in a browser using Quarkus' dev mode. The code works but contains code smells: `System.out.println` instead of proper logging and an empty catch block that silently swallows exceptions (these are simple examples of typical code smells, there are many more of course).
 
 . **Platform engineer perspective** — The platform engineer manages DevSpaces environments centrally, using the devfile registry as a starting point and the DevSpaces operator for governance.
 
-. **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the code smells. The developer fixes the issues by using an AI code assistant, replacing `System.out.println` with the Quarkus `Log` API and removing the empty catch block, pushes again, and the pipeline passes. Argo CD handles the deployment.
+. **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the code smells. The developer fixes the issues by using an AI code assistant, replacing `System.out.println` with the Quarkus `Log` API and removing the empty catch block, pushes again, and the pipeline passes. OpenShift GitOps handles the deployment.
 
-. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, and Auto Scaling (HPA).
+. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through OpenShift Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, and Auto Scaling (HPA).
 
 **Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, SonarQube, Argo CD, Service Mesh, Observability (Kiali/OpenShift console), DevSpaces code assistance (AI), Auto Scaling (HPA)
 
@@ -48,9 +43,9 @@ A new developer joins Parasol Insurance and experiences the full application lif
 
 _Move from "good to great." Show the capabilities that differentiate a mature application platform from basic container management._
 
-Fast forward: Parasol moves to Red Hat Developer Hub, the Parasol application and its components are now registered in the Red Hat Developer Hub catalog, and a secure software supply chain is in place
+Fast forward: Parasol deploys and internal developer portal using Red Hat Developer Hub (RHDH). The Parasol application and its components are now registered in the Red Hat Developer Hub catalog, and a secure software supply chain is in place.
 
-. **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation. They ask Lightspeed questions about the application. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
+. **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation for Parasol's software architectures. Developers ask Lightspeed questions about applications and APIs. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
 
 . **Secure development workflow** — Developers work in DevSpaces with the Dependency Analytics plugin, catching and fixing a dependency vulnerability in real time. A merge request triggers the secure build pipeline: ACS scanning, image signing via Trusted Artifact Signer (TAS), SBOM generation, and SLSA attestation via Tekton Chains. External secrets are managed through Vault.
 

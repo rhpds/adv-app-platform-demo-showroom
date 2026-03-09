@@ -45,12 +45,13 @@ The Dependency Analytics plugin in DevSpaces scans project dependencies in real-
 . In the **DevSpaces** workspace (continuing from Module 4), open the project's dependency file:
 * Open `pom.xml`
 * "The Dependency Analytics plugin scans this file automatically. It checks every dependency against known vulnerability databases and compatibility rules in real time."
++
+TIP: If the Dependency Analytics scan doesn't run automatically, click the pie chart in the top-right corner of the `pom.xml` to initialise it.
 
 . Show the **Dependency Analytics report**:
 * Either click the Open Report in the pop-up, or right-click on the vulnerability and choose "Red Hat Dependency Analytics Report"
-* Point out the report identifying the `quarkus-rest` dependency as unnecessary (this is the only _direct_ issue we can fix in our code, the others are indirect and could be addressed with more invasive changes)
-* Show the report message: _"A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it."_
-* "The report has identified an unnecessary dependency. The `quarkus-rest` extension is incompatible with other extensions in the project. This kind of dependency bloat increases the attack surface and can cause subtle runtime issues."
+* Point out the report identifying an issue with the `quarkus-rest` dependency (this is the only _direct_ issue we can fix in our code, the others are indirect and could be addressed with more invasive changes)
+* "The report has identified a vulnerability in the `quarkus-rest` dependency. The `quarkus-rest` extension is no longer used by the project so we can simply remove it."
 
 // TODO: Add screenshot of DevSpaces showing Dependency Analytics report with quarkus-rest flagged
 image::devspaces-dependency-analytics-popup.png[DevSpaces IDE showing Dependency Analytics report highlighting the unnecessary quarkus-rest dependency,link=self,window=blank,align="center",width=700,title="Dependency Analytics Red Squigglies indicating an issue"]
@@ -60,7 +61,7 @@ image::devspaces-dependency-analytics-report.png[DevSpaces IDE showing Dependenc
 
 . **Remove the unnecessary dependency** by deleting the `quarkus-rest` entry from `pom.xml`:
 * Show the dependency being removed
-* "One line removed. The dependency tree is cleaner, the attack surface is smaller, and the potential for runtime incompatibilities is eliminated. In the old workflow, this would have surfaced as a confusing build failure or runtime error much later."
+* "The `<dependency>` block is removed. The dependency tree is cleaner, the attack surface is smaller, and the potential for runtime incompatibilities is eliminated. In the old workflow, this would have surfaced as a confusing build failure or runtime error much later."
 
 . Show that the remaining dependencies are clean:
 * Point out dependencies with no issues flagged
@@ -112,7 +113,7 @@ _When the developer pushes code on their feature branch, it triggers the secure 
 
 **Value proposition:**
 
-The secure build pipeline integrates multiple trust and compliance controls into a single automated flow. When code is pushed: Red Hat Advanced Cluster Security (ACS) scans for vulnerabilities and enforces policies; Tekton Chains signs the container image, generates an SBOM, and creates SLSA attestation. Every artifact has a verifiable chain of custody from source to deployment. The developer can observe the entire process from within Developer Hub.
+A secure build pipeline integrates multiple trust and compliance controls into a single automated flow. When code is pushed: Red Hat Advanced Cluster Security (ACS) scans for vulnerabilities and enforces policies; Tekton Chains signs the container image, generates an SBOM, and creates SLSA attestation. Every artifact has a verifiable chain of custody from source to deployment. The developer can observe the entire process from within Developer Hub.
 
 === Show
 
@@ -137,7 +138,6 @@ image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure bu
 
 . Expand the pipeline and Walk through each stage as it appears in the Developer Hub pipeline view:
 * **Clone** -- Source code pulled from the feature branch
-* **Sonarqube SAST** -- Static analysis and security scanning
 * **ACS vulnerability scan and policy check** -- Red Hat Advanced Cluster Security scans the built image
 * Point out: "ACS checks the image against known vulnerability databases and organizational policies."
 * **Build and Push** -- Quarkus application compiled, container image built and pushed to the registry
@@ -152,18 +152,19 @@ image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure bu
 * "The developer can also watch the Argo CD sync right here in Developer Hub. The secure pipeline built and deployed the image to their development namespace, and Argo CD is reconciling the deployment."
 * "This is the secure software supply chain in action. Every artifact is scanned, signed, and attested, and the developer witnesses the entire process from a single pane of glass."
 
-(Optional if you have time, to promote to production, using the same process from section 1):
+TIP: Optional, but if you have time, promote to production using the same process from section 1.
 
-. After verifying the deployment is healthy, switch to **GitLab** at {gitlab_url}[{gitlab_url}^] (log in as `{dev_user}` / `{password}`):
+. After verifying the deployment is healthy, open the to **GitLab** {gitlab_url}[parasol/parasol-insurance repository^] and log in as `{dev_user}` / `{password}`:
 * Navigate to the repository
-* Click **Create merge request** for the feature branch
-* Fill in the merge request details
+* Click **Merge requests** in the side menu, then click *New merge request*
+* Fill in the merge request details, selecting your new feature branch as the source, and `main` as the target
 * "The developer has verified their code works in the development environment. Now they create a merge request for the platform engineer to review."
 
 . Switch to the **platform engineer persona** (log in as `{pe_user}` / `{password}` in GitLab):
 * Review and **approve the merge request**
 * Merge the MR
-* Navigate to **Repository** -> **Tags** and create a **new tag** with tag `1.1`
+* Select **Code** -> **Tags** in the respository's side menu and click **New tag**
+* Create a tag named `1.1`
 * "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release, and issue a new MR to the GitOps repo to update production. The platform engineer controls when code is promoted to production by merging and tagging."
 
 // TODO: Add screenshot of Developer Hub showing Argo CD sync status
@@ -217,7 +218,7 @@ _Applications need secrets -- API keys, database credentials, certificates -- bu
 
 **Value proposition:**
 
-The External Secrets Operator integrates with HashiCorp Vault to provide centralized, audited secrets management. Secrets are stored in Vault and automatically synced to Kubernetes secrets at runtime. Developers reference secrets by name in their manifests without ever seeing the actual values. Secret rotation happens in Vault and propagates automatically.
+The External Secrets Operator integrates with HashiCorp Vault to provide centralized, audited secrets management. Secrets are stored in Vault and automatically synced to Kubernetes secrets that applications can use at runtime. Developers reference secrets by name in their manifests without ever seeing the actual values. Secret rotation happens in Vault and propagates automatically when the ExternalSecrets operator performs its sync interval.
 
 === Show
 
@@ -227,16 +228,26 @@ The External Secrets Operator integrates with HashiCorp Vault to provide central
 
 **What I do:**
 
-. Open **Vault** at {vault_url}[{vault_url}^] and log in with the root token (retrieve it with `oc get secret vault-token -n vault -o jsonpath='\{.data.root_token}' | base64 -d`):
-* Select **Secrets* at the top and then navigate to the kv (key/value) folder then to the `secrets/litellm/credentials` path
+. Visit the {vault_url}[**Vault** UI^] served by a Vault instance running in your cluster. Log in with the Vaukt token.
++
+[TIP]
+====
+Retrieve the Vault token from the {console_url}/k8s/ns/vault/core~v1~Secret[`vault-token` Secret^] or using this command:
+```
+oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
+```
+====
+
++
+* In the Vault UI, select *Secrets* at the top and then navigate to the kv (key/value) folder then to the `secrets/litellm/credentials` path
 * Show the stored values: `base_url` and `api_key`
 * "All secrets are stored centrally in Vault, organized by application and purpose. The developer never sees these values in their code or manifests."
 +
 image::vault-litellm-credentials.png[HashiCorp Vault showing the litellm credentials secret with base_url and api_key,link=self,window=blank,align="center",width=700,title="LLM credentials managed centrally in Vault"]
 
 . Show the **ExternalSecret** resource in the application manifests:
-* In the OpenShift Console, navigate to **Workloads** > **Secrets**, select the application namespace (e.g. `parasol-insurance-prod`) and, and click on the `litellm-credentials` secret, and _Reveal Values_ showing they are the same values.
-* This Secrete was created by the External Secrets Operator based on the `ExternalSecret` created as part of the Argo CD deployment.
+* In the OpenShift Console, navigate to **Workloads** > **Secrets**, select the `parasol-insurance-prod` application namespace and, and click on the `litellm-credentials` secret, and _Reveal Values_ showing they are the same values.
+* This Secret was created by the External Secrets Operator based on the `ExternalSecret` created as part of the Argo CD deployment.
 * Click on the "Owner" link to show the ExternalSecret. 
 +
 [source,yaml]
@@ -297,6 +308,7 @@ A: "Yes. Vault supports fine-grained access control policies. Each team can only
 Q: "Do we have to use Vault specifically?"::
 A: "The External Secrets Operator supports multiple backends: HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, Google Secret Manager, and others."
 
+[#summary]
 == Module 5 summary
 
 === What we demonstrated

@@ -10,34 +10,41 @@
 ** xref:03-module-01-developer-experience.adoc#part-2[Part 2: Standardized development with DevSpaces]
 ** xref:03-module-01-developer-experience.adoc#part-3[Part 3: Adding a feature with Quarkus dev mode]
 ** xref:03-module-01-developer-experience.adoc#part-4[Part 4: Managing DevSpaces environments]
+** xref:03-module-01-developer-experience.adoc#summary[Module 1 summary]
 
 * xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline]
 ** xref:04-module-02-cicd-pipeline.adoc#part-1[Part 1: Triggering the pipeline]
 ** xref:04-module-02-cicd-pipeline.adoc#part-2[Part 2: Pipeline catches code smells]
 ** xref:04-module-02-cicd-pipeline.adoc#part-3[Part 3: GitOps-driven delivery with Argo CD]
+** xref:04-module-02-cicd-pipeline.adoc#summary[Module 2 summary]
 
 * xref:05-module-03-platform-operations.adoc[Module 3: Platform operations]
 ** xref:05-module-03-platform-operations.adoc#part-1[Part 1: Traffic management and security]
 ** xref:05-module-03-platform-operations.adoc#part-2[Part 2: Observability with Kiali]
 ** xref:05-module-03-platform-operations.adoc#part-3[Part 3: Autoscaling]
+** xref:05-module-03-platform-operations.adoc#summary[Section 1 summary]
 
 .Section 2: Advanced application platform
-* xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and catalog]
+* xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and Software Catalog]
 ** xref:06-module-04-developer-hub.adoc#part-1[Part 1: Developer Hub and Developer Lightspeed]
 ** xref:06-module-04-developer-hub.adoc#part-2[Part 2: Exploring the RHDH catalog]
 ** xref:06-module-04-developer-hub.adoc#part-3[Part 3: Self-service and environment provisioning]
+** xref:06-module-04-developer-hub.adoc#summary[Module 4 summary]
 
 * xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow]
 ** xref:07-module-05-secure-development.adoc#part-1[Part 1: DevSpaces and Dependency Analytics]
 ** xref:07-module-05-secure-development.adoc#part-2[Part 2: Secure build pipeline and merge request]
 ** xref:07-module-05-secure-development.adoc#part-3[Part 3: External secrets with Vault]
+** xref:07-module-05-secure-development.adoc#summary[Module 5 summary]
 
 * xref:08-module-06-supply-chain.adoc[Module 6: Trusted software supply chain]
 ** xref:08-module-06-supply-chain.adoc#part-1[Part 1: SBOM management with TPA]
 ** xref:08-module-06-supply-chain.adoc#part-2[Part 2: Application topology and wrap-up]
+** xref:08-module-06-supply-chain.adoc#summary[Section 2 summary]
 
 .Section 3: Intelligent applications
 * xref:09-module-07-ai-applications.adoc[Module 7: AI-enhanced applications]
 ** xref:09-module-07-ai-applications.adoc#part-1[Part 1: The email triage problem]
 ** xref:09-module-07-ai-applications.adoc#part-2[Part 2: Implementing LLM-powered routing]
 ** xref:09-module-07-ai-applications.adoc#part-3[Part 3: Deploying and showcasing the feature]
+** xref:09-module-07-ai-applications.adoc#summary[Section 3 summary]

@@ -294,6 +294,7 @@ A: "The LLM endpoint is configurable through Vault. Switching to a different mod
 Q: "How does the claims administrator verify the AI's decisions?"::
 A: "Every classification includes the LLM's reasoning. The administrator can see why each email was routed to a specific department. If they disagree, they can manually reassign it. Over time, these corrections can inform prompt improvements."
 
+[#summary]
 == Section 3 summary
 
 === What we demonstrated

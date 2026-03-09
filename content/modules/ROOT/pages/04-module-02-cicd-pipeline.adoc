@@ -18,13 +18,6 @@ _The developer from Module 1 has added a new feature and is ready to push their 
 * Security scanning happens late (or not at all), leading to costly remediation
 * Developers rely on manual processes to get code deployed
 
-**Current state at Parasol:**
-
-* Pipeline runs are triggered manually by senior engineers
-* Build processes differ across teams, with no standardization
-* Code changes take 3-5 days to reach a running environment due to manual handoffs
-* No automated security scanning in the build process
-
 **Value proposition:**
 
 Tekton pipelines automate the entire CI process, triggered by a simple git push. Every code change goes through the same standardized quality gates: build, test, scan, and package. This removes human error, enforces standards consistently, and gives developers fast feedback on their changes.
@@ -98,17 +91,10 @@ _The pipeline's SAST/Sonarqube stage fails because the developer's new claims st
 
 **Business challenge:**
 
-* Code smells and lack of test automation accumulate as technical debt, making the codebase harder to maintain over time
-* Improper logging makes production debugging expensive and time-consuming
+* Code smells and lack of automated code quality enforcement accumulates technical debt, making the codebase harder to maintain over time
+* Improper logging (`System.out.println`) makes production debugging expensive and time-consuming
 * Swallowed exceptions hide failures, causing silent data corruption or incorrect behavior
 * Manual code review alone cannot catch all quality issues consistently across teams
-
-**Current state at Parasol:**
-
-* No automated code quality enforcement in the development workflow
-* Developers use `System.out.println` for debugging and leave it in production code
-* Empty catch blocks hide errors that surface as difficult-to-diagnose production issues
-* Code review quality varies by team, with inconsistent enforcement of coding standards
 
 **Value proposition:**
 
@@ -376,6 +362,7 @@ A: "Argo CD supports Kustomize overlays and Helm values files for environment-sp
 Q: "What if someone makes a manual change in the cluster?"::
 A: "Argo CD detects configuration drift and can automatically correct it. If someone manually changes a deployment in the cluster, Argo CD reverts the change to match what is declared in Git. Git is always the source of truth."
 
+[#summary]
 == Module 2 summary
 
 === What we demonstrated

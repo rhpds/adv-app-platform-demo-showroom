@@ -9,6 +9,9 @@
 :gitlab_url: https://gitlab-gitlab.{openshift_cluster_ingress_domain}
 :sonarqube_url: https://sonarqube-sonarqube.{openshift_cluster_ingress_domain}
 
+// TPA URL
+:tpa_url: https://server-trusted-profile-analyzer.{openshift_cluster_ingress_domain}
+
 // Argo CD — two instances
 :argocd_bootstrap_url: https://openshift-gitops-server-openshift-gitops.{openshift_cluster_ingress_domain}
 :argocd_url: https://rhdh-gitops-server-rhdh-gitops.{openshift_cluster_ingress_domain}

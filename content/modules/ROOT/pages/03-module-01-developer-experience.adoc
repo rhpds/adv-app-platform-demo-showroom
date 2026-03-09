@@ -15,6 +15,7 @@ _Before Parasol Insurance could modernize their development practices, they firs
 
 * Legacy Java EE monolith is expensive to maintain and difficult to extend with new features
 * Traditional application server licensing costs are increasing year over year
+* Feature releases take months due to the complexity of the monolithic codebase
 * The monolith cannot take advantage of cloud native capabilities like auto-scaling and containerization
 * New developers need deep knowledge of legacy APIs and patterns before they can contribute
 
@@ -396,6 +397,7 @@ A: "Yes. The DevSpaces operator supports configuring trusted image registries an
 
 '''
 
+[#summary]
 == Module 1 summary
 
 === What we demonstrated

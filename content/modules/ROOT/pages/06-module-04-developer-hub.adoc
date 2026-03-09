@@ -4,7 +4,7 @@ include::partial$_attributes.adoc[]
 
 [NOTE]
 ====
-**Presenter note:** Section 2 picks up after time has passed. Parasol has adopted platform engineering practices and implemented an IDP with Red Hat Developer Hub (based on Backstage). They have also established a more secure software supply chain. The foundational platform from Section 1 is in place -- now the organization is ready to adopt advanced capabilities that improve discoverability, self-service, and software supply chain security.
+**Presenter note:** Section 2 picks up after time has passed. Parasol has adopted platform engineering practices and implemented an internal developer portal (IDP) with Red Hat Developer Hub, a product based on https://backstage.io/[Backstage]. They have also established a more secure software supply chain. The foundational platform from Section 1 is in place -- now the organization is ready to adopt advanced capabilities that improve discoverability, self-service, and software supply chain security.
 ====
 
 [#part-1]
@@ -20,17 +20,11 @@ _Red Hat Developer Hub (RHDH) is the Internal Developer Platform (IDP) for Paras
 * No single source of truth for what components exist, who owns them, and how they relate
 * New developer onboarding takes weeks of knowledge transfer and tribal knowledge sharing
 * Developers lack context about the projects they work on and need to interrupt teammates for answers
-
-**Current state at Parasol:**
-
-* Application documentation is scattered across wikis, READMEs, and tribal knowledge
-* Developers regularly ask teammates for API endpoints, service locations, and dependency information
-* No centralized view of which components provide or consume which APIs
 * Onboarding a new developer to the application landscape takes weeks
 
 **Value proposition:**
 
-Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of Continue, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
+Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of coding assitants and extensions such as Continue with Model Context Protocol, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
 
 === Show
 
@@ -55,11 +49,13 @@ image::rhdh-home-interface.png[Red Hat Developer Hub home screen showing the lef
 +
 [source,text,role="copypaste"]
 ----
-Tell me about the parasol-insurance-api in the catalog, and write a sample snippet of Java code to access it
+Tell me about the parasol-insurance-api API in the catalog, and write a sample snippet of Java code to access it
 ----
 +
 * Show the response as Lightspeed retrieves information from the catalog and documentation
 * "Lightspeed pulled information about the API from the software catalog, combined it with documentation, and generated a working code snippet. A new developer does not need to hunt through wikis or interrupt teammates. They ask Lightspeed and get a contextual answer in seconds."
+
+NOTE: The demo environment relies on a relatively small AI model that might not provide ideal answers for certain prompts. Larger models provide faster and more detailed responses, and make better use of the available Model Context Protocol tools available to inspect the RHDH catalog. 
 
 . Point out how the response combines multiple sources:
 * Catalog metadata (API description, owner, lifecycle)
@@ -98,7 +94,7 @@ A: "Yes. Lightspeed includes MCP servers that can expose context from the catalo
 '''
 
 [#part-2]
-== Part 2 — Exploring the RHDH catalog
+== Part 2 — Exploring the RHDH Software Catalog
 
 === Know
 
@@ -124,19 +120,19 @@ RHDH provides a centralized, searchable catalog of all applications, components,
 **What I do:**
 
 . Navigate to the **Catalog** in the left sidebar:
-* Show the list of registered entities (applications, components, APIs)
-* Point out that the Parasol application appears as a **System** with multiple components underneath it (choose the *System* filter to be able to find it easily)
+* Use the *Kind* dropdown to filter for *System* entities.
+* Select the *parasol-insurance* system.
 * "Everything related to the Parasol application is organized here. A new developer can see the entire landscape in seconds."
 
 . Click on the **parasol-insurance** system to show the system view:
 * Show all components registered under the system
 * Point out the dependency associations associations between components
-* Show the **provided APIs** and **consumed APIs** for each component
 * "The catalog captures how components relate to each other. A developer can trace these relationships without reading architecture documents or asking teammates."
 
-. Click on various components (e.g., the API) to show the component detail view:
+. Click on various entities in the graph (e.g., the API) to show their dedicated detail view:
 * Show the **Overview** tab with ownership, lifecycle, and system information
 * Show the **API** tab with provided and consumed API definitions
+* Show the **provided APIs** and **consumed APIs** for each Component
 * "Notice the documentation. It is rendered directly from the repository, written as code alongside the application. When the code changes, the docs stay current. No more stale wikis."
 +
 image::rhdh-catalog-parasol-system.png[Red Hat Developer Hub catalog showing the Parasol Insurance system with components,link=self,window=blank,align="center",width=700,title="Parasol system in the Developer Hub catalog"]
@@ -160,6 +156,9 @@ image::rhdh-catalog-parasol-api.png[Red Hat Developer Hub catalog showing the Pa
 Q: "Who maintains the catalog data?"::
 A: "The catalog is populated from `catalog-info.yaml` files in each repository. When a team registers their component, the catalog data stays in sync with the code. The platform team manages the overall catalog configuration, but individual teams own their component registrations."
 
+Q: "Can we streamline the creation and import of the catalog-info.yaml files?"::
+A: "Our Bulk Import plugin makes it easy for developers to generate the initial YAML file. Additionally, Developer Lightspeed can generate catalog-info.yaml and relationship information using it's context of the software catalog."
+
 Q: "Can we integrate internal APIs from other teams?"::
 A: "Yes. Any team can register their APIs in the catalog. This creates a self-service API marketplace where developers can discover and consume APIs across the organization without knowing which team owns them."
 
@@ -170,20 +169,15 @@ A: "Yes. Any team can register their APIs in the catalog. This creates a self-se
 
 === Know
 
-_Beyond discovery, RHDH provides self-service capabilities that allow developers to provision development environments from golden path templates. Instead of filing tickets and waiting for operations teams, developers use templates that the platform team has pre-approved. The "Parasol Insurance Secured Development" template creates a feature branch on the source repository and registers a new catalog component representing the developer's branch -- all the developer needs to provide is a branch name._
+_Beyond discovery, RHDH provides self-service capabilities that allow developers to provision development environments, request infrastructure, and more, by using "golden path" templates. Instead of filing tickets and waiting for operations teams, developers use templates that the platform team has pre-approved. The "Parasol Insurance Secured Development" template creates a feature branch on the source repository and registers a new catalog component representing the developer's branch -- all the developer needs to provide is a branch name._
 
 **Business challenge:**
 
-* Provisioning development infrastructure requires tickets and wait times
+* Provisioning development infrastructure requires tickets and wait times spanning days
 * No standardized way to create feature development environments
 * Each team reinvents project structure, CI/CD configuration, and deployment manifests
 * Shadow IT emerges when developers bypass slow provisioning processes
-
-**Current state at Parasol:**
-
-* Creating a new development environment takes 3-5 days of ticket processing
 * Platform team is a bottleneck for all infrastructure provisioning requests
-* No standardized approach to feature branch development with dedicated environments
 
 **Value proposition:**
 
@@ -193,7 +187,7 @@ RHDH templates provide golden path self-service for developers. The "Parasol Ins
 
 **What I say:**
 
-"The catalog solves discovery. Now let me show you self-service. Our developer needs a development environment to work on a new feature for the Parasol application. Traditionally, this means filing tickets and waiting days. Let me show you how that changes."
+"The catalog solves discovery. Now let me show you self-service. Our developer needs a production-like environment to work on and verify a new feature for the Parasol application. Traditionally, this means filing tickets and waiting days. Let me show you how that self-service with an IDP changes that."
 
 **What I do:**
 
@@ -201,17 +195,18 @@ RHDH templates provide golden path self-service for developers. The "Parasol Ins
 
 . Show the available software templates:
 * Point out that these are pre-approved golden path templates maintained by the platform team
-* "Each template includes everything a developer needs to get started. The platform team defined these golden paths, and the developer consumes them."
+* "Each template includes everything a developer needs to get started. The platform team defines these golden paths, and the developer consumes them."
 
 . Select the **Parasol Insurance Secured Development** template
 
 . Walk through the template form:
-* The developer only needs to specify a **branch name** (e.g., `feat1`) (keep the names short, as they will be used for fully qualified network names which have length restrictions))
+* The developer only needs to specify a **branch name** such as `feat1`.
++
+TIP: Keep the branch name short, as it will be used to generate a Route which has length restrictions
 * "That is it. One field. The template handles everything else: creating the branch on the source repository, provisioning the development namespace, configuring the pipeline for the branch, and registering a new component in the catalog."
 
 . Click **Create** and show the provisioning progress:
-* Branch created on the source repository
-* Development namespace provisioned on OpenShift
+* Manifests fetched and templated, then pushed to GitLab
 * CI/CD pipeline configured for the feature branch
 * Component registered in the RHDH catalog
 * "In a few seconds, the developer has a fully provisioned development environment linked to their feature branch."
@@ -223,7 +218,7 @@ RHDH templates provide golden path self-service for developers. The "Parasol Ins
 +
 image::rhdh-template-results.png[Developer Hub template provisioning results showing branch creation and catalog registration with Catalog link,link=self,window=blank,align="center",width=700,title="Development environment provisioned with one click"]
 
-. Click **Open In Catalog**, then click the **DevSpaces link** provided in the template output to open the workspace:
+. Click **Open In Catalog**, then click the **DevSpaces link** generated by the template to open a workspace for the new branch:
 * Show that DevSpaces opens to the correct feature branch automatically (far lower left branch name)
 * "The developer clicked one link and landed in a cloud workspace on their feature branch. Same DevSpaces experience from Section 1, but now provisioned through the IDP's self-service template."
 
@@ -251,6 +246,7 @@ A: "Yes. Templates are the golden path. They include the organization's approved
 Q: "What happens to the environment when the feature is done?"::
 A: "The development environment can be cleaned up through the catalog. The platform team can also configure automatic cleanup policies. The branch and its associated resources are removed when no longer needed."
 
+[#summary]
 == Module 4 summary
 
 === What we demonstrated

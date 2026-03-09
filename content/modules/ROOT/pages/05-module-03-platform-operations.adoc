@@ -18,13 +18,6 @@ _With the Parasol application deployed and running, the platform handles cross-c
 * No consistent security policies across services
 * Compliance requirements demand encryption in transit and access controls
 
-**Current state at Parasol:**
-
-* Service-to-service communication across the Parasol application's services is unencrypted
-* Each development team implements their own retry and timeout logic inconsistently
-* No centralized traffic management or routing policies
-* Compliance audits flag the lack of encryption in transit as a critical finding
-
 **Value proposition:**
 
 Service Mesh provides traffic management, mTLS encryption, and fine-grained access policies as platform capabilities. Developers do not need to implement these in their application code. The platform team configures policies once, and they apply consistently across all services. This separation of concerns reduces developer cognitive load while meeting enterprise security and compliance requirements.
@@ -51,14 +44,14 @@ Service Mesh provides traffic management, mTLS encryption, and fine-grained acce
 * Point out the production namespace with its services
 * "Here is the Parasol application's production namespace. The platform manages communication between all services automatically."
 
-. Click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Create traffic policy**:
-* Show the traffic policy creation form
+. Click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Update Traffic Policies**:
+* Show the traffic policy creation form.
 * "This is where the platform engineer can define traffic routing policies -- canary deployments, traffic splits, rate limiting, circuit breakers -- all without touching application code. The mesh applies these policies at the infrastructure level."
 * "For example, if Parasol wants to roll out a new version to 10% of traffic first, the platform engineer configures it here. No code changes, no redeployments, just a policy change."
 +
 [NOTE]
 ====
-**Presenter tip:** Do not actually create the policy. The goal is to show the capability and explain the business value. Cancel out of the form after showing it.
+**Presenter tip:** Do not actually create/edit the policy. The goal is to show the capability and explain the business value. Cancel out of the form after showing it.
 ====
 
 . Briefly discuss **access policies** (talk track):
@@ -104,13 +97,6 @@ _Platform engineers and developers need visibility into how services interact, w
 * Troubleshooting distributed applications requires manual log correlation
 * Performance bottlenecks are difficult to identify without traffic visualization
 * Mean time to resolution (MTTR) is high due to lack of observability
-
-**Current state at Parasol:**
-
-* Operations team has no centralized view of traffic patterns across Parasol services
-* Incident troubleshooting requires manual log correlation across multiple services
-* Performance bottlenecks are only discovered after customer complaints
-* Average MTTR for cross-service issues is measured in hours, not minutes
 
 **Value proposition:**
 
@@ -186,7 +172,6 @@ Stop and remove the generator when done:
 ----
 oc delete pod load-generator -n {parasol_prod_ns}
 ----
-====
 
 **What they should notice:**
 
@@ -232,13 +217,6 @@ _Production workloads need to handle variable demand. The Parasol application se
 * No automated response to changing demand patterns
 * Different workloads need different scaling strategies (CPU-bound vs. event-driven)
 
-**Current state at Parasol:**
-
-* Application replicas are statically configured. During peak hours, response times degrade.
-* Operations team manually scales deployments when alerted, adding 10-15 minutes of response time
-* Resources are over-provisioned during off-peak hours to avoid incidents, increasing infrastructure costs
-* Event-driven workloads like email processing have no way to scale based on queue depth
-
 **Value proposition:**
 
 OpenShift provides multiple autoscaling strategies out of the box:
@@ -261,7 +239,7 @@ OpenShift provides multiple autoscaling strategies out of the box:
 . Show the existing HPA configuration:
 * Navigate to **Workloads** -> **HorizontalPodAutoscalers** in the `{parasol_prod_ns}` namespace
 * Click on `parasol-insurance-hpa` to show the configuration: min 2, max 5, CPU target 10%
-* "The platform engineer configured this HPA in the GitOps manifests. It is managed as code alongside the deployment, reviewed through merge requests, and deployed through Argo CD. The platform automatically adjusts the number of replicas based on CPU utilization."
+* "The platform engineer configured this HPA in the GitOps manifests. It is managed as code alongside the deployment, reviewed through merge requests, and managed by OpenShift GitOps. The platform automatically adjusts the number of replicas based on CPU utilization."
 
 // TODO: Add screenshot of the HPA details page
 image::ocp-hpa-config.png[OpenShift console showing the HorizontalPodAutoscaler details with min 2 and max 5 pods and 10 percent CPU target,link=self,window=blank,align="center",width=700,title="HorizontalPodAutoscaler configured through GitOps"]
@@ -279,8 +257,8 @@ oc run load-generator --image=quay.io/curl/curl:latest \
 +
 * "This generates continuous traffic to the Parasol application, driving up CPU utilization."
 
-. Watch the **Topology** view as pods scale up:
-* The blue donut show scaling activity as new replicas are added
+. Watch the **Topology** view as pods scale up. It might take a minute for the load generator to start and for the scaling to occur:
+* The blue donut shows scaling activity as new replicas are added
 * Show the HPA status: **Workloads** -> **HorizontalPodAutoscalers** to see current vs. target CPU and replica count
 * "The platform detected the increased CPU utilization and automatically added replicas. No human intervention required. The application continues to serve traffic while scaling."
 
@@ -299,7 +277,7 @@ oc delete pod load-generator -n {parasol_prod_ns}
 
 . **Talk track** about additional scaling capabilities:
 * "What we just showed is horizontal pod autoscaling -- adding more replicas. But OpenShift provides several other autoscaling strategies:"
-* "**Vertical Pod Autoscaler** adjusts CPU and memory for individual pods based on observed usage. Instead of adding more replicas, it right-sizes each pod. This is ideal for workloads that need more resources per instance rather than more instances."
+* "**Vertical Pod Autoscaler** adjusts CPU and memory for individual pods based on observed usage. Instead of adding more replicas, it right-sizes each pod. This is suited for stateful workloads, or workloads that need more resources per instance rather than more instances."
 * "**Cluster Autoscaler and Machine Autoscaler** scale the cluster itself. If pods cannot be scheduled because the cluster is full, the platform automatically provisions new worker nodes. When demand drops, it removes them. The infrastructure grows and shrinks with demand."
 * "**KEDA, the event-driven autoscaler**, scales based on external event sources. For example, Parasol's email processing could scale based on the Kafka topic queue depth. If thousands of emails arrive at once, KEDA spins up more consumers to process them faster, then scales back to zero when the queue is empty."
 
@@ -327,6 +305,7 @@ A: "The Cluster Autoscaler monitors pending pods that cannot be scheduled due to
 Q: "How does KEDA differ from the HPA?"::
 A: "The HPA scales based on pod-level metrics like CPU and memory. KEDA scales based on external event sources: Kafka topic lag, HTTP queue length, database query count, or any custom scaler. KEDA can also scale to zero, which the HPA cannot. This makes KEDA ideal for event-driven and batch workloads."
 
+[#summary]
 == Section 1 summary
 
 === What we demonstrated across Modules 1-3
@@ -337,7 +316,7 @@ A: "The HPA scales based on pod-level metrics like CPU and memory. KEDA scales b
 
 === The continuous story
 
-A new developer joined Parasol, clicked one button to open the app in DevSpaces, explored the running application with its Kafka-powered email processing, added a claims statistics endpoint in seconds with Quarkus dev mode, committed and pushed from the IDE, triggering an automated pipeline that caught code smells. The developer used the platform's AI assistant to fix the issues, pushed again, and the pipeline passed. Argo CD deployed the change through GitOps, all on a platform that handles encryption, traffic management, workload monitoring, and observability automatically. This is what an application platform delivers.
+A new developer joined Parasol, clicked one button to open the app in DevSpaces, explored the running application, added a claims statistics endpoint in seconds with Quarkus dev mode, committed and pushed from the IDE, triggering an automated pipeline that caught code smells. The developer used the platform's AI assistant to fix the issues, pushed again, and the pipeline passed. Argo CD deployed the change through GitOps, all on a platform that handles encryption, traffic management, workload monitoring, and observability automatically. This is what an application platform delivers.
 
 === Key takeaways
 

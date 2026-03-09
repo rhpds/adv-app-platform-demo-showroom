@@ -18,13 +18,6 @@ _Every build in the secure pipeline generates a software bill of materials (SBOM
 * License compliance is difficult to verify without comprehensive dependency data
 * When a new CVE is disclosed, identifying which applications are affected takes days or weeks
 
-**Current state at Parasol:**
-
-* No SBOMs exist for any deployed application
-* When a new vulnerability is announced, manual investigation is required for every application
-* License compliance is tracked in spreadsheets with no automation
-* Audit responses require weeks of manual evidence gathering
-
 **Value proposition:**
 
 TPA provides a single pane of glass for all SBOM data across the organization. When a new CVE is disclosed, TPA immediately identifies which applications, components, and versions are affected. License data from SBOMs enables automated compliance checking. The combination of SBOM generation in the pipeline and TPA management creates a continuous compliance posture that scales with the organization.
@@ -61,10 +54,8 @@ TPA provides a single pane of glass for all SBOM data across the organization. W
 * Show any flagged license issues
 * "License compliance is automated. TPA flags any dependencies with licenses that conflict with the organization's policies."
 
-// TODO: Add screenshot of TPA showing the SBOM inventory
 image::tpa-sbom-inventory.png[Trusted Profile Analyzer showing the SBOM inventory with the Parasol application component and its dependency list,link=self,window=blank,align="center",width=700,title="SBOM inventory in the Trusted Profile Analyzer"]
 
-// TODO: Add screenshot of TPA vulnerability search results
 image::tpa-vulnerability-search.png[Trusted Profile Analyzer showing vulnerability search results identifying affected components and available fixes,link=self,window=blank,align="center",width=700,title="CVE search across all SBOMs"]
 
 **What they should notice:**
@@ -141,6 +132,7 @@ image::ocp-topology-secured-prod.png[OpenShift Topology view showing the Parasol
 
 "At Parasol, understanding the production landscape requires asking people and navigating multiple tools. With the OpenShift topology, the answer is one click away. And every component running here went through the same trusted pipeline with scanning, signing, and attestation."
 
+[#summary]
 == Section 2 summary
 
 === What we demonstrated across Modules 4-6
