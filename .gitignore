@@ -39,3 +39,7 @@ package-lock.json
 
 # Ignore yarn.lock for Yarn
 yarn.lock
+
+# Ignore utilities 
+# (wasn't in the original repo)
+utilities/

@@ -83,7 +83,10 @@ image::devspaces-dependency-analytics-report.png[DevSpaces IDE showing Dependenc
 **If asked:**
 
 Q: "What vulnerability databases does it use?"::
-A: "Dependency Analytics uses Red Hat's vulnerability data, which includes CVE databases, Red Hat security advisories, and known exploit information. It covers both direct and transitive dependencies."
+A: "Dependency Analytics uses Red Hat's vulnerability data, which includes CVE databases (https://github.com/github/advisory-database[GitHub Advisory Database^], https://github.com/CVEProject/cvelistV5[CVE Project Database^] from https://www.cve.org/[cve.org]), Red Hat security advisories, and known exploit information. It covers both direct and transitive dependencies."
+
+Q: "Can it be used in air-gapped / restricted environments?"::
+A: "Dependency Analytics uses a hosted, free public good instance of Red Hat Trusted Profile Analyzer (RHTPA) provided by Red Hat at no cost. Customers can configure their own RHTPA instance as backend for their developers, removing the need for Internet access"
 
 Q: "Does this work for languages other than Java?"::
 A: "Yes. Dependency Analytics supports Java (Maven, Gradle), JavaScript (npm), Python (pip), and Go. The plugin scans the appropriate dependency file for each language."
@@ -113,7 +116,9 @@ _When the developer pushes code on their feature branch, it triggers the secure 
 
 **Value proposition:**
 
-A secure build pipeline integrates multiple trust and compliance controls into a single automated flow. When code is pushed: Red Hat Advanced Cluster Security (ACS) scans for vulnerabilities and enforces policies; Tekton Chains signs the container image, generates an SBOM, and creates SLSA attestation. Every artifact has a verifiable chain of custody from source to deployment. The developer can observe the entire process from within Developer Hub.
+A secure build pipeline integrates multiple trust and compliance controls into a single automated flow. When code is pushed: Red Hat Advanced Cluster Security (ACS) scans for vulnerabilities and enforces policies; Tekton Chains signs the container image, generates an SBOM, and creates SLSA attestation. Every artifact has a verifiable chain of custody from source to deployment. The developer can observe the entire process from within Developer Hub.   
+
+Security teams have access to a complete audit trail, including what went in to generate an artifact, where and how it was built - in a tamper-proof, append-only transparency database.
 
 === Show
 
@@ -129,18 +134,46 @@ A secure build pipeline integrates multiple trust and compliance controls into a
 * Click the dropdown arrow next to **Commit** and select **Commit & Push**
 * "The developer pushes to their feature branch. The secure pipeline starts automatically."
 
-. Switch to **Developer Hub** at {rhdh_url}[{rhdh_url}^] and navigate to the component's **CI/CD** tab:
+. Switch to **Developer Hub** at {rhdh_url}[{rhdh_url}^] and navigate to the component's **CI** tab:
 * Show the pipeline run triggered by the push to the feature branch
 * "The developer sees the pipeline status right here in Developer Hub. No need to switch to the OpenShift console. Developer Hub is the single pane of glass."
 
 // TODO: Add screenshot of Developer Hub showing the secure pipeline running
-image::devhub-secure-pipeline.png[Developer Hub CI/CD view showing the secure build pipeline with ACS scan and Tekton Chains stages,link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
+image::devhub-secure-pipeline.png[Developer Hub CI view showing the secure build pipeline with ACS scan, SBOM generation and Tekton Chains (running in the background),link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
 
 . Expand the pipeline and Walk through each stage as it appears in the Developer Hub pipeline view:
 * **Clone** -- Source code pulled from the feature branch
+* **Build and Push** -- Quarkus application compiled, container image built and pushed to the registry
 * **ACS vulnerability scan and policy check** -- Red Hat Advanced Cluster Security scans the built image
 * Point out: "ACS checks the image against known vulnerability databases and organizational policies."
-* **Build and Push** -- Quarkus application compiled, container image built and pushed to the registry
+* Point out: "Once the pipeline has run, vulnerability scan statistics are shown in the pipeline overview"
++
+image::pipeline-acs-stats.png[Developer Hub CI view showing vulnerability statistics in the overview,link=self,window=blank,width=600,title="Vulnerability statistics in Developer Hub"]
+
+* Point out: "Clicking on the _Output_ icon above the pipeline run gives you access to detailed scan reports as well as ACS policy violations"
+
+image::pipeline-acs-actions.png[link=self,window=blank,width=600]
+image::pipeline-acs-scan-report.png[ACS scan report showing detailed vulnerability data,link=self,window=blank,width=600,title="ACS Vulnerability Scan Report"]
+
+[NOTE]
+====
+The vulnerability data here encompasses vulnerabilities detected in the application code as well as detections in the base image components - effectively showing the overall  vulnerability status of the generated image 
+====
+
+image::pipeline-acs-check-report.png[ACS policy check report showing violated policies,link=self,window=blank,width=600,title="ACS Policy Evaluation Report"]
+
+* **Generate SBOM** 
+** Uses `syft` to generate an SBOM of the image and the quarkus application inside it
+
+* **Upload SBOM to TPA**
+** Uploads the generated SBOM to Red Hat Trusted Profile Analyzer
+
+* Point out: "Clicking on the 'View SBOM' action opens the SBOM that was just uploaded in TPA for detailed analysis capabilities, access to packages and versions used, deep search and license information"
+
+image::pipeline-view-sbom.png[link=self,window=blank,width=600]
+image::pipeline-view-sbom-in-tpa.png[RHTPA detailed SBOM view,link=self,window=blank,width=600,title="RHTPA detailed SBOM view"]
+
+
 * **Tekton Chains** -- Automated post-build trust steps:
 ** Image signing (cryptographic signature applied)
 ** SBOM generation (software bill of materials created)
