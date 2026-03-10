@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. The same developer from Section 2 is tasked with replacing this with LLM-powered classification. They re-open their DevSpaces workspace from the Section 2 feature branch (or create a new one if starting from here), pull in the LLM classification code from a prepared branch, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This is Section 3 (Intelligent Applications). The Parasol application is running with a keyword-based email routing system that sends ambiguous emails to "Review Required" for manual triage. A new developer ({dev2_user}) is tasked with replacing this with LLM-powered classification. They log in to Developer Hub, create a new development environment using the "Parasol Insurance Secured Development" template with branch name `llm-routing`, pull in the LLM classification code from a prepared branch, and push it through the pipeline. The result is intelligent email routing with no more manual review. Target duration: 15 minutes across 3 parts.
 
 [NOTE]
 ====
@@ -81,7 +81,7 @@ A: "Model governance is handled by the data science and platform teams. The appl
 
 === Know
 
-_The same developer from Section 2 is tasked with improving the email routing. They re-open their DevSpaces workspace from the feature branch created in Section 2. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer pulls in the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
+_Another developer (`{dev2_user}`) is tasked with improving the email routing. They log in to Developer Hub and use the "Parasol Insurance Secured Development" template to create a new development environment with branch name `llm-routing`. The pre-approved Kafka broker and LLM configuration is already available as environment variables (configured by the platform engineer through external secrets, as shown in Module 5). The developer pulls in the LLM classification code from a prepared branch, reviews the changes, and pushes through the pipeline._
 
 [NOTE]
 ====
@@ -105,13 +105,22 @@ The platform engineer has already configured the LLM endpoint and Kafka credenti
 
 **What I say:**
 
-"The same developer from Section 2 has been tasked with replacing the keyword matching with LLM-powered classification. Let me show you how they do this using the same platform patterns we have been demonstrating."
+"Another developer has been tasked with replacing the keyword matching with LLM-powered classification. Let me show you how they do this using the same platform patterns we have been demonstrating."
 
 **What I do:**
 
-. Re-open the **DevSpaces** workspace from the feature branch created in Section 2:
-* Use the DevSpaces link from the Developer Hub catalog component created in Module 4
-* Show the workspace loading on the correct feature branch
+. Open a **different browser** (e.g., Firefox or Safari if you have been using Chrome) and navigate to **Developer Hub** at {rhdh_url}[{rhdh_url}^]. Log in as `{dev2_user}` / `{password}`.
++
+TIP: Using a separate browser avoids session conflicts with the `{dev_user}` session from earlier modules.
+
+. Click the **+** (plus) button at the top of the page to access software templates, then select **Parasol Insurance Secured Development**.
+
+. Fill in the branch name as `llm-routing` and click **Create**:
+* Wait for the provisioning to complete
+* "This is the same self-service workflow from Module 4. A new developer, a new branch, a fully provisioned environment in seconds."
+
+. Click **Open In Catalog**, then click the **DevSpaces link** to open a workspace for the `llm-routing` branch:
+* Show the workspace loading on the correct branch
 
 . Open a new **Terminal** in DevSpaces and pull in the LLM classification code from the prepared branch:
 +
@@ -159,7 +168,7 @@ image::devspaces-application-properties.png[DevSpaces IDE showing application.pr
 +
 [NOTE]
 ====
-**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab when prompted and navigate to the Inbox to see emails being classified by the LLM in real time.
+**Presenter tip:** If time permits, the demoer can start Quarkus dev mode to show the LLM classification working locally before pushing. Use kbd:[CTRL+SHIFT+P] (or kbd:[CMD+SHIFT+P] on Mac) -> Tasks: Run Task -> devfile -> Start Development Mode. Open the app in a new tab when prompted and navigate to the Inbox to see emails being classified by the LLM in real time - it can take up to 30 seconds for a new email to appear in the list.
 ====
 
 . Push the code (same as previous sections):
@@ -177,7 +186,7 @@ image::scm-commit.png[SCM Commit pricess,link=self,window=blank,align="center",w
 
 **What they should notice:**
 
-* The developer re-opened their existing DevSpaces workspace from the Section 2 feature branch
+* A new developer provisioned a development environment through Developer Hub self-service in seconds
 * The LLM endpoint and Kafka credentials were pre-configured by the platform engineer as environment variables
 * The prepared LLM code was pulled in cleanly -- one new file and one modified file
 * The implementation uses a clean AI service interface with a system prompt that describes the business rules
@@ -186,7 +195,7 @@ image::scm-commit.png[SCM Commit pricess,link=self,window=blank,align="center",w
 
 **Business value callout:**
 
-"What you just saw is AI integration following the exact same development workflow. The developer did not provision any new infrastructure, configure API keys, or use any special tools. The platform engineer pre-configured the LLM endpoint through external secrets (which we saw in Module 5), and the developer implemented the feature using a standard Quarkus extension. One new file, one modified file, and a git push. That is how the platform makes AI a standard part of development."
+"What you just saw is AI integration following the exact same development workflow. A new developer logged in, provisioned a development environment through self-service, and was productive in minutes. They did not need to configure API keys or use any special tools. The platform engineer pre-configured the LLM endpoint through external secrets (which we saw in Module 5), and the developer implemented the feature using a standard Quarkus extension. One new file, one modified file, and a git push. That is how the platform makes AI a standard part of development."
 
 **If asked:**
 
@@ -273,12 +282,12 @@ The developer's sandbox pipeline (in their namespace) is separate — it only bu
 * The "Review Required" bucket is completely eliminated -- every email is classified
 * The LLM provides rich, contextual reasons for each classification, not just a keyword match
 * Ambiguous emails that previously required manual triage are now handled automatically
-* The same platform patterns (DevSpaces, pipelines, GitOps) applied to the AI feature
-* The developer pulled in prepared code, reviewed it, and pushed -- no special AI tooling required
+* The same platform patterns (Developer Hub, DevSpaces, pipelines, GitOps) applied to the AI feature
+* A new developer was productive in minutes using self-service provisioning -- no special AI tooling required
 
 **Business value callout:**
 
-"Let me recap what just happened. A developer received a task to add AI-powered email routing. They re-opened their existing DevSpaces workspace, pulled in the LLM integration code from a prepared branch, reviewed it, and pushed it through the secure pipeline. The platform handled everything else: the LLM credentials came from Vault, the pipeline scanned and signed the image, and Argo CD deployed it. The result? The 'Review Required' bucket is gone. Every email gets an intelligent classification with a clear explanation. Manual triage costs just dropped to near zero. And it went through the exact same security and compliance controls as every other component."
+"Let me recap what just happened. A new developer received a task to add AI-powered email routing. They logged into Developer Hub, provisioned a development environment through self-service, pulled in the LLM integration code from a prepared branch, reviewed it, and pushed it through the secure pipeline. The platform handled everything else: the LLM credentials came from Vault, the pipeline scanned and signed the image, and Argo CD deployed it. The result? The 'Review Required' bucket is gone. Every email gets an intelligent classification with a clear explanation. Manual triage costs just dropped to near zero. And it went through the exact same security and compliance controls as every other component."
 
 **If asked:**
 
@@ -301,7 +310,7 @@ A: "Every classification includes the LLM's reasoning. The administrator can see
 
 In this module, you saw how the application platform extends naturally to AI-enhanced workloads:
 
-. **AI as a standard feature** -- The developer used the same DevSpaces environment, pipeline, and GitOps delivery to add LLM-powered email classification. No special tools or processes required.
+. **AI as a standard feature** -- A new developer provisioned an environment through self-service, used DevSpaces, the pipeline, and GitOps delivery to add LLM-powered email classification. No special tools or processes required.
 . **Pre-configured AI services** -- The platform engineer pre-configured the LLM endpoint and credentials through external secrets. The developer consumed them as environment variables, just like any other service dependency.
 . **Immediate business value** -- The "Review Required" email bucket was eliminated entirely. Every email now gets intelligent classification with rich contextual reasoning.
 . **Trusted delivery** -- The AI-enhanced code went through the same secure pipeline with scanning, signing, and attestation. AI is not a special case.

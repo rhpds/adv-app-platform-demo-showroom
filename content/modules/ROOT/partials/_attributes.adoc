@@ -28,6 +28,7 @@
 
 // Demo personas — use {password} (common_password) for both
 :dev_user: dev1
+:dev2_user: dev2
 :pe_user: pe1
 :password: {common_password}
 
