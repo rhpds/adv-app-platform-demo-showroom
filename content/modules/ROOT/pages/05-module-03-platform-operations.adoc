@@ -151,6 +151,16 @@ image::ossm-console-traffic.png[OpenShift Service Mesh traffic,link=self,window=
 * Show how the graph adapts to show different perspectives
 * "Platform engineers can view traffic by application, by workload, or by version. During a canary deployment, for example, you can see traffic split between the old and new versions in real time."
 
+. (Optional) Demonstrate **fault injection** to show how the mesh helps test application resilience:
+* In the traffic graph, click on the **parasol-insurance** service node (the triangle icon)
+* Click the **three-dot menu** on the right side panel and select **Fault Injection**
+* Select **Add HTTP Abort** and set the **Abort Percentage** to `5`
+* Click **Save**
+* "The platform engineer just injected a 5% failure rate into the Parasol service -- without touching any application code. This is useful for testing how applications behave when facing network failures. You can also inject latency, timeouts, and other fault conditions to simulate real-world degradation."
+* Watch the traffic graph animation -- error percentages start rising and the service node turns **yellow**, signaling to the platform engineer that something needs investigation
+* "Notice the service turned yellow and the error rate is climbing. In a real scenario, this is exactly what the platform engineer would see if a downstream service started failing. The mesh gives immediate, visual feedback -- no need to dig through logs."
+* After demonstrating, remove the fault injection by clicking the three-dot menu again, selecting **Delete**, and confirming
+
 . Show **workload observability** using the OpenShift built-in monitoring:
 * Navigate to **Observe** -> **Metrics** in the OpenShift web console
 * Show CPU and memory utilization metrics for the Parasol workloads
