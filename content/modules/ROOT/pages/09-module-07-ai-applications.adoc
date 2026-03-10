@@ -129,7 +129,8 @@ TIP: Using a separate browser avoids session conflicts with the `{dev_user}` ses
 cd $PROJECT_SOURCE && \
 git rm -rf . && \
 git clean -df && \
-git checkout origin/llm-classification -- .
+git checkout origin/llm-classification -- . && \
+git checkout devfile.yaml
 ----
 +
 * "The LLM classification implementation has been prepared on a separate branch. We pull the code into our feature branch with a single command. This overlays the AI-enhanced version of the application onto our working branch without changing branches."
