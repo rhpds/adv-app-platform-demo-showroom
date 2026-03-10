@@ -324,7 +324,7 @@ oc get secret rhdh-gitops-cluster -n rhdh-gitops -o jsonpath='{.data.admin\.pass
 * Verify the endpoint is working in the deployed application
 * "The claims statistics API that our developer added is now live _in the dev environment_. It has been built, scanned for quality, and deployed, all automatically. The developer pushed code and the platform handled everything else."
 +
-image::parasol-claims-stats-live.png[Parasol Insurance application showing the claims app live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims app deployed and live in the Parasol dev environment"]
+image::parasol-claim-stats-live.png[Parasol Insurance application showing the claims app live in the deployed application after pipeline and GitOps delivery,link=self,window=blank,align="center",width=700,title="Claims app deployed and live in the Parasol dev environment"]
 
 . Promote to Production (optional, if time allows):
 * As a platform engineer, you can trigger a promotion to production by creating a new tag in the source repository, and then approving the merge request (MR) to update the production GitOps repository to use the new tag. This separates responsibilities between developers and platform operators, while still keeping the process automated and auditable.
