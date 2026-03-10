@@ -140,19 +140,38 @@ image::devspaces-continue-panel.png[DevSpaces IDE with the Continue AI assistant
 . Open the **Continue** AI assistant panel on the left sidebar:
 * "This is where the platform's AI developer capabilities come in. The Continue extension has been pre-configured in the devfile by the platform engineer to use the IT-approved model -- in this case, a model hosted on the Red Hat demo platform through OpenShift AI. The developer does not need to configure API keys, choose a model, or worry about data governance. The platform engineer set it up as part of the golden path."
 
-. In the Continue chat, enter a prompt like:
+. In the Continue chat, enter a prompt:
 +
 [source,text,role="copypaste"]
 ----
-This code in @ClaimsStatsResource.java has code smells according to sonarqube - something about system.out.println, field injection vs. constructor, and empty try/catch. please fix all of them!
+The existing src/main/java/com/parasol/ClaimsStatsResource.java has
+code smells according to sonarqube - can you fix them? the
+system.out.println, field injection, and empty catch block. don't
+throw any new exceptions, just log it.
 ----
++
+[NOTE]
+====
+Occasionally the "reasoning" content from the model leaks into the editor (this is a known issue), causing all sorts of chaos. if this happens, reject any changes, and open a new chat (with the `+` button) and try an alternative prompt:
+
+[source,text,role="copypaste"]
+----
+The existing src/main/java/com/parasol/ClaimsStatsResource.java has
+code smells according to sonarqube - can you fix them? the
+system.out.println, field injection, and empty catch block. don't
+throw any new exceptions, just log it.  Please generate a fixed
+version (do not try to edit it in place).
+----
+
+The assistant should give you the code in the response, that you can copy/paste on top of the existing code.
+====
 +
 * Watch as the LLM analyzes the code and generates fixes
 * The AI identifies both issues: `System.out.println` should use proper logging, and the empty catch block should be removed
 * Review the diff that Continue presents -- it shows exactly what changed
-* Accept the changes in the chat by clicking the green checkmark to _Accept All_
+* Accept the changes in the chat by clicking the green checkmark to _Accept All_ (or delete the old code and insert the new code from the assistant).
 * "The AI understood the Sonarqube findings and fixed the code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
-
++
 image::devspaces-continue-diff.png[Continue AI assistant showing a diff view with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
 
 . Verify the corrected code looks like this (for reference, or in case the LLM responds differently):
