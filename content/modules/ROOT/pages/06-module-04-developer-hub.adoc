@@ -24,7 +24,7 @@ _Red Hat Developer Hub (RHDH) is the Internal Developer Platform (IDP) for Paras
 
 **Value proposition:**
 
-Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of coding assitants and extensions such as Continue with Model Context Protocol, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
+Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of coding assistants and extensions such as Continue with Model Context Protocol, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
 
 === Show
 
