@@ -23,6 +23,27 @@ Other services (SonarQube, Argo CD, Vault) require their own admin credentials �
 
 In some places, it's easiest to use `oc` to fetch dynamic data like passwords or URLs. You can run `oc` commands via the OpenShift console's built-in terminal. To open the console terminal, click the "_>" icon in the top right of the console header. This opens a terminal pane with a command prompt that has `oc` already configured and logged in as your user.
 
+== Environment namespaces
+
+Throughout the modules you'll work on applications belonging to a fictious company named Parasol. The following lists explain each application namespace and why it exists. Notice that we use new namespaces in each module to avoid conflicts and start from a clean slate, or to separate personal developer environments from shared environments.
+
+=== Section 1: Foundational application platform
+
+* **`parasol-insurance-dev`** — Development environment for the Parasol application. Receives deployments from the CI/CD pipeline on every code push.
+* **`parasol-insurance-prod`** — Production environment. Deployments are controlled through GitOps (Argo CD) with manual approval gates via GitLab merge requests.
+* **`parasol-insurance-build`** — Contains Tekton pipeline definitions, EventListeners, and build tasks. Pipeline runs execute here, not in the dev/prod namespaces.
+
+=== Section 2: Secured supply chain
+
+* **`parasol-insurance-secured-dev`** — Development environment with the full secure supply chain — ACS vulnerability scanning, image signing (TAS), SBOM generation, and SLSA attestation via Tekton Chains.
+* **`parasol-insurance-secured-prod`** — Secured production environment. Promotion requires two manual gates: a code merge request approval + tag creation, and a GitOps merge request approval.
+* **`parasol-insurance-secured-build`** — Secured build pipeline namespace. Contains the main EventListener and pipelines for both feature branch builds and production tag promotions.
+
+=== Per-user namespaces
+
+* **`<username>-devspaces`** — Auto-provisioned by DevSpaces for each developer's cloud IDE workspaces and associated PVCs.
+* **`parasol-insurance-secured-<username>`** — Created via the Developer Hub "Parasol Insurance Secured Development" golden path template. Each developer gets an isolated namespace with its own pipeline and Argo CD application for their feature branch.
+
 == Environment components
 
 === Section 1: Foundational application platform
