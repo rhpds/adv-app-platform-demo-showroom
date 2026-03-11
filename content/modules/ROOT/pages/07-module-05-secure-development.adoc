@@ -157,7 +157,7 @@ image::pipeline-acs-scan-report.png[ACS scan report showing detailed vulnerabili
 
 [NOTE]
 ====
-The vulnerability data here encompasses vulnerabilities detected in the application code as well as detections in the base image components - effectively showing the overall  vulnerability status of the generated image 
+The vulnerability data here encompasses vulnerabilities detected in the **application code** as well as detections in the **base image components** - effectively showing the **overall vulnerability status** of the generated image 
 ====
 
 image::pipeline-acs-check-report.png[ACS policy check report showing violated policies,link=self,window=blank,width=600,title="ACS Policy Evaluation Report"]
@@ -168,7 +168,7 @@ image::pipeline-acs-check-report.png[ACS policy check report showing violated po
 * **Upload SBOM to TPA**
 ** Uploads the generated SBOM to Red Hat Trusted Profile Analyzer
 
-* Point out: "Clicking on the 'View SBOM' action opens the SBOM that was just uploaded in TPA for detailed analysis capabilities, access to packages and versions used, deep search and license information"
+** Point out: "Clicking on the 'View SBOM' action opens the SBOM that was just uploaded in TPA for detailed analysis capabilities, access to packages and versions used, deep search and license information"
 
 image::pipeline-view-sbom.png[link=self,window=blank,width=600]
 image::pipeline-view-sbom-in-tpa.png[RHTPA detailed SBOM view,link=self,window=blank,width=600,title="RHTPA detailed SBOM view"]
@@ -176,19 +176,26 @@ image::pipeline-view-sbom-in-tpa.png[RHTPA detailed SBOM view,link=self,window=b
 
 * **Tekton Chains** -- Automated post-build trust steps:
 ** Image signing (cryptographic signature applied)
-** SBOM generation (software bill of materials created)
 ** SLSA attestation (provenance record created)
-* "Tekton Chains runs automatically after the image is built. It signs the image, generates an SBOM, and creates a SLSA attestation. None of this requires developer action."
+** "Tekton Chains runs automatically in the background as a Kubernetes Controller, watching the pipeline tasks and pipeline run. It signs the image, records pipeline and task states, inputs and outputs, creates and signs a SLSA attestation. None of this requires developer action."
 
-. Show the **Argo CD** tab in Developer Hub:
+* Point out: "As an example, Red Hat Quay recognizes the signature and shows the signed and attached attestation. Clicking on the inspected image link in the RHTAS report opens the registry, where I can see the image has automatically been signed and attested"
+
+image::pipeline-acs-quay-link.png[link=self,window=blank,width=600]
+image::pipeline-quay-signature.png[Red Hat Quay showing the image signature and attestation,link=self,window=blank,width=600,title="Red Hat Quay showing the image signature and attestation"]
+
+
+. Show the **CD** tab in Developer Hub (powered by ArgoCD / OpenShift GitOps):
 * Show the development namespace syncing with the new image
 * "The developer can also watch the Argo CD sync right here in Developer Hub. The secure pipeline built and deployed the image to their development namespace, and Argo CD is reconciling the deployment."
+
+image::rhdh-dev-cd.png[CD Tab shows the healthy status of the deployment in the developer's namespace,link=self,window=blank,width=600,title="CD Tab shows the healthy status of the deployment in the developer's namespace"]
+
 * "This is the secure software supply chain in action. Every artifact is scanned, signed, and attested, and the developer witnesses the entire process from a single pane of glass."
 
-TIP: Optional, but if you have time, promote to production using the same process from section 1.
+TIP: Optional, but if you have time, promote to production using the same process from section 1 as follows:
 
-. After verifying the deployment is healthy, open the to **GitLab** {gitlab_url}[parasol/parasol-insurance repository^] and log in as `{dev_user}` / `{password}`:
-* Navigate to the repository
+. After verifying the deployment is healthy, open the **GitLab** {gitlab_url}/parasol/parasol-insurance[parasol/parasol-insurance repository^] and log in as `{dev_user}` / `{password}`:
 * Click **Merge requests** in the side menu, then click *New merge request*
 * Fill in the merge request details, selecting your new feature branch as the source, and `main` as the target
 * "The developer has verified their code works in the development environment. Now they create a merge request for the platform engineer to review."
@@ -198,10 +205,23 @@ TIP: Optional, but if you have time, promote to production using the same proces
 * Merge the MR
 * Select **Code** -> **Tags** in the repository's side menu and click **New tag**
 * Create a tag named `1.1`
-* "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release, and issue a new MR to the GitOps repo to update production. The platform engineer controls when code is promoted to production by merging and tagging."
+** "The platform engineer reviews the code, approves the merge request, and creates a release tag. This triggers the production pipeline to build and deploy the tagged release, and issue a new MR to the GitOps repo to update production. The platform engineer controls when code is promoted to production by merging and tagging."
 
-// TODO: Add screenshot of Developer Hub showing Argo CD sync status
-image::devhub-argocd-sync.png[Developer Hub showing Argo CD sync status for the development namespace,link=self,window=blank,align="center",width=700,title="Argo CD sync status viewed in Developer Hub"]
+* In **Developer Hub**, 
+** navigate to the Catalog
+** then open the "parasol-insurance-secured" component
+** go the the "CI" tab ({rhdh_url}/catalog/default/component/parasol-insurance-secured/ci[direct link^])
+
+* "The code tag triggered the secure **tag promotion** pipeline, which builds a new image from the previously merged, now tagged source. This includes all the security guardrails we have seen before (vulnerability scanning & evaluation of security policies, creation of an SBOM, Tekton Chains image signing and attesting the pipeline run).  
+* The promotion pipeline triggers a validation pipeline that verifies image signatures and completeness of SLSA attestations - we only want to promote images that have been signed and where we can validate release policies using https://conforma.dev[**Conforma**^] "
+
+image::pipeline-conforma-validate.png[Developer Hub showing tag promote and validation pipeline,link=self,window=blank,width=600,title="The promotion and the validation pipeline"]
+
+* "Clicking on the 'View Output' action shows the full **Conforma** (formerly known as "_Enterprise Contract_ ") report and which rules have been evaluated against the image and its attestations"
+
+image::pipeline-conforma-report.png[The conforma report showing policy evaluation results,link=self,window=blank,width=600,title="The conforma report showing policy evaluation results"]
+
+
 
 **What they should notice:**
 
@@ -210,6 +230,7 @@ image::devhub-argocd-sync.png[Developer Hub showing Argo CD sync status for the 
 * The pipeline includes security scanning (ACS), image signing, SBOM generation, and SLSA attestation
 * The developer created a merge request only after verifying the deployment works
 * The platform engineer reviewed, approved, and created a release tag for production
+* The release tag pipeline also validated image signatures and SLSA compliance
 
 **Business value callout:**
 
@@ -218,7 +239,10 @@ image::devhub-argocd-sync.png[Developer Hub showing Argo CD sync status for the 
 **If asked:**
 
 Q: "What is SLSA attestation?"::
-A: "SLSA (Supply-chain Levels for Software Artifacts) is a framework for ensuring software supply chain integrity. The attestation proves how the artifact was built: which source code, which build system, which steps."
+A: "SLSA (Supply-chain Levels for Software Artifacts) is a framework for ensuring software supply chain integrity. The attestation proves how the artifact was built: which source code, which build system, which steps, which sources, which parameters."
+
+Q: "Which SLSA policies are enforced?"::
+A: "Red Hat provides a large set of policies and rules to validate image attributes and attestation content. These can be used as-is or can be tailored based on requirements. Custum rules and policies can easily be defined, for example to verify if a specific task with specific inputs and outputs has been run during the artifact production. (e.g. was the release tag created by an allowed person, does the release pipeline include a scan task and what results did it generate, etc.)"
 
 Q: "Can we customize which policies ACS enforces?"::
 A: "Yes. ACS policies are fully configurable by the platform team. They can set thresholds for vulnerability severity, block specific CVEs, enforce base image requirements, and more."
