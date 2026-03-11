@@ -32,31 +32,78 @@ TPA provides a single pane of glass for all SBOM data across the organization. W
 
 . Open **TPA** at {tpa_url}[{tpa_url}^]
 
+. Show the **Dashboard**:
+* "For a quick overview of what's currently happening across the software portfolio we have a dashboard showing the latest ingested SBOMs and advisories. You can jump to any of the SBOMs here directly - or check the latest ingested Advisory and check if any of your SBOMs are affected by it"
+
+image::tpa-dashboard.png[The RHTPA dashboard,link=self,window=blank,width=600,title="The RHTPA dashboard with overview and quick links"]
+
 . Show the **SBOM inventory**:
 * Navigate to the list of SBOMs
-* Point out the SBOM for the Parasol component that was just built
+* Point out an SBOM for the Parasol component that was just built
 * "Every image built by the pipeline has an SBOM registered here automatically. No manual step required."
+* "We can organize the SBOMs by labels - these labels were created by the pipeline automatically, so let's look at 'preprod' SBOMs"
+* Click on the the "stage=preprod" label
+
+image::tpa-sboms-labels.png[The SBOM View,link=self,window=blank,width=600,title="The SBOM view, allowing for searching, filtering or selection by labels"]
+
+image::tpa-sboms-labels-filtered.png[The SBOM View showing filtered by label,link=self,window=blank,width=600,title="The SBOM view, filtered by label"]
+
 
 . Click on the Parasol component SBOM to show the contents:
 * Walk through the SBOM data:
-** **Dependencies**: List of all direct and transitive dependencies with versions
-** **Licenses**: License information for each dependency
-** **Vulnerabilities**: Known CVEs associated with the included dependencies
+** **Packages**: List of all components with versions and license (if license data is available)
+** **Vulnerabilities**: Known CVEs associated with the included components
+
+** Clicking on a specific CVE gives us all SBOMs ("Related SBOMs") affected by this CVE
+
+
+image::tpa-sboms-cve.png[link=self,window=blank,width=600]
+image::tpa-sboms-cve-specific.png[link=self,window=blank,width=600,title="Affected SBOMs by a specific CVE"]
+
+** Clicking on the "affected dependency" shows us which dependency was mentioned in this CVE and which version is affected
+
+image::tpa-sboms-cve-dependency.png[link=self,window=blank,width=600,title="Drilling down to the affected dependency"]
+
+** Clicking on that affected dependency then shows us all CVEs where this vulnerable package was mentioned
+
+image::tpa-sboms-cve-dependency-vuln.png[link=self,window=blank,width=600,title="CVEs mentioning this dependency"]
+
+** Clicking on "SBOMs using package" shows us all SBOMs that are using this affected dependency
+
+image::tpa-sboms-cve-dependency-vuln-sbom.png[link=self,window=blank,width=600,title="SBOMs using this dependency"]
+
+
+
 * "This is a complete inventory of everything inside the container image. Every library, every version, every license. This is what compliance teams need for audit."
 
+* "Security teams and architects can verify what problems are affecting a component and how widespread that problem is in the software portfolio"
+
+
+
 . Demonstrate **vulnerability search**:
-* Search for a specific CVE (or show the vulnerability list for the SBOM)
+* Search for a specific CVE (or text)
 * Show which components are affected by the CVE, which version introduced it, and whether a fix is available
+
+image::tpa-vulnerabilities-view.png[link=self,window=blank,width=600,title="Listing CVEs by search term and affected SBOMs"]
+
+
 * "When a new CVE is announced, the security team does not need to check every application manually. They search TPA and immediately see which images are affected."
 
 . Show **license compliance** data:
-* Point out the license summary for the SBOM
-* Show any flagged license issues
-* "License compliance is automated. TPA flags any dependencies with licenses that conflict with the organization's policies."
+* Select an SBOM
+* Highlight the license data available in packages
 
-image::tpa-sbom-inventory.png[Trusted Profile Analyzer showing the SBOM inventory with the Parasol application component and its dependency list,link=self,window=blank,align="center",width=700,title="SBOM inventory in the Trusted Profile Analyzer"]
+** "You have a view of which licenses are present in an SBOM and you can download an SBOM-scoped license report for further analysis"
 
-image::tpa-vulnerability-search.png[Trusted Profile Analyzer showing vulnerability search results identifying affected components and available fixes,link=self,window=blank,align="center",width=700,title="CVE search across all SBOMs"]
+image::tpa-sbom-licenses.png[link=self,window=blank,width=600,title="SBOM Packages with license information"]
+
+. Show the **Search View**:
+* Select the license drop-down and enter e.g. "lgpl", select one or more licenses
+* SBOMs are filtered by licenses contained
+
+image::tpa-sbom-search-by-license.png[link=self,window=blank,width=600,title="SBOMs filtered by license information"]
+
+
 
 **What they should notice:**
 
@@ -74,6 +121,9 @@ image::tpa-vulnerability-search.png[Trusted Profile Analyzer showing vulnerabili
 
 Q: "How often are SBOMs updated?"::
 A: "A new SBOM is generated for every pipeline run. Every time an image is built, the SBOM reflects the current state of dependencies."
+
+Q: "How often are CVEs updated?"::
+A: "Vulnerability data isn't static - new problems are identified daily. RHTPA ingests the CVE and Advisory data by default every 4 hours, but that can be configured. New data is applied to all existing SBOMs in the database - it's not just a point-in-time scan"
 
 Q: "Can we export SBOM data for auditors?"::
 A: "Yes. TPA supports standard SBOM formats (SPDX, CycloneDX). SBOMs can be exported for external auditors, regulatory submissions, or integration with other compliance tools."
