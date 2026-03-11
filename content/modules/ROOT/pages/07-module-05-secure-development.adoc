@@ -242,7 +242,7 @@ Q: "What is SLSA attestation?"::
 A: "SLSA (Supply-chain Levels for Software Artifacts) is a framework for ensuring software supply chain integrity. The attestation proves how the artifact was built: which source code, which build system, which steps, which sources, which parameters."
 
 Q: "Which SLSA policies are enforced?"::
-A: "Red Hat provides a large set of policies and rules to validate image attributes and attestation content. These can be used as-is or can be tailored based on requirements. Custum rules and policies can easily be defined, for example to verify if a specific task with specific inputs and outputs has been run during the artifact production. (e.g. was the release tag created by an allowed person, does the release pipeline include a scan task and what results did it generate, etc.)"
+A: "Red Hat provides a large set of policies and rules to validate image attributes and attestation content. These can be used as-is or can be tailored based on requirements. Custom rules and policies can easily be defined, for example to verify if a specific task with specific inputs and outputs has been run during the artifact production. (e.g. was the release tag created by an allowed person, does the release pipeline include a scan task and what results did it generate, etc.)"
 
 Q: "Can we customize which policies ACS enforces?"::
 A: "Yes. ACS policies are fully configurable by the platform team. They can set thresholds for vulnerability severity, block specific CVEs, enforce base image requirements, and more."

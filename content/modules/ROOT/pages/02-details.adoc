@@ -25,7 +25,7 @@ In some places, it's easiest to use `oc` to fetch dynamic data like passwords or
 
 == Environment namespaces
 
-Throughout the modules you'll work on applications belonging to a fictious company named Parasol. The following lists explain each application namespace and why it exists. Notice that we use new namespaces in each module to avoid conflicts and start from a clean slate, or to separate personal developer environments from shared environments.
+Throughout the modules you'll work on applications belonging to a fictitious company named Parasol. The following lists explain each application namespace and why it exists. Notice that we use new namespaces in each module to avoid conflicts and start from a clean slate, or to separate personal developer environments from shared environments.
 
 === Section 1: Foundational application platform
 
