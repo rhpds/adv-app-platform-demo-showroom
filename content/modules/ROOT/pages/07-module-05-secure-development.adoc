@@ -184,6 +184,28 @@ image::pipeline-view-sbom-in-tpa.png[RHTPA detailed SBOM view,link=self,window=b
 image::pipeline-acs-quay-link.png[link=self,window=blank,width=600]
 image::pipeline-quay-signature.png[Red Hat Quay showing the image signature and attestation,link=self,window=blank,width=600,title="Red Hat Quay showing the image signature and attestation"]
 
+.**Optional: Show Attestation Highlights - Click to expand**
+[%collapsible]
+====
+To show what data is actually being recorded by Tekton Chains (and verified by Conforma in the **tag-promotion** pipeline, see below), we have provided a short script in the OpenShift Web Terminal:
+
+1.) Open the {console_url}/terminal[Openshift Web Terminal^] and make sure you're logged in as `admin` / `{admin_password}` (use the "htpasswd" login option)
+
+2.) Start the Web Terminal (accept the defaults, if asked for a namespace)
+
+3.) run `verify-image` and select an image that has an attestation, e.g. `parasol-insurance-secured`
+
+image::attestation-overview.png[link=self,window=blank,width=600,title="Some of the data that has been recorded, signed and attested by Tekton Chains"]
+
+4.) It will list some highlights of what was being recorded (such as tasks and their parameters)
+
+5.) If you run `verify-image --verbose` you'll get the full recorded attestations in JSON format
+
+**End of optional section**
+====
+
+
+
 
 . Show the **CD** tab in Developer Hub (powered by ArgoCD / OpenShift GitOps):
 * Show the development namespace syncing with the new image
