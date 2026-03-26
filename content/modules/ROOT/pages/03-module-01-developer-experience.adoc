@@ -240,7 +240,7 @@ If you miss the popup notification, you can also open the application from the *
 * Walk through the running application briefly
 * "This is the Parasol Insurance platform. It is used by Parasol's agents to manage insurance claims and communicate with new and existing customers. Behind the scenes, it uses Apache Kafka for enterprise messaging -- incoming customer emails are processed through a keyword matching algorithm that routes them to the correct department: claims, retention, or acquisition. We will come back to that email routing in Section 3, where we enhance it with AI."
 +
-// TODO: Add screenshot of the running Parasol app dashboard opened from DevSpaces
+
 image::parasol-app-home.png[Parasol Insurance application dashboard showing open claims and recent activity and the Inbox tab in the left navigation,link=self,window=blank,align="center",width=700,title="The running Parasol Insurance application"]
 
 . Create the new claims statistics endpoint. In the Explorer on the left, right-click on the `java / com / Parasol` directory and select **New File**. Name the file `ClaimsStatsResource.java`. Then copy and paste the following code into the new file:
@@ -438,7 +438,7 @@ The two required labels (`app.kubernetes.io/component: getting-started-samples` 
 * The new **"Private AI Coding Assistant with Ollama"** sample now appears in the list of available workspace templates
 * "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama and Continue inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
 
-// TODO: Add screenshot showing the new sample in the DevSpaces Create Workspace screen
+image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample added,link=self,window=blank,align="center",width=700,title="DevSpaces console showing the new sample "]
 
 **What they should notice:**
 
