@@ -212,6 +212,11 @@ Quarkus dev mode provides live reload and continuous testing capabilities that r
 * Live coding is active
 * The application is running and accessible
 
+[TIP]
+====
+If you miss the popup notification, you can also open the application from the *ENDPOINTS* panel in the lower left of the DevSpaces window. Find *quarkus-dev (8080/https)* and click the arrow icon to open it in a new tab.
+====
+
 . When DevSpaces prompts with a popup to open the application, click to **open it in a new tab**:
 * Walk through the running application briefly
 * "This is the Parasol Insurance platform. It is used by Parasol's agents to manage insurance claims and communicate with new and existing customers. Behind the scenes, it uses Apache Kafka for enterprise messaging -- incoming customer emails are processed through a keyword matching algorithm that routes them to the correct department: claims, retention, or acquisition. We will come back to that email routing in Section 3, where we enhance it with AI."
