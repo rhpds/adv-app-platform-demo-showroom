@@ -396,7 +396,7 @@ image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster cust
 +
 image::ecosystem.png[OpenShift console showing the Software Catalog,link=self,window=blank,align="center",width=700,title="Ecosystem Catalog for platform engineers to curate available services and tools"]
 
-. Show how a platform engineer can add a custom sample workspace to the DevSpaces "Create Workspace" screen. This gives developers a curated set of starting points beyond the default devfile registry:
+. _(Optional)_ Show how a platform engineer can add a custom sample workspace to the DevSpaces "Create Workspace" screen. This gives developers a curated set of starting points beyond the default devfile registry:
 * "Platform engineers can publish custom workspace samples so developers can spin up pre-configured environments for specific use cases. Let me show you how to add one that gives developers a private AI coding assistant running entirely within DevSpaces."
 * In the OpenShift console (logged in as `{pe_user}`), open the **Web Terminal** by clicking the `>_` icon in the top navigation bar
 * Create a ConfigMap in the `openshift-devspaces` namespace with the sample definition. Run the following command in the web terminal:
@@ -437,8 +437,17 @@ The two required labels (`app.kubernetes.io/component: getting-started-samples` 
 * Navigate to the **DevSpaces dashboard** at {devspaces_url}[{devspaces_url}^] and click **Create Workspace**
 * The new **"Private AI Coding Assistant with Ollama"** sample now appears in the list of available workspace templates
 * "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama and Continue inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
++
+image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample added,link=self,window=blank,align="center",width=700,title="DevSpaces console showing the new sample"]
 
-image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample added,link=self,window=blank,align="center",width=700,title="DevSpaces console showing the new sample "]
+* Click on the **"Private AI Coding Assistant with Ollama"** sample to create a new workspace from it
++
+[NOTE]
+====
+This workspace takes several minutes to start as it downloads open-source AI models (`Llama3` and `Starcoder2`) locally into the DevSpaces workspace during startup. This is expected — the models run entirely within the workspace and no data is sent to external services.
+====
+* Once the workspace opens, show that the Continue AI assistant extension is pre-configured to use the local Ollama models
+* "A developer can now get AI-assisted coding — code generation, documentation, analysis — all running privately within the cluster. The platform engineer published this as a one-click sample, and any developer on the team can spin it up."
 
 **What they should notice:**
 
