@@ -348,7 +348,7 @@ image::parasol-claim-stats-live.png[Parasol Insurance application showing the cl
 . Promote to Production (optional, if time allows):
 * As a platform engineer, you can trigger a promotion to production by creating a new tag in the source repository, and then approving the merge request (MR) to update the production GitOps repository to use the new tag. This separates responsibilities between developers and platform operators, while still keeping the process automated and auditable.
 * Log into GitLab as the `pe1` user, navigate to the `parasol-insurance` repository, noting the latest commit from the developer.
-* Click on **Tags** on the left, and select **New Tag** to create a new tag, with a name (e.g. `1.1`, or `prod-20240601`) and linking it to the latest commit on the `main` branch. You can leave the rest of the fields blank, scroll to the bottom and click **Create tag**.
+* Click on **Tags** on the right, and select **New Tag** to create a new tag, with a name (e.g. `1.1`, or `prod-20240601`) and linking it to the latest commit on the `main` branch. You can leave the rest of the fields blank, scroll to the bottom and click **Create tag**.
 * With the new tag created, a new pipeline begins to build the production image (at the specified tag), and issue a new MR to the GitOps repo to update the production image.
 * Once the pipeline completes, navigate to the https://gitlab-gitlab.{subdomain}/parasol/parasol-insurance-manifests[GitOps repository in GitLab], and you will see a new MR to update the production image tag. Review the MR and approve/merge it to merge the change.
 * With the change merged, Argo CD detects the new desired state and deploys the new version to production automatically.
