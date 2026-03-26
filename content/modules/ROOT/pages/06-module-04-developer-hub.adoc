@@ -55,7 +55,14 @@ Tell me about the parasol-insurance-api API in the catalog, and write a sample s
 * Show the response as Lightspeed retrieves information from the catalog and documentation
 * "Lightspeed pulled information about the API from the software catalog, combined it with documentation, and generated a working code snippet. A new developer does not need to hunt through wikis or interrupt teammates. They ask Lightspeed and get a contextual answer in seconds."
 
-NOTE: The demo environment relies on a relatively small AI model that might not provide ideal answers for certain prompts. Larger models provide faster and more detailed responses, and make better use of the available Model Context Protocol tools available to inspect the RHDH catalog. 
+[WARNING]
+====
+LLMs are non-deterministic — responses vary between attempts. The demo environment uses a relatively small model (`qwen3-14b`). Before issuing prompts:
+
+* Ensure *qwen3-14b* is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results.
+* If Lightspeed reports that an API (e.g. `parasol-insurance-api`) does not exist, try asking it to "list all APIs in the catalog" first, then re-ask your original question. This helps the model discover catalog context.
+* As better models become available for the demo, these workarounds will no longer be needed.
+====
 
 . Point out how the response combines multiple sources:
 * Catalog metadata (API description, owner, lifecycle)
