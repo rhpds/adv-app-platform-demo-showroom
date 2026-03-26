@@ -396,6 +396,49 @@ image::devspaces-checluster-cr.png[OpenShift console showing the CheCluster cust
 +
 image::ecosystem.png[OpenShift console showing the Software Catalog,link=self,window=blank,align="center",width=700,title="Ecosystem Catalog for platform engineers to curate available services and tools"]
 
+. Show how a platform engineer can add a custom sample workspace to the DevSpaces "Create Workspace" screen. This gives developers a curated set of starting points beyond the default devfile registry:
+* "Platform engineers can publish custom workspace samples so developers can spin up pre-configured environments for specific use cases. Let me show you how to add one that gives developers a private AI coding assistant running entirely within DevSpaces."
+* In the OpenShift console (logged in as `{pe_user}`), open the **Web Terminal** by clicking the `>_` icon in the top navigation bar
+* Create a ConfigMap in the `openshift-devspaces` namespace with the sample definition. Run the following command in the web terminal:
++
+[source,bash,role="copypaste"]
+----
+cat <<'EOF' | oc apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: getting-started-samples
+  namespace: openshift-devspaces
+  labels:
+    app.kubernetes.io/component: getting-started-samples
+    app.kubernetes.io/part-of: che.eclipse.org
+data:
+  my-samples.json: |
+    [
+      {
+        "displayName": "Private AI Coding Assistant with Ollama",
+        "description": "A cloud development environment with a private AI coding assistant powered by Ollama and Continue. Runs open-source LLMs locally within the workspace for AI-assisted code generation, documentation, and analysis — without sending code to external services.",
+        "tags": ["AI", "Ollama", "Continue"],
+        "url": "https://github.com/redhat-developer-demos/cde-ollama-continue",
+        "icon": {
+          "base64data": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPHBhdGggZmlsbD0iI2ZmMDAwMCIgZD0iTTE1NCA4NiBDMTQ1IDY3LDE1NyA0OSwxNzYgNDcgQzE5NyA0NSwyMTIgNjQsMjIwIDg4IEMyMjQgMTAwLDIyOCAxMTIsMjQwIDEyMiBDMjU2IDEzNiwyNjYgMTU3LDI3MiAxOTAgQzI3OSAyMjQsMjgxIDI1NywyOTAgMjg2IEMyOTYgMzA1LDMxMSAzMTYsMzM5IDMxOSBDMzc2IDMyMyw0MTIgMzE5LDQzNSAzMzAgQzQ1NSAzMzksNDY3IDM1NSw0NzAgMzc4IEM0NzMgNDA1LDQ2OSA0MzIsNDU4IDQ1NSBDNDUyIDQ2OCw0NDkgNDgyLDQ0OCA0OTUgIEw0MTggNDk1IEM0MTQgNDg1LDQxOCA0NzAsNDIyIDQ1NiBDNDMwIDQyOCw0MzMgNDA2LDQyOCAzODMgQzQyMyAzNjAsNDA3IDM0OCwzODAgMzQ1IEMzNTUgMzQzLDMyOSAzNDYsMzA2IDM0NSBDMjgzIDM0NCwyNjMgMzQwLDI0NiAzMjkgQzIzMCAzMTgsMjIwIDMwMSwyMTQgMjc5IEMyMDcgMjUyLDIwMSAyMTgsMjAwIDE4NSBDMTk5IDE2MiwxOTQgMTQ0LDE4MiAxMzEgQzE2OSAxMTcsMTYwIDEwNCwxNTQgODYgWiIvPjwvc3ZnPg==",
+          "mediatype": "image/svg+xml"
+        }
+      }
+    ]
+EOF
+----
++
+[NOTE]
+====
+The two required labels (`app.kubernetes.io/component: getting-started-samples` and `app.kubernetes.io/part-of: che.eclipse.org`) are what tell the DevSpaces operator to pick up this ConfigMap as a sample. The JSON data defines the sample's display name, description, tags, icon, and the Git repository URL containing the devfile.
+====
+
+* Navigate to the **DevSpaces dashboard** at {devspaces_url}[{devspaces_url}^] and click **Create Workspace**
+* The new **"Private AI Coding Assistant with Ollama"** sample now appears in the list of available workspace templates
+* "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama and Continue inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
+
+// TODO: Add screenshot showing the new sample in the DevSpaces Create Workspace screen
 
 **What they should notice:**
 
@@ -403,6 +446,7 @@ image::ecosystem.png[OpenShift console showing the Software Catalog,link=self,wi
 * The DevSpaces operator gives centralized control over workspace policies through a Kubernetes custom resource
 * Configuration changes apply to all new workspaces automatically. No per-developer configuration required.
 * Resource governance (CPU, memory, storage, idle timeout) prevents workspace sprawl
+* Custom workspace samples can be published with a single ConfigMap, giving developers curated starting points for specific use cases
 
 **Business value callout:**
 
