@@ -43,7 +43,7 @@ A new developer joins Parasol Insurance and experiences the full application lif
 
 _Move from "good to great." Show the capabilities that differentiate a mature application platform from basic container management._
 
-Fast forward: Parasol deploys and internal developer portal using Red Hat Developer Hub (RHDH). The Parasol application and its components are now registered in the Red Hat Developer Hub catalog, and a secure software supply chain is in place.
+Fast forward: Parasol deploys an internal developer portal using Red Hat Developer Hub (RHDH). The Parasol application and its components are now registered in the Red Hat Developer Hub catalog, and a secure software supply chain is in place.
 
 . **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation for Parasol's software architectures. Developers ask Lightspeed questions about applications and APIs. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
 
