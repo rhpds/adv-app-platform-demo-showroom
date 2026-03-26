@@ -243,7 +243,16 @@ image::pipeline-conforma-validate.png[Developer Hub showing tag promote and vali
 
 image::pipeline-conforma-report.png[The conforma report showing policy evaluation results,link=self,window=blank,width=600,title="The conforma report showing policy evaluation results"]
 
+. The final step in the validation pipeline opens a merge request (MR) against the `parasol-insurance-secured-manifests` GitOps repository in GitLab, updating the production image tag to the newly validated and signed image:
+* As the platform engineer (`{pe_user}`), navigate to the {gitlab_url}/parasol/parasol-insurance-secured-manifests/-/merge_requests[parasol-insurance-secured-manifests merge requests in GitLab^]
+* Review the MR -- it updates the production image tag to the new release
+* Approve and merge the MR
+* "By merging this MR, Argo CD detects the change in the GitOps repository and automatically deploys the validated, signed container image to production. The platform engineer controls when production changes happen, while the entire supply chain -- from build to signing to policy validation -- is fully automated."
 
+. Navigate to the {argocd_url}[Argo CD console^] and observe the `parasol-insurance-secured` project syncing the new production deployment:
+* "Argo CD picks up the merged change and rolls out the new image to production. The entire journey -- from code push to signed, attested, policy-validated production deployment -- happened through automated pipelines with human approval only at the merge step."
+
+// TODO: Add screenshot showing the production promotion in Argo CD
 
 **What they should notice:**
 
