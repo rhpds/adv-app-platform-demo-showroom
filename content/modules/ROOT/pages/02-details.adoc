@@ -236,7 +236,7 @@ oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
 
 . Verify the LLM endpoint is serving by running the following command in the OpenShift console terminal (if your code assistant in DevSpaces worked above, you can skip this):
 +
-[source,bash,role="copypaste"]
+[source,bash,role="copypaste",subs="attributes+"]
 ----
 curl -s -H "Authorization: Bearer {llm_api_key}" {llm_endpoint_url}/v1/models | jq .
 ----
