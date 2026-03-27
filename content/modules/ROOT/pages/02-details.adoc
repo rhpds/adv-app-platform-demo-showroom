@@ -196,12 +196,16 @@ In Section 3, the application is extended with an AI-enhanced component that con
 oc rollout restart deployment/parasol-db -n parasol-insurance-dev
 oc rollout restart deployment/parasol-db -n parasol-insurance-secured-dev
 oc rollout restart deployment/parasol-db -n parasol-insurance-secured-dev1
+oc rollout restart deployment/parasol-db -n parasol-insurance-secured-dev2
 oc rollout restart deployment/parasol-db -n parasol-insurance-prod
 oc rollout restart deployment/parasol-insurance -n parasol-insurance-dev
 oc rollout restart deployment/parasol-insurance-secured -n parasol-insurance-secured-dev
 oc rollout restart deployment/parasol-insurance-secured -n parasol-insurance-secured-dev1
+oc rollout restart deployment/parasol-insurance-secured -n parasol-insurance-secured-dev2
 oc rollout restart deployment/parasol-insurance -n parasol-insurance-prod
 ----
+
+NOTE: Not all namespaces may exist depending on how much of the demo has been run so far. It is safe to ignore errors for namespaces that do not exist.
 
 Wait for all rollouts to complete before proceeding with the demo.
 ====
