@@ -240,7 +240,8 @@ oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
 ----
 curl -s -H "Authorization: Bearer {llm_api_key}" {llm_endpoint_url}/models | jq .
 ----
-
++
+You should see a JSON object with a list of available models if the LLM endpoint is working correctly.
 
 [TIP]
 ====
