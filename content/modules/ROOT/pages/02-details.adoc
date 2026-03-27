@@ -211,7 +211,7 @@ Wait for all rollouts to complete before proceeding with the demo.
 . Open Dev Spaces by clicking the "Edit Source Code" link on the Parasol application — confirm the dashboard loads
 . Verify the AI code assistant works: Once DevSpaces opens, wait for the Continue plugin to initialize (this may take a few minutes on first launch). Open it give it a good "Hello" prompt.
 . Open SonarQube at {sonarqube_url}[{sonarqube_url}^] and log in as `admin` (retrieve password from `sonarqube-admin` secret in the `sonarqube` namespace)
-. Open the `rhdh-gitops` Argo CD at {argocd_url}[{argocd_url}^] and log in as `admin` (retrieve password from `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace) (explained above)
+. Open the `rhdh-gitops` Argo CD at {argocd_url}[{argocd_url}^] and log in as `admin` (retrieve password from `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace) (explained above). It is expected that the `-secured` Argo CD applications may not be fully healthy at this point — they will resolve once the secured pipeline runs for the first time in Section 2
 . Verify the Tekton pipeline is visible in the OpenShift console: navigate to **Pipelines** in the `{parasol_build_ns}` namespace
 . Log into the OpenShift console as `{pe_user}` / `{password}` and open **Service Mesh → Overview** to confirm it loads, then check **Service Mesh → Traffic Graph** to confirm the traffic graph renders (you'll need to select the `{parasol-dev_ns}` and `kafka` namespace and click "Apply" to see the Parasol services). Turn on Traffic Animation in the *Display* menu for added visual effect (since nothing is currently happening in the app it won't show much).
 
@@ -219,9 +219,8 @@ Wait for all rollouts to complete before proceeding with the demo.
 
 . Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}` — confirm the catalog loads
 . Verify the Parasol system and its components are registered in the catalog
-. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development
-_ template)
-. Open TPA at {tpa_url}[{tpa_url}^] and confirm SBOM data is visible
+. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development_ template)
+. Open TPA at {tpa_url}[{tpa_url}^] — the *SBOMs* tab will be empty at this point, which is expected since no pipelines have run yet. Instead, check the *Vulnerabilities* tab to confirm vulnerability data has been downloaded, and the *Importers* tab to confirm the `osv-github` importer is running (> 0% progress)
 . Verify Vault is accessible at {vault_url}[{vault_url}^]:
 .. Retrieve the root token with
 +
@@ -235,7 +234,12 @@ oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
 
 === Section 3 (in addition to Sections 1-2)
 
-. Verify the LLM endpoint is serving and accessible at {llm_endpoint_url}[{llm_endpoint_url}^] (if your code assistant in devspaces worked above, then you can skip this confirmation)
+. Verify the LLM endpoint is serving by running the following command in the OpenShift console terminal (if your code assistant in DevSpaces worked above, you can skip this):
++
+[source,bash,role="copypaste"]
+----
+curl -s -H "Authorization: Bearer {llm_api_key}" {llm_endpoint_url}/v1/models | jq .
+----
 
 
 [TIP]
