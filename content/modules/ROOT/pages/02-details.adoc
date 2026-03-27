@@ -187,6 +187,23 @@ In Section 3, the application is extended with an AI-enhanced component that con
 
 == Pre-demo checklist
 
+[WARNING]
+====
+**Resurrected clusters:** If you stopped a running demo cluster and later restarted it, the Istio ambient service mesh may fail to re-establish `HBONE` tunnels to existing pods. This causes the Parasol application to fail to connect to its PostgreSQL database, and pipelines that attempt to restart the application will fail. If you encounter this, restart the database and application pods in the affected namespaces by running the following commands in the OpenShift console terminal:
+
+[source,bash,role="copypaste"]
+----
+oc rollout restart deployment/parasol-db -n parasol-insurance-secured-dev
+oc rollout restart deployment/parasol-db -n parasol-insurance-secured-dev1
+oc rollout restart deployment/parasol-db -n parasol-insurance-prod
+oc rollout restart deployment/parasol-insurance-secured -n parasol-insurance-secured-dev
+oc rollout restart deployment/parasol-insurance-secured -n parasol-insurance-secured-dev1
+oc rollout restart deployment/parasol-insurance -n parasol-insurance-prod
+----
+
+Wait for all rollouts to complete before proceeding with the demo.
+====
+
 === Section 1
 
 . Log into the OpenShift console at {console_url}[{console_url}^] as `{dev_user}` / `{password}`
