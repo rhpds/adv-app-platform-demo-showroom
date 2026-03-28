@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module continues directly from Module 1. The developer pushes code with code smells (improper logging and empty exception handling), the Tekton pipeline catches them via SAST/Sonarqube, the developer fixes the issues in DevSpaces, and Argo CD handles deployment. The pipeline is viewed in the OpenShift web console and the deployment sync is viewed in the Argo CD console. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This module continues directly from Module 1. The developer pushes code with code smells (improper logging and empty exception handling), the Tekton pipeline catches them via SAST/Sonarqube, the developer fixes the issues in DevSpaces, and Argo CD handles deployment. Part 4 explores how OpenShift Builds governs the image building process using Cloud Native `Buildpacks`. The pipeline is viewed in the OpenShift web console and the deployment sync is viewed in the Argo CD console. Target duration: 20 minutes across 4 parts.
 
 [#part-1]
 == Part 1 — Triggering the pipeline
@@ -51,7 +51,7 @@ image::ocp-pipeline-running.png[OpenShift web console Pipelines view showing a T
 . Walk through the pipeline stages as they execute:
 * **Clone** — Source code pulled from the Git repository
 * **Sonarqube SAST** — Static analysis and security scanning
-* **Build and Push** — Quarkus application compiled, container image built and pushed to the registry
+* **Build and Push** — The application is built and containerized using OpenShift Builds with Cloud Native `Buildpacks`. No `Containerfile` is needed -- the platform auto-detects the application type (Java/Maven/Quarkus) and builds the container image automatically. We will explore this in more detail in <<part-4>>.
 * **Re-rollout app** — The updated application is re-deployed in the dev environment
 * "Every code change goes through the exact same stages. No shortcuts, no skipping steps, no variation between teams."
 
@@ -381,6 +381,102 @@ A: "Argo CD supports Kustomize overlays and Helm values files for environment-sp
 Q: "What if someone makes a manual change in the cluster?"::
 A: "Argo CD detects configuration drift and can automatically correct it. If someone manually changes a deployment in the cluster, Argo CD reverts the change to match what is declared in Git. Git is always the source of truth."
 
+'''
+
+[#part-4]
+== Part 4 — OpenShift Builds: platform-governed image building
+
+=== Know
+
+_In Part 1, the pipeline built and containerized the Parasol application automatically using OpenShift Builds with Cloud Native `Buildpacks` -- without a `Containerfile`. This part explores that build process in more detail: what happened under the hood, how the platform engineer governs the build process, and how the build metrics provide visibility into CI performance._
+
+**Business challenge:**
+
+* Container image builds are often ungoverned -- developers write their own `Dockerfiles` with inconsistent base images, configurations, and security practices
+* Platform teams have no visibility into build performance or resource consumption
+* `Containerfile` maintenance becomes a burden as frameworks and base images evolve
+* No standardized, auditable way to control _how_ applications are built across teams
+
+**Value proposition:**
+
+OpenShift Builds (based on the Shipwright project) separates the concerns of _what_ to build from _how_ to build. Platform engineers define approved build strategies (`ClusterBuildStrategy` resources) that govern base images, security contexts, and resource limits. Developers just point at their source code -- the platform handles the rest. With Cloud Native `Buildpacks`, developers do not even need a `Containerfile`: the `buildpack` auto-detects the application type and builds the image using best practices for that framework.
+
+=== Show
+
+**What I say:**
+
+"In Part 1, you saw the pipeline build the Parasol application without a `Containerfile`. Let's look at how that works. The platform uses OpenShift Builds, which is based on the CNCF Shipwright project, to manage container image builds. The key idea is separation of concerns: the platform engineer controls _how_ images are built, and the developer just writes code."
+
+**What I do:**
+
+. In the **OpenShift web console**, navigate to **Builds** -> **Shipwright** -> **ClusterBuildStrategies**:
+* Show the list of available strategies: `buildah`, `buildpacks`, `source-to-image`, `buildpacks-extender`
+* "These are the approved build strategies that the platform engineer has made available. Developers cannot create their own -- they can only reference the ones the platform team provides. This is the governance layer."
+* Click on the `buildpacks` strategy to show its details
+* "This strategy uses Cloud Native `Buildpacks`. It auto-detects the application framework, builds it, and produces a container image. No `Dockerfiles`, no `Containerfiles`. The platform engineer controls which builder images are allowed, what resource limits apply, and what security context the build runs under."
++
+// TODO: add screenshot of ClusterBuildStrategies list
+image::builds-clusterbuildstrategies.png[OpenShift console showing the list of ClusterBuildStrategies,link=self,window=blank,align="center",width=700,title="Platform-governed build strategies available cluster-wide"]
+
+. Navigate to **Builds** -> **Shipwright** -> **Builds** in the `{parasol_build_ns}` namespace:
+* Show the `parasol-insurance` Build resource
+* Click on it to show its details: source (Git repo), strategy (`buildpacks` ClusterBuildStrategy), and output (Quay registry)
+* "This Build resource defines _what_ to build: the Parasol source code from GitLab. It references the `buildpacks` ClusterBuildStrategy for _how_ to build. The developer did not need to write a Dockerfile or configure a build process. They pointed at their repo, and the platform figured out the rest."
++
+// TODO: add screenshot of Build resource details
+image::builds-build-details.png[OpenShift console showing the parasol-insurance Build resource with source and strategy details,link=self,window=blank,align="center",width=700,title="Build resource referencing Git source and buildpacks strategy"]
+
+. Navigate to **Builds** -> **Shipwright** -> **BuildRuns** in the `{parasol_build_ns}` namespace:
+* Show the completed BuildRun from the pipeline
+* Click on it to show its status, duration, and linked pod
+* "Every time the pipeline runs, it creates a BuildRun. This is the execution record -- it shows when the build started, how long it took, whether it succeeded, and the exact image digest that was produced. This gives the platform team full auditability of every image that was built."
++
+// TODO: add screenshot of BuildRun details
+image::builds-buildrun-details.png[OpenShift console showing a completed BuildRun with duration and status,link=self,window=blank,align="center",width=700,title="BuildRun execution record with full audit trail"]
+
+. Navigate to **Observe** -> **Metrics** in the OpenShift console:
+* In the query field, enter:
++
+[source,text,role="copypaste"]
+----
+build_buildrun_completion_duration_seconds_sum / build_buildrun_completion_duration_seconds_count
+----
++
+* Click **Run queries** to show the average build duration
+* "OpenShift Builds exposes Prometheus metrics for every build. Here we can see the average build completion time. The platform team can use this to track build performance over time, set alerts for builds that exceed SLA thresholds, and identify bottlenecks."
++
+// TODO: add screenshot of the metrics graph
+image::builds-metrics-duration.png[OpenShift Observe metrics page showing a graph of average build duration,link=self,window=blank,align="center",width=700,title="Build duration metrics in the OpenShift monitoring console"]
+
+* You can also try this query to see the total number of completed builds:
++
+[source,text,role="copypaste"]
+----
+build_buildruns_completed_total
+----
+
+**What they should notice:**
+
+* No `Containerfile` was needed to build the Parasol application. The `buildpack` auto-detected Maven, Java, and Quarkus and built everything automatically.
+* The platform engineer controls _how_ images are built through ClusterBuildStrategies. Developers cannot bypass these governance controls.
+* Every build has a full execution record (BuildRun) with timestamps, duration, status, and image digest.
+* Build metrics are available in the standard OpenShift monitoring stack, giving platform teams visibility into CI performance.
+
+**Business value callout:**
+
+"This is the platform doing the undifferentiated heavy lifting. At Parasol today, every team maintains their own `Dockerfiles`, often with different base images, different build patterns, and different levels of security hygiene. When a base image CVE is announced, someone has to track down every `Dockerfile` across every team and update them. With OpenShift Builds, the platform team manages the build strategies centrally. When a base image needs updating, they update the strategy in one place and every team's builds use the new image on their next run. Developers never think about `Dockerfiles` -- they write code, and the platform builds it safely."
+
+**If asked:**
+
+Q: "What if we need a custom build strategy for a specific use case?"::
+A: "Platform engineers can create namespace-scoped `BuildStrategy` resources for specific teams or use cases. These follow the same model but are scoped to a single namespace. For example, a team that needs GPU-accelerated builds could have a custom strategy with different resource limits."
+
+Q: "Can we still use `Dockerfiles` if we want to?"::
+A: "Yes. The `buildah` ClusterBuildStrategy supports traditional `Dockerfile`/`Containerfile`-based builds. Teams can migrate to `buildpacks` at their own pace. The governance model is the same either way: the platform controls the strategy, the developer references it."
+
+Q: "What about build caching?"::
+A: "Cloud Native `Buildpacks` support layer caching across builds. Dependencies that have not changed are reused from previous builds, significantly reducing subsequent build times. The `buildpacks` strategy supports both PVC-based and image-based caching."
+
 [#summary]
 == Module 2 summary
 
@@ -392,6 +488,7 @@ In this module, you saw how the platform's CI/CD pipeline enforces quality and a
 . **Quality enforcement** — The Sonarqube quality gate caught code smells (improper logging and empty exception handling), with a direct link to the Sonarqube report in the pipeline log
 . **AI-assisted remediation** — The developer used the Continue AI assistant (pre-configured by the platform engineer) to fix the code smells, reviewing the diff before accepting the changes
 . **GitOps delivery** — Argo CD managed the deployment declaratively, with the sync process visible in the Argo CD console
+. **Platform-governed builds** — OpenShift Builds with Cloud Native `Buildpacks` built the container image without a `Containerfile`, governed by platform-managed ClusterBuildStrategies, with full build metrics in the monitoring stack
 
 === Setting up Module 3
 
