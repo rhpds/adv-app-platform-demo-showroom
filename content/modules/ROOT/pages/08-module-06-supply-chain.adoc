@@ -188,7 +188,7 @@ image::ocp-topology-secured-prod.png[OpenShift Topology view showing the Parasol
 === What we demonstrated across Modules 4-6
 
 . **Module 4: Developer Hub and catalog** -- Developer Lightspeed for AI-assisted platform knowledge, centralized discovery through the RHDH catalog, and self-service environment provisioning through golden path templates
-. **Module 5: Secure development workflow** -- Dependency scanning in the IDE, a secure build pipeline with ACS scanning and Tekton Chains attestation viewed from Developer Hub, merge request workflow with release tagging, and centralized secrets management with Vault
+. **Module 5: Secure development workflow** -- Dependency scanning in the IDE, a secure build pipeline with ACS scanning and Tekton Chains attestation viewed from Developer Hub, and merge request workflow with release tagging
 . **Module 6: Trusted software supply chain** -- SBOM management with TPA for continuous compliance, and application topology showing the complete system in production
 
 === The trust chain

@@ -2,11 +2,11 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-*Presenter note*: This module continues the Section 2 story. The developer works on their feature branch in DevSpaces, uses the Dependency Analytics plugin to identify an unnecessary dependency (quarkus-rest), pushes code that triggers the secure build pipeline against their feature branch, then creates a merge request in GitLab for PE approval. The PE approves and creates a release tag. External secrets are managed through Vault using litellm-credentials as the example. Target duration: 15 minutes across 3 parts.
+*Presenter note*: This module continues the Section 2 story. The developer works on their feature branch in DevSpaces, uses the Dependency Analytics plugin to identify an unnecessary dependency (quarkus-rest), pushes code that triggers the secure build pipeline against their feature branch, then creates a merge request in GitLab for PE approval. The PE approves and creates a release tag. Target duration: 15 minutes across 2 parts.
 
 [NOTE]
 ====
-One big difference here is that you should not have to visit the OpenShift Console at all - reinforcing the message that Developer Hub is the single pane of glass for developers. The deployment topology, pipeline and Argo CD sync are both viewed from Developer Hub. The only time you leave Developer Hub is to log in to GitLab as the platform engineer to approve the merge request and create a release tag, and to show Vault details.
+One big difference here is that you should not have to visit the OpenShift Console at all - reinforcing the message that Developer Hub is the single pane of glass for developers. The deployment topology, pipeline and Argo CD sync are both viewed from Developer Hub. The only time you leave Developer Hub is to log in to GitLab as the platform engineer to approve the merge request and create a release tag.
 ====
 
 [#part-1]
@@ -281,121 +281,6 @@ A: "Yes. ACS policies are fully configurable by the platform team. They can set 
 Q: "Why create the merge request separately instead of the pipeline doing it?"::
 A: "The developer verifies their work in the development environment before requesting a merge. This is an intentional workflow: the developer confirms the feature works, then requests review. The platform engineer controls when code is promoted to production by merging and creating a release tag."
 
-'''
-
-[#part-3]
-== Part 3 — External secrets with Vault
-
-=== Know
-
-_Applications need secrets -- API keys, database credentials, certificates -- but storing them in Git or environment variables is a security risk. Parasol uses HashiCorp Vault with the External Secrets Operator to inject secrets into applications at runtime, keeping sensitive data out of source control and configuration manifests._
-
-**Business challenge:**
-
-* Secrets stored in Git repositories or environment variables are a security liability
-* No centralized secrets management across applications and environments
-* Secret rotation requires manual updates to application configurations
-* Compliance requirements mandate secrets management with audit trails
-
-**Current state at Parasol:**
-
-* Some teams store secrets in Git (encrypted but still in source control)
-* Others use Kubernetes secrets directly, with no centralized management
-* Secret rotation is manual and error-prone, sometimes causing outages
-* No audit trail for who accessed which secrets and when
-
-**Value proposition:**
-
-The External Secrets Operator integrates with HashiCorp Vault to provide centralized, audited secrets management. Secrets are stored in Vault and automatically synced to Kubernetes secrets that applications can use at runtime. Developers reference secrets by name in their manifests without ever seeing the actual values. Secret rotation happens in Vault and propagates automatically when the ExternalSecrets operator performs its sync interval.
-
-=== Show
-
-**What I say:**
-
-"Before we move on, let me address a critical concern: secrets management. Our application needs API keys and credentials. For example, the LLM endpoint that will be used in Section 3 requires a base URL and an API key. Where do those secrets come from, and how do we keep them secure?"
-
-**What I do:**
-
-. Visit the {vault_url}[**Vault** UI^] served by a Vault instance running in your cluster. Log in with the Vault token.
-+
-[TIP]
-====
-Retrieve the Vault token from the {console_url}/k8s/ns/vault/core~v1~Secret[`vault-token` Secret^] or using this command:
-```
-oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
-```
-====
-
-+
-* In the Vault UI, select *Secrets* at the top and then navigate to the kv (key/value) folder then to the `secrets/litellm/credentials` path
-* Show the stored values: `base_url` and `api_key`
-* "All secrets are stored centrally in Vault, organized by application and purpose. The developer never sees these values in their code or manifests."
-+
-image::vault-litellm-credentials.png[HashiCorp Vault showing the litellm credentials secret with base_url and api_key,link=self,window=blank,align="center",width=700,title="LLM credentials managed centrally in Vault"]
-
-. Show the **ExternalSecret** resource in the application manifests:
-* In the OpenShift Console, navigate to **Workloads** > **Secrets**, select the `parasol-insurance-prod` application namespace and, and click on the `litellm-credentials` secret, and _Reveal Values_ showing they are the same values.
-* This Secret was created by the External Secrets Operator based on the `ExternalSecret` created as part of the Argo CD deployment.
-* Click on the "Owner" link to show the ExternalSecret. 
-+
-[source,yaml]
-----
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: litellm-credentials
-spec:
-  refreshInterval: 1h
-  secretStoreRef:
-    name: vault-secret-store
-    kind: ClusterSecretStore
-  target:
-    name: litellm-credentials
-    creationPolicy: Owner
-  data:
-    - secretKey: base_url
-      remoteRef:
-        key: secrets/litellm/credentials
-        property: base_url
-    - secretKey: api_key
-      remoteRef:
-        key: secrets/litellm/credentials
-        property: api_key
-----
-+
-* "The External Secret references a path in Vault, not the actual secret value. The External Secrets Operator syncs the value at runtime."
-
-* Point out that the secret exists in the cluster but was never committed to Git
-* "The operator automatically created this Kubernetes secret from the Vault data. The application consumes it like any normal secret. But the actual values never appear in source control."
-
-. **Talk track** about rotation and audit:
-* "When the platform team rotates a secret in Vault, the External Secrets Operator syncs the new value automatically based on the refresh interval. No application restart required, no manual update. And every access to every secret is audited in Vault's audit log."
-
-
-**What they should notice:**
-
-* Secrets are never stored in Git or hardcoded in application code
-* The ExternalSecret resource references a Vault path, not an actual value
-* The operator handles syncing automatically, keeping the cluster in sync with Vault
-* The litellm-credentials example shows how the LLM API key (used in Section 3) is managed securely
-* Secret rotation is transparent to the application
-* Full audit trail for compliance
-
-**Business value callout:**
-
-"At Parasol, some teams store secrets in Git, others use Kubernetes secrets directly. Neither approach provides centralized management, rotation, or audit trails. With Vault and the External Secrets Operator, every secret is centrally managed, automatically rotated, and fully audited. The developer never sees the actual values, and compliance requirements are satisfied automatically."
-
-**If asked:**
-
-Q: "What happens if Vault is unavailable?"::
-A: "The Kubernetes secrets that were already synced continue to work. The External Secrets Operator retries on the next refresh interval. Applications are not affected by temporary Vault outages."
-
-Q: "Can different teams have different access to secrets?"::
-A: "Yes. Vault supports fine-grained access control policies. Each team can only access secrets for their applications and environments."
-
-Q: "Do we have to use Vault specifically?"::
-A: "The External Secrets Operator supports multiple backends: HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, Google Secret Manager, and others."
-
 [#summary]
 == Module 5 summary
 
@@ -406,7 +291,6 @@ In this module, you saw how the secure development workflow protects the softwar
 . **Dependency Analytics** -- Real-time dependency scanning directly in the developer's IDE, identifying an unnecessary and incompatible dependency before committing
 . **Secure build pipeline** -- ACS scanning, image signing, SBOM generation, and SLSA attestation integrated into a single automated pipeline, triggered by a push to the feature branch, with the developer watching from Developer Hub
 . **Merge request and release** -- The developer creates a merge request after verifying the deployment, the platform engineer reviews, approves, and creates a release tag for production
-. **External secrets management** -- Vault integration keeps sensitive data out of source control with centralized management, automatic rotation, and audit trails
 
 === Setting up Module 6
 

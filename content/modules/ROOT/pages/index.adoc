@@ -16,14 +16,14 @@ Establish the core value of OpenShift as an application platform. Application mo
 
 * xref:03-module-01-developer-experience.adoc[Module 1: Developer experience] — MTA migration context, one-click DevSpaces from the topology view, Quarkus dev mode, and platform engineer governance
 * xref:04-module-02-cicd-pipeline.adoc[Module 2: CI/CD pipeline] — Tekton pipeline triggering, SAST/Sonarqube quality gates that catch code smells, and GitOps delivery with Argo CD
-* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, and Auto Scaling (HPA)
+* xref:05-module-03-platform-operations.adoc[Module 3: Platform operations] — Traffic management and mTLS with Service Mesh, real-time observability with the Service Mesh console, Auto Scaling (HPA), and external secrets with Vault
 
 **Section 2: Advanced developer services**
 
-Move from "good to great." Red Hat Developer Hub as the single pane of glass for catalog, self-service, pipelines, and deployment status. Secure software factory with ACS scanning, Tekton Chains signing, SBOM generation, admission control, and Vault for secrets management.
+Move from "good to great." Red Hat Developer Hub as the single pane of glass for catalog, self-service, pipelines, and deployment status. Secure software factory with ACS scanning, Tekton Chains signing, SBOM generation, and admission control.
 
 * xref:06-module-04-developer-hub.adoc[Module 4: Developer Hub and catalog] — Developer Lightspeed for MTA, RHDH catalog exploration with AI-powered Q&A, and self-service environment and component provisioning
-* xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow] — Dependency Analytics in DevSpaces, secure build pipeline with signing and attestation, and external secrets with Vault
+* xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow] — Dependency Analytics in DevSpaces, secure build pipeline with signing and attestation
 * xref:08-module-06-supply-chain.adoc[Module 6: Trusted software supply chain] — Production deployment with admission control, SBOM management with TPA, and application topology
 
 **Section 3: Intelligent applications**

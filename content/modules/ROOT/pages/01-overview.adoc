@@ -35,9 +35,9 @@ A new developer joins Parasol Insurance and experiences the full application lif
 
 . **CI/CD pipeline** — The developer pushes their code, triggering a Tekton pipeline. The pipeline's SAST/Sonarqube stage fails because of the code smells. The developer fixes the issues by using an AI code assistant, replacing `System.out.println` with the Quarkus `Log` API and removing the empty catch block, pushes again, and the pipeline passes. OpenShift GitOps handles the deployment.
 
-. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through OpenShift Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, and Auto Scaling (HPA).
+. **Platform operations** — With the application deployed, the platform handles cross-cutting concerns: mTLS encryption and traffic management through OpenShift Service Mesh, real-time observability through the Service Mesh (Kiali) and OpenShift consoles, Auto Scaling (HPA), and centralized secrets management with Vault.
 
-**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, SonarQube, Argo CD, Service Mesh, Observability (Kiali/OpenShift console), DevSpaces code assistance (AI), Auto Scaling (HPA)
+**Platform capabilities demonstrated:** MTA, DevSpaces, Quarkus, Tekton, SonarQube, Argo CD, Service Mesh, Observability (Kiali/OpenShift console), DevSpaces code assistance (AI), Auto Scaling (HPA), Vault for secrets management
 
 === Section 2: Advanced developer platform (Modules 4-6)
 
@@ -47,11 +47,11 @@ Fast forward: Parasol deploys an internal developer portal using Red Hat Develop
 
 . **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation for Parasol's software architectures. Developers ask Lightspeed questions about applications and APIs. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
 
-. **Secure development workflow** — Developers work in DevSpaces with the Dependency Analytics plugin, catching and fixing a dependency vulnerability in real time. A merge request triggers the secure build pipeline: ACS scanning, image signing via Trusted Artifact Signer (TAS), SBOM generation, and SLSA attestation via Tekton Chains. External secrets are managed through Vault.
+. **Secure development workflow** — Developers work in DevSpaces with the Dependency Analytics plugin, catching and fixing a dependency vulnerability in real time. A merge request triggers the secure build pipeline: ACS scanning, image signing via Trusted Artifact Signer (TAS), SBOM generation, and SLSA attestation via Tekton Chains.
 
 . **Trusted software supply chain** — The developer creates a merge request to the production configuration. The platform engineer merges it. SBOMs and associated vulnerabilities are managed through the Trusted Profile Analyzer (TPA). The Developer Hub topology provides a complete view of all components.
 
-**Platform capabilities demonstrated:** RHDH catalog, RHDH templating, RHDH self-service, Developer Lightspeed, Dependency Analytics, ACS, TAS (signing and admission control), Tekton Chains, TPA, Vault for secrets management
+**Platform capabilities demonstrated:** RHDH catalog, RHDH templating, RHDH self-service, Developer Lightspeed, Dependency Analytics, ACS, TAS (signing and admission control), Tekton Chains, TPA
 
 === Section 3: Intelligent applications (Module 7)
 
@@ -107,6 +107,7 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 * **GitOps-driven delivery** (Argo CD) ensures consistent, auditable deployments across environments
 * **Traffic management and security** (Service Mesh) provide mTLS encryption and fine-grained traffic control without application code changes
 * **Observability** (Service Mesh console/Kiali) gives real-time visibility into service health and traffic patterns
+* **External secrets management** (Vault) keeps sensitive data out of source control with centralized management and audit trails
 
 **Advanced developer services (Section 2)**
 
@@ -114,7 +115,6 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 * **Developer Lightspeed** brings AI-assisted development and migration guidance into the IDE
 * **Dependency Analytics** scans dependencies for vulnerabilities in real time during development
 * **Secure build pipeline** integrates ACS scanning, image signing, SBOM generation, and SLSA attestation
-* **External secrets management** (Vault) keeps sensitive data out of source control with centralized management and audit trails
 * **Trusted Artifact Signer** (TAS) provides admission control that verifies signatures and attestations at deployment
 * **Trusted Profile Analyzer** (TPA) manages SBOMs and vulnerability tracking across the portfolio
 

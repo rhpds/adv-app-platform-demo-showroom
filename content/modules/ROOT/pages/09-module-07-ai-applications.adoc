@@ -207,7 +207,7 @@ Q: "What happens if the LLM is unavailable?"::
 A: "The code includes a fallback to the original keyword matching logic. If the LLM call fails for any reason, emails are still classified using the keyword approach. The fallback is logged for visibility."
 
 Q: "How do you handle the LLM API key securely?"::
-A: "The API key is managed through the same external secrets pattern from Module 5. It is stored in Vault as `litellm-credentials` and injected at runtime. The developer never sees or commits the actual key."
+A: "The API key is managed through the same external secrets pattern from Module 3. It is stored in Vault as `litellm-credentials` and injected at runtime. The developer never sees or commits the actual key."
 
 '''
 

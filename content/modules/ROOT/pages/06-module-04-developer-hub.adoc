@@ -266,7 +266,7 @@ In this module, you saw how Red Hat Developer Hub transforms the developer exper
 
 === Setting up Module 5
 
-Our developer has a fully provisioned development environment on their feature branch, open in DevSpaces. In Module 5, we will see how they use the Dependency Analytics plugin to identify an unnecessary dependency, push code through the secure build pipeline, and manage secrets through Vault.
+Our developer has a fully provisioned development environment on their feature branch, open in DevSpaces. In Module 5, we will see how they use the Dependency Analytics plugin to identify an unnecessary dependency and push code through the secure build pipeline.
 
 === Presenter transition
 

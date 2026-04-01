@@ -58,16 +58,17 @@ Throughout the modules you'll work on applications belonging to a fictitious com
 * **Red Hat OpenShift Service Mesh** {servicemesh_version} - Istio-based traffic management and security
 * **Kiali** - Service mesh observability console (the OpenShift console refers to this as the "Service Mesh" menu)
 * **Red Hat OpenShift monitoring stack** {monitoring_version} - Prometheus, Grafana, and AlertManager
+* **HashiCorp Vault** - External secrets management
+* **External Secrets Operator** - Syncs secrets from Vault into Kubernetes
 
 === Section 2: Advanced developer services
 
 * **Red Hat Developer Hub** {rhdh_version} - Developer portal with catalog, templates, and self-service
-* **Developer Lightspeed** - AI-assisted development within Developer Hub 
+* **Developer Lightspeed** - AI-assisted development within Developer Hub
 * **Red Hat Advanced Cluster Security for Kubernetes** {acs_version} - Vulnerability scanning and policy enforcement
 * **Red Hat Trusted Artifact Signer** {tas_version} - Image signing, verification
 * **Tekton Chains** {tekton_chains_version} - Automated image signing, SBOM generation, and SLSA attestation
 * **Red Hat Trusted Profile Analyzer** {tpa_version} - SBOM management and vulnerability tracking
-* **HashiCorp Vault** - External secrets management
 * **Dependency Analytics** - IDE plugin for real-time dependency vulnerability scanning
 * **Apache Kafka** - Event streaming for business data (pre-existing in the demo environment) (also used in section 3)
 
@@ -154,7 +155,7 @@ oc get secret openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.a
 * URL: {tpa_url}[{tpa_url}^]
 * Login with OpenShift credentials
 
-=== Vault (Section 2)
+=== Vault (Section 1)
 
 * URL: {vault_url}[{vault_url}^]
 * Secrets browser: {vault_secrets_url}[{vault_secrets_url}^]
@@ -220,13 +221,6 @@ The commands will take about 1-2 minutes to complete. Wait for all rollouts to f
 . Open the `rhdh-gitops` Argo CD at {argocd_url}[{argocd_url}^] and log in as `admin` (retrieve password from `rhdh-gitops-cluster` secret in the `rhdh-gitops` namespace) (explained above). It is expected that the `-secured` Argo CD applications may not be fully healthy at this point — they will resolve once the secured pipeline runs for the first time in Section 2
 . Verify the Tekton pipeline is visible in the OpenShift console: navigate to **Pipelines** in the `{parasol_build_ns}` namespace
 . Log into the OpenShift console as `{pe_user}` / `{password}` and open **Service Mesh → Overview** to confirm it loads, then check **Service Mesh → Traffic Graph** to confirm the traffic graph renders (you'll need to select the `{parasol-dev_ns}` and `kafka` namespace and click "Apply" to see the Parasol services). Turn on Traffic Animation in the *Display* menu for added visual effect (since nothing is currently happening in the app it won't show much).
-
-=== Section 2 (in addition to Section 1)
-
-. Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}` — confirm the catalog loads
-. Verify the Parasol system and its components are registered in the catalog
-. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development_ template)
-. Open TPA at {tpa_url}[{tpa_url}^] — the *SBOMs* tab will be empty at this point, which is expected since no pipelines have run yet. Instead, check the *Vulnerabilities* tab to confirm vulnerability data has been downloaded, and the *Importers* tab to confirm the `osv-github` importer is running (> 0% progress)
 . Verify Vault is accessible at {vault_url}[{vault_url}^]:
 .. Retrieve the root token with
 +
@@ -236,6 +230,13 @@ oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
 ----
 +
 .. Log in with the root token and verify Parasol secrets are configured at {vault_secrets_url}[{vault_secrets_url}^]
+
+=== Section 2 (in addition to Section 1)
+
+. Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}` — confirm the catalog loads
+. Verify the Parasol system and its components are registered in the catalog
+. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development_ template)
+. Open TPA at {tpa_url}[{tpa_url}^] — the *SBOMs* tab will be empty at this point, which is expected since no pipelines have run yet. Instead, check the *Vulnerabilities* tab to confirm vulnerability data has been downloaded, and the *Importers* tab to confirm the `osv-github` importer is running (> 0% progress)
 . Open GitLab at {gitlab_url}[{gitlab_url}^] and log in as `{dev_user}` / `{password}` — confirm repository access
 
 === Section 3 (in addition to Sections 1-2)
