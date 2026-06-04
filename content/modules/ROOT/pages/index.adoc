@@ -10,6 +10,11 @@ This demonstration shows why Red Hat OpenShift is more than container management
 * xref:01-overview.adoc[Overview and presenter preparation]
 * xref:02-details.adoc[Environment details and setup]
 
+[WARNING]
+====
+Refer to the xref:02-details.adoc#_pre_demo_checklist[Pre-Demo Checklist] if you plan to reboot or hibernate your cluster. It contains important information about restoring application health for demo applications enrolled in Service Mesh.
+====
+
 **Section 1: Foundational application platform**
 
 Establish the core value of OpenShift as an application platform. Application modernization, standardized development with DevSpaces, Quarkus dev mode, Tekton pipelines with quality enforcement, Argo CD delivery, and platform operations with Service Mesh and observability.
