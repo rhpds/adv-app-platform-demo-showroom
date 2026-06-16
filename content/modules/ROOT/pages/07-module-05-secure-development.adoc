@@ -138,7 +138,6 @@ Security teams have access to a complete audit trail, including what went in to 
 * Show the pipeline run triggered by the push to the feature branch
 * "The developer sees the pipeline status right here in Developer Hub. No need to switch to the OpenShift console. Developer Hub is the single pane of glass."
 
-// TODO: Add screenshot of Developer Hub showing the secure pipeline running
 image::devhub-secure-pipeline.png[Developer Hub CI view showing the secure build pipeline with ACS scan, SBOM generation and Tekton Chains (running in the background),link=self,window=blank,align="center",width=700,title="Secure build pipeline viewed in Developer Hub"]
 
 . Expand the pipeline and Walk through each stage as it appears in the Developer Hub pipeline view:

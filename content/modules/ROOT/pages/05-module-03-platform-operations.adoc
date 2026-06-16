@@ -120,7 +120,8 @@ oc run load-generator --image=quay.io/curl/curl:latest \
 ----
 
 . From the **Overview** page, click the **three-dot menu** (kebab menu) next to `parasol-insurance-prod` and select **Graph**:
-* On the Display menu, enable Traffic Animation, and set the refresh rate to 10 seconds at the upper right.
+* On the Display menu, enable *Traffic Animation* and *Waypoint Proxies*, and set the refresh rate to 10 seconds at the upper right.
+* In the graph dropdown select the *Workload graph*
 * Show the service graph with animated traffic flow between the Parasol services
 * "This is a live traffic graph. The lines represent actual requests flowing between services right now. The animation shows the direction and volume of traffic."
 * Point out the service nodes and the connections between them
@@ -132,7 +133,7 @@ image::ossm-console-traffic.png[OpenShift Service Mesh traffic,link=self,window=
 * Point out request success rate indicators on the connections
 * "At a glance, the platform engineer can see that both services are healthy and traffic is flowing normally. If a service starts failing, the node turns yellow or red immediately. No need to dig through logs to discover a problem."
 
-. Click on a service node to show **detailed metrics**:
+. Click on a service node (circular nodes) to show **detailed metrics**:
 * Show the side panel with service details
 * Point out key metrics (not all are shown all the time)
 ** **Requests per second** -- current throughput
