@@ -178,7 +178,7 @@ A: "Yes. Any team can register their APIs in the catalog. This creates a self-se
 
 === Know
 
-_Beyond discovery, RHDH provides self-service capabilities that allow developers to provision development environments, request infrastructure, and more, by using "golden path" templates. Instead of filing tickets and waiting for operations teams, developers use templates that the platform team has pre-approved. The "Parasol Insurance Secured Development" template creates a feature branch on the source repository and registers a new catalog component representing the developer's branch -- all the developer needs to provide is a branch name._
+_Beyond discovery, RHDH provides self-service capabilities that allow developers to provision development environments, request infrastructure, and more, by using "golden path" templates. Instead of filing tickets and waiting for operations teams, developers use templates that the platform team has pre-approved. The "Onboarding features on Parasol Insurance application" template creates a feature branch on the source repository and registers a new catalog component representing the developer's branch -- all the developer needs to provide is a branch name._
 
 **Business challenge:**
 
@@ -190,7 +190,7 @@ _Beyond discovery, RHDH provides self-service capabilities that allow developers
 
 **Value proposition:**
 
-RHDH templates provide golden path self-service for developers. The "Parasol Insurance Secured Development" template creates a feature branch on the source repository and provisions a complete development environment: a dedicated namespace, CI/CD pipeline wired to the branch, and a catalog component representing the developer's work. The developer only needs to specify a branch name. The new component is automatically registered in the catalog and the developer can open it directly in DevSpaces.
+RHDH templates provide golden path self-service for developers. The "Onboarding features on Parasol Insurance application" template creates a feature branch on the source repository and provisions a complete development environment: a dedicated namespace, CI/CD pipeline wired to the branch, and a catalog component representing the developer's work. The developer only needs to specify a branch name. The new component is automatically registered in the catalog and the developer can open it directly in DevSpaces.
 
 === Show
 
@@ -206,7 +206,7 @@ RHDH templates provide golden path self-service for developers. The "Parasol Ins
 * Point out that these are pre-approved golden path templates maintained by the platform team
 * "Each template includes everything a developer needs to get started. The platform team defines these golden paths, and the developer consumes them."
 
-. Select the **Parasol Insurance Secured Development** template
+. Select the **Onboarding features on Parasol Insurance application** template
 
 . Walk through the template form:
 * The developer only needs to specify a **branch name** such as `feat1`.
