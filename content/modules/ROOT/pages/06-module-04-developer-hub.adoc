@@ -24,7 +24,7 @@ _Red Hat Developer Hub (RHDH) is the Internal Developer Platform (IDP) for Paras
 
 **Value proposition:**
 
-Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of coding assistants and extensions such as Continue with Model Context Protocol, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
+Developer Hub provides a centralized, searchable catalog of all applications, components, APIs, and documentation. Developer Lightspeed integrates AI directly into the IDP (not the IDE -- that is the job of coding assistants and extensions such as Roo Code with Model Context Protocol, which we saw in Section 1). Lightspeed combines product documentation, developer documentation, and the software catalog to answer developer questions in natural language, speeding up development and reducing onboarding friction. The platform engineer configures Lightspeed to use the IT-approved model, so developers get AI assistance within governance guardrails.
 
 === Show
 
@@ -43,7 +43,7 @@ Developer Hub provides a centralized, searchable catalog of all applications, co
 image::rhdh-home-interface.png[Red Hat Developer Hub home screen showing the left sidebar navigation with Catalog and Lightspeed and other menu items,link=self,window=blank,align="center",width=700,title="Developer Hub: the single pane of glass for developers"]
 
 . Open **Lightspeed** using the floating icon in the bottom-right of the UI:
-* "This is Developer Lightspeed -- AI-assisted development built right into the developer platform. Unlike Continue, which is an AI assistant in the IDE for writing code, Lightspeed operates at the platform level. It combines product documentation, developer docs, and the software catalog to answer questions about the projects developers work on."
+* "This is Developer Lightspeed -- AI-assisted development built right into the developer platform. Unlike Roo Code, which is an AI assistant in the IDE for writing code, Lightspeed operates at the platform level. It combines product documentation, developer docs, and the software catalog to answer questions about the projects developers work on."
 . Use the three dots in the top-right of the Lightspeed window to select the full screen view.
 . Enter a natural language prompt in Lightspeed:
 +
@@ -57,9 +57,9 @@ Tell me about the parasol-insurance-api API in the catalog, and write a sample s
 
 [WARNING]
 ====
-LLMs are non-deterministic — responses vary between attempts. The demo environment uses a relatively small model (`qwen3-14b`). Before issuing prompts:
+LLMs are non-deterministic — responses vary between attempts. The demo environment uses `qwen3-235b`. Before issuing prompts:
 
-* Ensure `qwen3-14b` is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results.
+* Ensure `qwen3-235b` is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results.
 * If Lightspeed reports that an API (e.g. `parasol-insurance-api`) does not exist, try asking it to "list all APIs in the catalog" first, then re-ask your original question. This helps the model discover catalog context.
 * As better models become available for the demo, these workarounds will no longer be needed.
 ====
@@ -92,11 +92,11 @@ A: "Developer Lightspeed supports multiple model backends. The platform engineer
 Q: "How does Lightspeed know about our applications?"::
 A: "Lightspeed uses the catalog data, registered APIs, and docs-as-code content to answer questions. It has context about the relationships between components, the API contracts, and the documentation. As the catalog grows, Lightspeed becomes more useful."
 
-Q: "Is this the same as the Continue extension we saw in Section 1?"::
-A: "No. Continue is an AI assistant in the IDE for writing and fixing code. Lightspeed operates at the platform level in Developer Hub, answering questions about the application landscape, APIs, and documentation. They complement each other: Lightspeed for understanding the platform, Continue for writing code."
+Q: "Is this the same as the Roo Code extension we saw in Section 1?"::
+A: "No. Roo Code is an AI assistant in the IDE for writing and fixing code. Lightspeed operates at the platform level in Developer Hub, answering questions about the application landscape, APIs, and documentation. They complement each other: Lightspeed for understanding the platform, Roo Code for writing code."
 
 Q: "Can I access lightspeed context from elsewhere like my IDE?"::
-A: "Yes. Lightspeed includes MCP servers that can expose context from the catalog and tech docs to any system that supports the MCP protocol, including many IDE extensions like Continue, Roo Code, Claude Code, and many more. This allows you to get the same contextual information in your chosen interface as you do in the Developer Hub interface."
+A: "Yes. Lightspeed includes MCP servers that can expose context from the catalog and tech docs to any system that supports the MCP protocol, including many IDE extensions like Roo Code, Claude Code, and many more. This allows you to get the same contextual information in your chosen interface as you do in the Developer Hub interface."
 
 '''
 
