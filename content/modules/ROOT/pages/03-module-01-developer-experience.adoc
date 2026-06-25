@@ -436,7 +436,7 @@ The two required labels (`app.kubernetes.io/component: getting-started-samples` 
 
 * Navigate to the **DevSpaces dashboard** at {devspaces_url}[{devspaces_url}^] and click **Create Workspace**
 * The new **"Private AI Coding Assistant with Ollama"** sample now appears in the list of available workspace templates
-* "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
+* "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant - based on the Continue extension - running Ollama inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
 +
 image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample added,link=self,window=blank,align="center",width=700,title="DevSpaces console showing the new sample"]
 
