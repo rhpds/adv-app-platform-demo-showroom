@@ -134,13 +134,12 @@ image::ocp-pipeline-sonar-report.png[Sonaqube report,link=self,window=blank,alig
 
 . Switch back to **DevSpaces** where the developer's workspace is still open
 
-// TODO: Add screenshot of the Continue AI assistant panel opened in the DevSpaces sidebar
-image::devspaces-continue-panel.png[DevSpaces IDE with the Continue AI assistant panel open in the left sidebar showing the chat interface,link=self,window=blank,align="center",width=700,title="Continue AI assistant pre-configured by the platform engineer"]
+image::devspaces-roo-panel.png[DevSpaces IDE with the Roo Code AI assistant panel open in the left sidebar showing the chat interface,link=self,window=blank,align="center",width=700,title="Roo Code AI assistant pre-configured by the platform engineer"]
 
-. Open the **Continue** AI assistant panel on the left sidebar:
-* "This is where the platform's AI developer capabilities come in. The Continue extension has been pre-configured in the devfile by the platform engineer to use the IT-approved model -- in this case, a model hosted on the Red Hat demo platform through OpenShift AI. The developer does not need to configure API keys, choose a model, or worry about data governance. The platform engineer set it up as part of the golden path."
+. Open the **Roo Code** AI assistant panel on the left sidebar:
+* "This is where the platform's AI developer capabilities come in. The Roo Code extension has been pre-configured by the platform engineer to use the IT-approved model -- in this case, a model hosted on the Red Hat demo platform through OpenShift AI. The developer does not need to configure API keys, choose a model, or worry about data governance. The platform engineer set it up as part of the golden path."
 
-. In the Continue chat, enter a prompt:
+. In the Roo Code chat, enter a prompt:
 +
 [source,text,role="copypaste"]
 ----
@@ -168,11 +167,10 @@ The assistant should give you the code in the response, that you can copy/paste 
 +
 * Watch as the LLM analyzes the code and generates fixes
 * The AI identifies both issues: `System.out.println` should use proper logging, and the empty catch block should be removed
-* Review the diff that Continue presents -- it shows exactly what changed
-* Accept the changes in the chat by clicking the green checkmark to _Accept All_ (or delete the old code and insert the new code from the assistant).
+* Roo might prompt you to accept multiple changes, showing a diff as it goes -- go ahead and allow them by clicking *Save*
 * "The AI understood the Sonarqube findings and fixed the code smells. The developer can inspect the diff to verify the changes before accepting them. This is AI-assisted development governed by the platform."
 +
-image::devspaces-continue-diff.png[Continue AI assistant showing a diff view with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
+image::devspaces-roo-diff.png[Roo Code AI assistant after making fixes. The developer used the Source view to review the final diff with the code fixes: System.out.println replaced with Log.info and empty catch block removed,link=self,window=blank,align="center",width=700,title="AI-generated code fixes with diff view"]
 
 . Verify the corrected code looks like this (for reference, or in case the LLM responds differently):
 
@@ -228,7 +226,7 @@ public class ClaimsStatsResource {
 +
 [NOTE]
 ====
-**Presenter tip:** Depending on the audience, you fan walk through the diff briefly. Point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API -- this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. And the empty try-catch was removed entirely -- if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it. Emphasize that the AI understood the context and made the right fixes without the developer needing to look up the Quarkus logging API. The field-level injection was also moved to constructor injection, which is a best practice for testability and clearer dependencies. The platform's guardrails (Sonarqube) and AI assistance (Continue) worked together to enforce and achieve code quality.
+**Presenter tip:** Depending on the audience, you fan walk through the diff briefly. Point out that `System.out.println` was replaced with `Log.info` from the Quarkus logging API -- this gives structured logging with timestamps, log levels, and integration with the platform's observability stack. And the empty try-catch was removed entirely -- if something goes wrong, the exception propagates and the platform's error handling surfaces it properly instead of hiding it. Emphasize that the AI understood the context and made the right fixes without the developer needing to look up the Quarkus logging API. The field-level injection was also moved to constructor injection, which is a best practice for testability and clearer dependencies. The platform's guardrails (Sonarqube) and AI assistance (Roo Code) worked together to enforce and achieve code quality.
 ====
 
 . Commit and push the fix using the **Source Control** view as before.
@@ -252,7 +250,7 @@ image::ocp-pipeline-passed.png[OpenShift web console showing all pipeline stages
 * The platform caught the code smells automatically. No human reviewer needed to flag them.
 * The Sonarqube report URL was available directly in the pipeline log
 * The failures were specific and actionable: Sonarqube told the developer exactly what to fix and why
-* The developer used AI (Continue extension) to fix the issues instead of manually editing code
+* The developer used AI (Roo Code extension) to fix the issues instead of manually editing code
 * The AI was pre-configured by the platform engineer in the devfile -- the developer did not set it up
 * The fix followed the same workflow: AI-assisted code change, commit and push from the IDE, automatic pipeline run
 * The second pipeline run passed all stages, including the previously failed quality gate
@@ -390,7 +388,7 @@ In this module, you saw how the platform's CI/CD pipeline enforces quality and a
 
 . **Automated pipeline triggering** — A commit and push from DevSpaces triggered a full Tekton pipeline with Clone, Sonarqube SAST, Build and Push, and Re-rollout stages, visible in the OpenShift web console
 . **Quality enforcement** — The Sonarqube quality gate caught code smells (improper logging and empty exception handling), with a direct link to the Sonarqube report in the pipeline log
-. **AI-assisted remediation** — The developer used the Continue AI assistant (pre-configured by the platform engineer) to fix the code smells, reviewing the diff before accepting the changes
+. **AI-assisted remediation** — The developer used the Roo Code AI assistant (pre-configured by the platform engineer) to fix the code smells, reviewing the diff before accepting the changes
 . **GitOps delivery** — Argo CD managed the deployment declaratively, with the sync process visible in the Argo CD console
 
 === Setting up Module 3

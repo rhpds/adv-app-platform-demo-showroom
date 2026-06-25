@@ -121,10 +121,10 @@ These prompts only appear the first time a workspace is created. Subsequent laun
 ====
 +
 .. *"Authorize access to OpenShift from DevSpaces?"* -> click **Allow selected permissions**. Dev Spaces needs to interact with OpenShift to create and manage workspace infrastructure.
-.. *"Do you trust the authors of this repository?"* -> click **Continue**. This allows DevSpaces to initialize the extensions system and run startup scripts defined in the devfile.
+.. *"Do you trust the authors of this repository?"* -> click the button to continue. This allows DevSpaces to initialize the extensions system and run startup scripts defined in the devfile.
 .. *GitLab login screen* -> log in with your developer credentials (`{dev_user}` / `{password}`). This issues an OAuth token allowing Dev Spaces to perform Git operations (clone, push, pull) using your GitLab identity.
 .. *"Do you trust the authors of the files in this workspace?"* -> click **Yes, I trust the authors**. This protects against malicious repository content that could execute in the IDE.
-.. *"Trust publishers and install"* -> click to install the extensions such as the Continue AI assistant. You only need to do this once.
+.. *"Trust publishers and install"* -> click to install the extensions such as the Roo Code AI assistant. You only need to do this once.
 .. Dismiss the lower-right popups about MicroProfile and Red Hat Dependency Analytics by clicking the **X** in the upper right of each popup -- these are not needed during the demo.
 +
 [WARNING]
@@ -141,7 +141,7 @@ If you miss the "trust the authors" prompt, DevSpaces will open in **Restricted 
 . Once the workspace loads, show the fully configured browser-based IDE:
 * File explorer with the complete project structure
 * Terminal with all CLI tools available (`oc`, `mvn`, etc)
-* Extensions pre-installed (Java, Quarkus, YAML, Continue AI code assistant, etc)
+* Extensions pre-installed (Java, Quarkus, YAML, Roo Code AI assistant, etc)
 * Git integration connected to the repository
 +
 image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded and configured,link=self,window=blank,align="center",width=700,title="Fully configured cloud development workspace"]
@@ -436,7 +436,7 @@ The two required labels (`app.kubernetes.io/component: getting-started-samples` 
 
 * Navigate to the **DevSpaces dashboard** at {devspaces_url}[{devspaces_url}^] and click **Create Workspace**
 * The new **"Private AI Coding Assistant with Ollama"** sample now appears in the list of available workspace templates
-* "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama and Continue inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
+* "The platform engineer just published a new workspace sample that gives any developer a fully private AI coding assistant running Ollama inside DevSpaces. No code leaves the cluster. Developers see this as a one-click option when creating a new workspace. This is how the platform team curates the developer experience."
 +
 image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample added,link=self,window=blank,align="center",width=700,title="DevSpaces console showing the new sample"]
 
@@ -446,7 +446,7 @@ image::devspaces-new-stack-devfile.png[DevSpaces console showing the new sample 
 ====
 This workspace takes several minutes to start as it downloads open-source AI models (`Llama3` and `Starcoder2`) locally into the DevSpaces workspace during startup. This is expected — the models run entirely within the workspace and no data is sent to external services.
 ====
-* Once the workspace opens, show that the Continue AI assistant extension is pre-configured to use the local Ollama models
+* Once the workspace opens, show that the AI assistant extension is pre-configured to use the local Ollama models
 * "A developer can now get AI-assisted coding — code generation, documentation, analysis — all running privately within the cluster. The platform engineer published this as a one-click sample, and any developer on the team can spin it up."
 
 **What they should notice:**
