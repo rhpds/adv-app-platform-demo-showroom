@@ -30,6 +30,7 @@
 ** xref:06-module-04-developer-hub.adoc#part-1[Part 1: Developer Hub and Developer Lightspeed]
 ** xref:06-module-04-developer-hub.adoc#part-2[Part 2: Exploring the RHDH catalog]
 ** xref:06-module-04-developer-hub.adoc#part-3[Part 3: Self-service and environment provisioning]
+** xref:06-module-04-developer-hub.adoc#part-4[Part 4: Maintaining the golden path]
 ** xref:06-module-04-developer-hub.adoc#summary[Module 4 summary]
 
 * xref:07-module-05-secure-development.adoc[Module 5: Secure development workflow]

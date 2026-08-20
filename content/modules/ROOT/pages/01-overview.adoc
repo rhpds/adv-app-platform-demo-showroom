@@ -45,13 +45,13 @@ _Move from "good to great." Show the capabilities that differentiate a mature ap
 
 Fast forward: Parasol deploys an internal developer portal using Red Hat Developer Hub (RHDH). The Parasol application and its components are now registered in the Red Hat Developer Hub catalog, and a secure software supply chain is in place.
 
-. **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation for Parasol's software architectures. Developers ask Lightspeed questions about applications and APIs. Self-service templates let developers provision complete development environments and scaffold new components without tickets.
+. **Developer Hub and catalog** — Developer Lightspeed accelerates developer productivity with AI assistance. Developers explore the RHDH catalog via Lightspeed to discover components, APIs, and documentation for Parasol's software architectures. Developers ask Lightspeed questions about applications and APIs. Self-service templates let developers provision complete development environments and scaffold new components without tickets. When the platform engineer updates a golden-path template — for example a Quarkus security patch — Developer Hub opens merge requests on every application created from that template.
 
 . **Secure development workflow** — Developers work in DevSpaces with the Dependency Analytics plugin, catching and fixing a dependency vulnerability in real time. A merge request triggers the secure build pipeline: ACS scanning, image signing via Trusted Artifact Signer (TAS), SBOM generation, and SLSA attestation via Tekton Chains.
 
 . **Trusted software supply chain** — The developer creates a merge request to the production configuration. The platform engineer merges it. SBOMs and associated vulnerabilities are managed through the Trusted Profile Analyzer (TPA). The Developer Hub topology provides a complete view of all components.
 
-**Platform capabilities demonstrated:** RHDH catalog, RHDH templating, RHDH self-service, Developer Lightspeed, Dependency Analytics, ACS, TAS (signing and admission control), Tekton Chains, TPA
+**Platform capabilities demonstrated:** RHDH catalog, RHDH templating, RHDH self-service, RHDH template lifecycle, Developer Lightspeed, Dependency Analytics, ACS, TAS (signing and admission control), Tekton Chains, TPA
 
 === Section 3: Intelligent applications (Module 7)
 
@@ -111,7 +111,7 @@ Red Hat OpenShift as a complete application platform addresses these challenges 
 
 **Advanced developer services (Section 2)**
 
-* **Developer Hub** (RHDH) provides a single pane of glass: centralized catalog, golden path templates, pipeline status, deployment status, and container images
+* **Developer Hub** (RHDH) provides a single pane of glass: centralized catalog, golden path templates, template lifecycle merge requests, pipeline status, deployment status, and container images
 * **Developer Lightspeed** brings AI-assisted development and migration guidance into the IDE
 * **Dependency Analytics** scans dependencies for vulnerabilities in real time during development
 * **Secure build pipeline** integrates ACS scanning, image signing, SBOM generation, and SLSA attestation

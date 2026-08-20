@@ -235,7 +235,7 @@ oc get secret vault-token -n vault -o jsonpath='\{.data.token}' | base64 -d
 
 . Open Red Hat Developer Hub at {rhdh_url}[{rhdh_url}^] and log in as `{dev_user}` / `{password}` — confirm the catalog loads
 . Verify the Parasol system and its components are registered in the catalog
-. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development_ template)
+. Confirm software templates are available in the "Create" section (look for the _Parasol Insurance Secured Development_ template and the _Quarkus Application_ template). Do not pre-bump `backstage.io/template-version` on Quarkus Application — Module 4 Part 4 needs Developer Hub to observe a live version increase.
 . Open TPA at {tpa_url}[{tpa_url}^] — the *SBOMs* tab will be empty at this point, which is expected since no pipelines have run yet. Instead, check the *Vulnerabilities* tab to confirm vulnerability data has been downloaded, and the *Importers* tab to confirm the `osv-github` importer is running (> 0% progress)
 . Open GitLab at {gitlab_url}[{gitlab_url}^] and log in as `{dev_user}` / `{password}` — confirm repository access
 

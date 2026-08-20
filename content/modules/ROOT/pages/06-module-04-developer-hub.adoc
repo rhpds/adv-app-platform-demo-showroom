@@ -257,6 +257,168 @@ A: "Yes. Templates are the golden path. They include the organization's approved
 Q: "What happens to the environment when the feature is done?"::
 A: "The development environment can be cleaned up through the catalog. The platform team can also configure automatic cleanup policies. The branch and its associated resources are removed when no longer needed."
 
+'''
+
+[#part-4]
+== Part 4 — Maintaining the golden path (platform engineer persona)
+
+=== Know
+
+_Part 3 showed a developer consuming a golden path: one field, a feature branch, a provisioned environment. That is day one. Day two is harder. A golden path that nobody updates becomes tomorrow's legacy stack. When Quarkus ships a security fix, Parasol cannot open a ticket against every team that scaffolded a service last quarter. The platform engineer updates the Software Template once. Developer Hub finds every application created from that template and opens a reviewable merge request._
+
+**Business challenge:**
+
+* Golden-path templates drift from the applications created from them the moment a developer pushes the first commit
+* A CVE in a shared runtime (Quarkus, a base image, a pipeline task) becomes a portfolio-wide scramble: chat messages, tickets, and inconsistent upgrades
+* Silently overwriting application repositories would destroy legitimate project customizations and break trust in the platform
+* Platform engineers have no inventory of "which apps came from which template" outside spreadsheets and tribal knowledge
+
+**Current state at Parasol:**
+
+* The **Quarkus Application** template is the blessed starting point for new Java services: source repo, GitOps repo, pipeline, and catalog registration in one Create flow
+* Developers already customize those repos. The platform must propose updates, not overwrite them.
+* Until Developer Hub tracks `scaffoldedFrom` relationships, the platform team cannot answer "who is still on the vulnerable Quarkus BOM?" without a hunt
+
+**Value proposition:**
+
+Software Templates in Developer Hub are versioned, Git-managed artifacts. Each scaffolded application records the template it came from. When the platform engineer bumps `backstage.io/template-version` and changes the skeleton (for example `quarkus.platform.version` in `pom.xml`), the `scaffolder-relation-processor` plugin diffs the new skeleton against every downstream source repository and opens a GitLab merge request. The developer reviews and merges. The golden path stays golden without a ticket storm, and without the platform team force-pushing into product code.
+
+=== Show
+
+[NOTE]
+====
+**Presenter tip:** If time is tight, skip this part. Parts 1–3 already close the Module 5 handoff: the Parasol feature branch is open in DevSpaces. Part 4 is the platform-engineer coda — what happens when the golden path itself changes.
+====
+
+**What I say:**
+
+"We just watched a developer consume a golden path. That is half the story. Someone has to keep that path current. Suppose Quarkus ships a security fix tomorrow. Every new service should start on the patched BOM — and every service we already created from this template should get a reviewable change, not a chat thread and a ticket queue.
+
+Let me switch hats. I am the platform engineer. Parasol publishes a **Quarkus Application** template for brand-new services — different from the feature-branch template we just used on Parasol Insurance. I will create one small service from it, then update the template the way we would for a CVE, and show you the merge request Developer Hub opens on that service."
+
+**What I do:**
+
+. Stay in **Developer Hub** at {rhdh_url}[{rhdh_url}^]. You can stay logged in as `{dev_user}` for the Create step (developers scaffold apps). Keep `{pe_user}` ready in the other browser for GitLab.
++
+[NOTE]
+====
+**Presenter tip:** Confirm **Quarkus Application** appears under **Create**. Do **not** pre-bump `backstage.io/template-version` before the demo. The plugin only opens a merge request when it sees the version *increase from a value it already cached*. If you bump before Developer Hub has processed `1.0.0`, the first version it sees becomes the baseline and nothing happens, silently.
+====
+
+. Click the **+** (plus) button and select the **Quarkus Application** template.
++
+image::rhdh-lifecycle-create-quarkus.png[Developer Hub self-service wizard for creating a Quarkus Application: Application Name, Owner, and Description,link=self,window=blank,align="center",width=700,title="Create a new service from the Quarkus Application golden path"]
+
+. Fill in the form:
+* **Application Name:** `hello-quarkus` (if that name already exists, use `hello-quarkus-2` or similar)
+* **Owner:** select `group:default/developers`
+* **Description:** optional
+* **Image Organization:** leave as `parasol`
+. Click **Create** and wait for the scaffolder task to finish.
+* Fetch source skeleton, publish source to GitLab (`parasol/hello-quarkus`)
+* Fetch GitOps manifests, publish to GitLab (`parasol/hello-quarkus-gitops`)
+* Create Argo CD resources, register the component in the catalog
+* "That is a new service, not a feature branch on Parasol. Source, GitOps, and catalog registration — the same golden-path idea, for greenfield work."
++
+image::rhdh-lifecycle-scaffolder-run.png[Completed scaffolder run showing source repository, GitOps repository, and Open in catalog links,link=self,window=blank,align="center",width=700,title="Template run: source, GitOps, and catalog in one pass"]
++
+[NOTE]
+====
+**Presenter tip:** Do not wait for the Tekton pipeline. The first git push can miss the webhook (the listener is registered after Argo CD syncs the build chart). Pipeline, ACS, and SBOM are Module 5. This part only needs a catalog entity that points back at the template.
+====
+
+. Click **Open in catalog** on the new `hello-quarkus` component:
+* On **Overview**, point out ownership and the link back to the source repository
+* "The catalog has the new service. The pointer back to the template lives in Git — that is what the lifecycle plugin reads."
+
+. Switch to the **platform engineer** browser. Open GitLab at {gitlab_url}[{gitlab_url}^] and log in as `{pe_user}` / `{password}`
+
+. Open `parasol/hello-quarkus` and show `catalog-info.yaml`. Point out `spec.scaffoldedFrom: template:default/quarkus-app`.
+* "Developer Hub ingested that field from Git. That is how it knows this application was born from the Quarkus Application template, and how a template update becomes a fleet operation instead of a scavenger hunt."
+
+. Open the **`rhdh/rhdh-templates`** project — this is the Git-managed Software Template library, imported at cluster bootstrap. Use the Web IDE or the file editor:
++
+* Edit `templates/quarkus-app/skeleton/pom.xml` and bump the Quarkus platform version:
++
+[source,xml,role="copypaste"]
+----
+<!-- was: 3.15.1 -->
+<quarkus.platform.version>3.15.7</quarkus.platform.version>
+----
++
+* Edit `templates/quarkus-app/template.yaml` and bump the template version:
++
+[source,yaml,role="copypaste"]
+----
+metadata:
+  annotations:
+    backstage.io/template-version: "1.1.0"  # was "1.0.0"
+----
++
+* Commit both changes to `main`.
+* "One commit in the template repo. I did not clone twenty application repos. I did not file twenty tickets. The catalog already knows who consumed this path."
+
+. Use the catalog refresh window (about five minutes) as talk time:
+* A CVE in the Quarkus BOM is a portfolio problem. Spreadsheets and hope do not scale.
+* Developer Hub proposes a merge request. The application team still owns the merge. Customizations stay unless they conflict.
+* This is governance, not a takeover: the platform engineer maintains the path; developers maintain their product code.
++
+[NOTE]
+====
+**Presenter tip:** If no merge request appears after a refresh, bump the version once more (`1.1.0` → `1.1.1`) and commit again. The plugin must observe a live increase from a version it already cached. A log line `events backend not found` right after the plugin loads is expected and harmless — delivery stays in-process.
+====
+
+. In Developer Hub, open the notification bell in the header. The entity owner gets a notification with a link to the merge request.
++
+image::rhdh-lifecycle-notification.png[Developer Hub unread notifications showing a template update is ready, with a link to the GitLab merge request,link=self,window=blank,align="center",width=700,title="Template update notification in Developer Hub"]
+
+. In GitLab, open **Merge requests** on `parasol/hello-quarkus`. You should see a request named along the lines of `hello-quarkus/template-upgrade-v1.1.0`, authored by the scaffolder relation processor, with the `pom.xml` Quarkus version diff.
++
+image::rhdh-lifecycle-template-upgrade-mr.png[GitLab merge request opened by scaffolder-relation-processor showing the quarkus.platform.version bump in pom.xml,link=self,window=blank,align="center",width=700,title="Template upgrade merge request on the scaffolded application"]
++
+* "The developer reviews this the same way they review any other change. Merge it, and the golden path has moved. Decline it, and the platform team sees who is carrying the old BOM on purpose."
+
+**What they should notice:**
+
+* Creating from **Quarkus Application** is a different golden path than onboarding a Parasol feature branch — new service, not a branch on an existing app
+* The scaffolded component records `scaffoldedFrom`, so Developer Hub can find every consumer of the template
+* The platform engineer edited Git — `rhdh/rhdh-templates` — not a live ConfigMap on the cluster
+* Notifications land in Developer Hub, next to the catalog, not in a side channel the developer might miss
+* The update arrives as a merge request, not a force-push. The application team reviews it.
+
+**Business value callout:**
+
+"When the next Quarkus CVE lands, Parasol does not start with a spreadsheet of application owners. The platform engineer bumps the template. Every service born from that golden path gets a merge request. Teams that have moved on review a diff. Teams that have not still get the offer. That is what it means to own a path, not just to publish a starter on day one."
+
+**If asked:**
+
+Q: "How does Developer Hub know which repositories to update?"::
+A: "Each scaffolded `catalog-info.yaml` sets `scaffoldedFrom: template:default/quarkus-app`. The relation-processor plugin walks those catalog relationships, resolves each entity's source repository, diffs the current skeleton against the repo, and opens the merge request. No extra inventory."
+
+Q: "Can this overwrite a team's customizations?"::
+A: "The default plugin compares the *current* skeleton to the *current* repo. If a team has edited files that also live in the skeleton — `pom.xml` is the usual example — those edits show up in the merge request next to the real template change. Always review before merging. Unresolved scaffolder placeholders and stripped Jinja conditionals can also appear. That is why this is a merge request, not an auto-merge."
+
+Q: "The merge request is noisy. Can we send only the lines that changed in the template?"::
+A: "Yes — that is the scoped-diff alternative, closer to how tools like `copier` or `cruft` update projects. The bundled plugin has no 'diff only what changed between two template versions' mode yet; it always diffs the live skeleton against the live repo. For a demo, two scripts in this showroom (`content/modules/ROOT/examples/template-lifecycle/`) stand in: `disable-automated-lifecycle.sh` turns off the plugin's own merge requests (and adds Argo CD `ignoreDifferences` so GitOps does not flip the flag back), then `propagate-skeleton-diff.sh` diffs the last two GitLab commits scoped to `templates/quarkus-app/skeleton` and opens a merge request only where that patch applies cleanly."
++
+[source,bash,role="copypaste"]
+----
+./disable-automated-lifecycle.sh              # apply; --dry-run to preview
+./propagate-skeleton-diff.sh                  # open scoped MRs; --dry-run to preview
+----
++
+Copy the scripts from the showroom repo to a machine with `oc` logged into the demo cluster (`git` and `python3` required). This demo uses OIDC, so the propagate script reads `RHDH_TOKEN` from `backend-secret` / `BACKEND_SECRET` unless you export one. The scripts are a demo stand-in, not a production control plane: the same detection, catalog lookup, and merge-request flow already live in the plugin. A production fix is a scoped `diffMode` (or equivalent) on `scaffolder-relation-processor`, not a shell wrapper around `oc`.
++
+image::rhdh-lifecycle-scoped-diff-mr.png[GitLab merge request containing only the pom.xml Quarkus version bump, without unrelated skeleton files,link=self,window=blank,align="center",width=700,title="Scoped diff: only the template change, not a full-repo compare"]
+
+Q: "What if no merge request appears?"::
+A: "Work the layers: confirm the relation-processor plugin loaded in the RHDH backend logs; ignore `events backend not found`; then bump `backstage.io/template-version` *again* so the plugin observes a live increase. If you still see `Received template update event` in the logs but no merge request, the failure is downstream — GitLab token, VCS integration, or a missing `url:` source location on the entity."
+
+Q: "Who is allowed to change the template?"::
+A: "The platform team. `rhdh/rhdh-templates` is Git-managed like any other golden-path artifact. Developers consume Create; they do not edit the skeleton to 'fix' one application."
+
+'''
+
 [#summary]
 == Module 4 summary
 
@@ -267,14 +429,15 @@ In this module, you saw how Red Hat Developer Hub transforms the developer exper
 . **Developer Lightspeed** -- AI-assisted development integrated directly into the IDP, combining product docs, developer docs, and the software catalog to answer developer questions in natural language
 . **Centralized catalog** -- A single source of truth for all applications, components, APIs, and documentation with explicit relationships and docs-as-code
 . **Self-service provisioning** -- Golden path templates allow developers to provision feature branch environments with a single field, with the branch, namespace, pipeline, and catalog component created automatically
+. **Golden path lifecycle** -- When the platform engineer updates a Software Template, Developer Hub opens merge requests on every application created from that template, so a Quarkus security patch becomes a reviewable change instead of a ticket storm
 
 === Setting up Module 5
 
-Our developer has a fully provisioned development environment on their feature branch, open in DevSpaces. In Module 5, we will see how they use the Dependency Analytics plugin to identify an unnecessary dependency and push code through the secure build pipeline.
+Our developer still has a fully provisioned development environment on their Parasol feature branch, open in DevSpaces — that is the Part 3 workspace, not the `hello-quarkus` service from Part 4. If you demonstrated Part 4, switch back to that feature-branch workspace. In Module 5, we will see how they use the Dependency Analytics plugin to identify an unnecessary dependency and push code through the secure build pipeline.
 
 === Presenter transition
 
 [NOTE]
 ====
-**Presenter tip:** The transition to Module 5 should emphasize the shift from setup to development: "Our developer now has a fully provisioned environment on their feature branch. Let's see what happens when they start working on the code and the platform's security tooling catches a dependency issue."
+**Presenter tip:** The transition to Module 5 should emphasize the shift from setup to development: "Our developer now has a fully provisioned environment on their feature branch. Let's see what happens when they start working on the code and the platform's security tooling catches a dependency issue." Leave the `hello-quarkus` template-upgrade story aside; Module 5 continues on Parasol Insurance.
 ====
