@@ -45,9 +45,7 @@ image::rhdh-home-interface.png[Red Hat Developer Hub home screen showing the lef
 . Open **Lightspeed** using the floating icon in the bottom-right of the UI:
 * "This is Developer Lightspeed -- AI-assisted development built right into the developer platform. Unlike Roo Code, which is an AI assistant in the IDE for writing code, Lightspeed operates at the platform level. It combines product documentation, developer docs, and the software catalog to answer questions about the projects developers work on."
 . Use the three dots in the top-right of the Lightspeed window to select the full screen view.
-. Confirm that `qwen3-235b` is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results for this demo.
-+
-image::rhdh-lightspeed-model-selection.png[Lightspeed model selection drop-down showing qwen3-235b selected,link=self,window=blank,align="center",width=700,title="Select the qwen3-235b model before issuing prompts"]
+. Confirm that `qwen3-235b-a22b` is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results for this demo.
 +
 [NOTE]
 ====
