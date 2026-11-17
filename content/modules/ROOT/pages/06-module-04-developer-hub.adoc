@@ -47,6 +47,8 @@ image::rhdh-home-interface.png[Red Hat Developer Hub home screen showing the lef
 . Use the three dots in the top-right of the Lightspeed window to select the full screen view.
 . Confirm that `qwen3-235b-a22b` is selected in the model selection drop-down (upper right of the Lightspeed interface). Other models may be listed but will not produce meaningful results for this demo.
 +
+image::rhdh-lightspeed-model-selection.png[Lightspeed model selection drop-down,link=self,window=blank,align="center",width=700,title="Select the model before issuing prompts"]
++
 [NOTE]
 ====
 LLMs are non-deterministic — responses vary between attempts. If Lightspeed reports that an API (e.g. `parasol-insurance-api`) does not exist, try asking it to "list all APIs in the catalog" first, then re-ask your original question. This helps the model discover catalog context. As better models become available for the demo, these workarounds will no longer be needed.
